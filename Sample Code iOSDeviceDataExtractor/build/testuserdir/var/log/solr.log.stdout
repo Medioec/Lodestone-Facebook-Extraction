@@ -1,0 +1,800 @@
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SOLR_PORT=8983 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set STOP_PORT=8079 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "Windows_NT" == "Windows_NT" setlocal enabledelayedexpansion enableextensions 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "PASS_TO_RUN_EXAMPLE=" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Determine top-level Solr directory 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SDIR=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\bin\ 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "\" == "\" set SDIR=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\bin 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SOLR_TIP=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\bin\.. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>pushd E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\bin\.. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SOLR_TIP=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>popd
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Used to report errors before exiting the script 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SCRIPT_ERROR= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set NO_USER_PROMPT=0 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Allow user to import vars from an include file 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM vars set in the include file can be overridden with 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM command line args 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "" == "" set "SOLR_INCLUDE=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\bin\autopsy-solr.in.cmd" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF EXIST "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\bin\autopsy-solr.in.cmd" CALL "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\bin\autopsy-solr.in.cmd" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Settings here will override settings in existing env vars or in bin/solr.  The default shipped state 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM of this file is completely commented. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM By default the script will use JAVA_HOME to determine which java 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM to use, but you can set a specific path for Solr to use without 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM affecting other Java applications on your server/workstation. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_JAVA_HOME= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Increase Java Min/Max Heap as needed to support your indexing / query needs 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_JAVA_MEM=-Xms512m -Xmx512m 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Configure verbose GC logging: 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM For Java 8: if this is set, additional params will be added to specify the log file & rotation 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM For Java 9 or higher: GC_LOG_OPTS is currently not supported. If you set it, the startup script will exit with failure. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_LOG_OPTS=-verbose:gc -XX:+PrintHeapAtGC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Various GC settings have shown to work well for a number of common Solr workloads. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM See solr.cmd GC_TUNE for the default list. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE=-XX:SurvivorRatio=4 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:TargetSurvivorRatio=90 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:MaxTenuringThreshold=8 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:+UseConcMarkSweepGC 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:ConcGCThreads=4 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:ParallelGCThreads=4 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:+CMSScavengeBeforeRemark 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:PretenureSizeThreshold=64m 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:+UseCMSInitiatingOccupancyOnly 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:CMSInitiatingOccupancyFraction=50 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:CMSMaxAbortablePrecleanTime=6000 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:+CMSParallelRemarkEnabled 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:+ParallelRefProcEnabled 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set GC_TUNE= -XX:-OmitStackTraceInFastThrow    etc. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Set the ZooKeeper connection string if using an external ZooKeeper ensemble 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM e.g. host1:2181,host2:2181/chroot 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Leave empty if not using SolrCloud 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set ZK_HOST= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Set the ZooKeeper client timeout (for SolrCloud mode) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set ZK_CLIENT_TIMEOUT=15000 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM By default the start script uses "localhost"; override the hostname here 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM for production SolrCloud environments to control the hostname exposed to cluster state 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_HOST=192.168.1.1 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM By default Solr will try to connect to Zookeeper with 30 seconds in timeout; override the timeout if needed 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_WAIT_FOR_ZK=30 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM By default the start script uses UTC; override the timezone if needed 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_TIMEZONE=UTC 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Set to true to activate the JMX RMI connector to allow remote JMX client applications 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM to monitor the JVM hosting Solr; set to "false" to disable that behavior 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM (false is recommended in production environments) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set ENABLE_REMOTE_JMX_OPTS=false 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM The script will use SOLR_PORT+10000 for the RMI_PORT or you can set it here 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set RMI_PORT=18983 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Anything you add to the SOLR_OPTS variable will be included in the java 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM start command line as-is, in ADDITION to other options. If you specify the 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM -a option on start script, those options will be appended as well. Examples: 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SOLR_OPTS= -Dbootstrap_confdir=../solr/configsets/AutopsyConfig/conf -Dcollection.configName=AutopsyConfig -Dsolr.default.confdir=../solr/configsets/AutopsyConfig/conf  
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Path to a directory for Solr to store cores and their data. By default, Solr will use server\solr 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM If solr.xml is not stored in ZooKeeper, this directory needs to contain solr.xml 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_HOME= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Path to a directory that Solr will use as root for data folders for each core. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM If not set, defaults to <instance_dir>/data. Overridable per core through 'dataDir' core property 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_DATA_HOME= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Changes the logging level. Valid values: ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF. Default is INFO 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM This is an alternative to changing the rootLogger in log4j2.xml 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_LOG_LEVEL=INFO 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Location where Solr should write logs to. Absolute or relative to solr start dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_LOGS_DIR=logs 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Enables log rotation before starting Solr. Setting SOLR_LOG_PRESTART_ROTATION=true will let Solr take care of pre 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM start rotation of logs. This is false by default as log4j2 handles this for us. If you choose to use another log 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM framework that cannot do startup rotation, you may want to enable this to let Solr rotate logs on startup. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_LOG_PRESTART_ROTATION=false 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Set the host interface to listen on. Jetty will listen on all interfaces (0.0.0.0) by default. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM This must be an IPv4 ("a.b.c.d") or bracketed IPv6 ("[x::y]") address, not a hostname! 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_JETTY_HOST=0.0.0.0 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Sets the port Solr binds to, default is 8983 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_PORT=8983 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Enables HTTPS. It is implictly true if you set SOLR_SSL_KEY_STORE. Use this config 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM to enable https module with custom jetty configuration. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_ENABLED=true 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Uncomment to set SSL-related system properties 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Be sure to update the paths to the correct keystore for your environment 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_KEY_STORE=etc/solr-ssl.keystore.jks 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_KEY_STORE_PASSWORD=secret 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_TRUST_STORE=etc/solr-ssl.keystore.jks 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_TRUST_STORE_PASSWORD=secret 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Require clients to authenticate 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_NEED_CLIENT_AUTH=false 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Enable clients to authenticate (but not require) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_WANT_CLIENT_AUTH=false 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM SSL Certificates contain host/ip "peer name" information that is validated by default. Setting 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM this to false can be useful to disable these checks when re-using a certificate on many hosts 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_CHECK_PEER_NAME=true 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Override Key/Trust Store types if necessary 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_KEY_STORE_TYPE=JKS 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_TRUST_STORE_TYPE=JKS 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Uncomment if you want to override previously defined SSL values for HTTP client 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM otherwise keep them commented and the above values will automatically be set for HTTP clients 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_CLIENT_KEY_STORE= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_CLIENT_KEY_STORE_PASSWORD= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_CLIENT_TRUST_STORE= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_CLIENT_TRUST_STORE_PASSWORD= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_CLIENT_KEY_STORE_TYPE= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_SSL_CLIENT_TRUST_STORE_TYPE= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Sets path of Hadoop credential provider (hadoop.security.credential.provider.path property) and 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM enables usage of credential store. 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Credential provider should store the following keys: 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM * solr.jetty.keystore.password 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM * solr.jetty.truststore.password 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Set the two below if you want to set specific store passwords for HTTP client 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM * javax.net.ssl.keyStorePassword 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM * javax.net.ssl.trustStorePassword 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM More info: https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/CredentialProviderAPI.html 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_HADOOP_CREDENTIAL_PROVIDER_PATH=localjceks://file/home/solr/hadoop-credential-provider.jceks 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_OPTS=" -Dsolr.ssl.credential.provider.chain=hadoop" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Settings for authentication 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Please configure only one of SOLR_AUTHENTICATION_CLIENT_BUILDER or SOLR_AUTH_TYPE parameters 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_AUTHENTICATION_CLIENT_BUILDER=org.apache.solr.client.solrj.impl.PreemptiveBasicAuthClientBuilderFactory 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_AUTH_TYPE=basic 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_AUTHENTICATION_OPTS="-Dbasicauth=solr:SolrRocks" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Settings for ZK ACL 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_ZK_CREDS_AND_ACLS=-DzkACLProvider=org.apache.solr.common.cloud.VMParamsAllAndReadonlyDigestZkACLProvider ^ 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM  -DzkCredentialsProvider=org.apache.solr.common.cloud.VMParamsSingleSetCredentialsDigestZkCredentialsProvider ^ 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM  -DzkDigestUsername=admin-user -DzkDigestPassword=CHANGEME-ADMIN-PASSWORD ^ 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM  -DzkDigestReadonlyUsername=readonly-user -DzkDigestReadonlyPassword=CHANGEME-READONLY-PASSWORD 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_OPTS= -Dbootstrap_confdir=../solr/configsets/AutopsyConfig/conf -Dcollection.configName=AutopsyConfig -Dsolr.default.confdir=../solr/configsets/AutopsyConfig/conf   
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM When running Solr in non-cloud mode and if planning to do distributed search (using the "shards" parameter), the 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM list of hosts needs to be whitelisted or Solr will forbid the request. The whitelist can be configured in solr.xml, 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM or if you are using the OOTB solr.xml, can be specified using the system property "solr.shardsWhitelist". Alternatively 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM host checking can be disabled by using the system property "solr.disable.shardsWhitelist" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM set SOLR_OPTS=" -Dbootstrap_confdir=../solr/configsets/AutopsyConfig/conf -Dcollection.configName=AutopsyConfig -Dsolr.default.confdir=../solr/configsets/AutopsyConfig/conf  -Dsolr.shardsWhitelist=http://localhost:8983,http://localhost:8984" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM For a visual indication in the Admin UI of what type of environment this cluster is, configure 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM a -Dsolr.environment property below. Valid values are prod, stage, test, dev, with an optional 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM label or color, e.g. -Dsolr.environment=test,label=Functional+test,color=brown 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM SOLR_OPTS="$SOLR_OPTS -Dsolr.environment=prod" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "DEFAULT_SERVER_DIR=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Select HTTP OR HTTPS related configurations 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SOLR_URL_SCHEME=http 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "SOLR_JETTY_CONFIG=--module=http" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "SOLR_SSL_OPTS= " 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF DEFINED SOLR_HADOOP_CREDENTIAL_PROVIDER_PATH (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Dhadoop.security.credential.provider.path=" ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT DEFINED SOLR_SSL_ENABLED (IF DEFINED SOLR_SSL_KEY_STORE (set "SOLR_SSL_ENABLED=true" )  ELSE (set "SOLR_SSL_ENABLED=false" ) ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "false" == "true" (
+set "SOLR_JETTY_CONFIG=--lib='E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\solr-webapp\webapp\WEB-INF\lib\*'"  
+ if !JAVA_MAJOR_VERSION! GEQ 9 (set "SOLR_JETTY_CONFIG=!SOLR_JETTY_CONFIG! --module=https" )  else (set "SOLR_JETTY_CONFIG=!SOLR_JETTY_CONFIG! --module=https8" )  
+ set SOLR_URL_SCHEME=https  
+ IF DEFINED SOLR_SSL_KEY_STORE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Dsolr.jetty.keystore=" )  
+ IF DEFINED SOLR_SSL_KEY_STORE_TYPE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Dsolr.jetty.keystore.type=" )  
+ IF DEFINED SOLR_SSL_TRUST_STORE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Dsolr.jetty.truststore=" )  
+ IF DEFINED SOLR_SSL_TRUST_STORE_TYPE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Dsolr.jetty.truststore.type=" )  
+ IF DEFINED SOLR_SSL_NEED_CLIENT_AUTH (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Dsolr.jetty.ssl.needClientAuth=" )  
+ IF DEFINED SOLR_SSL_WANT_CLIENT_AUTH (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Dsolr.jetty.ssl.wantClientAuth=" )  
+ IF DEFINED SOLR_SSL_CLIENT_KEY_STORE (
+set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Djavax.net.ssl.keyStore="  
+ IF DEFINED SOLR_SSL_CLIENT_KEY_STORE_TYPE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Djavax.net.ssl.keyStoreType=" ) 
+)  ELSE (
+IF DEFINED SOLR_SSL_KEY_STORE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Djavax.net.ssl.keyStore=" )  
+ IF DEFINED SOLR_SSL_KEY_STORE_TYPE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Djavax.net.ssl.keyStoreType=" ) 
+)  
+ IF DEFINED SOLR_SSL_CLIENT_TRUST_STORE (
+set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Djavax.net.ssl.trustStore="  
+ IF DEFINED SOLR_SSL_CLIENT_TRUST_STORE_TYPE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Djavax.net.ssl.trustStoreType=" ) 
+)  ELSE (
+IF DEFINED SOLR_SSL_TRUST_STORE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Djavax.net.ssl.trustStore=" )  
+ IF DEFINED SOLR_SSL_TRUST_STORE_TYPE (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Djavax.net.ssl.trustStoreType=" ) 
+)  
+ IF DEFINED SOLR_SSL_CHECK_PEER_NAME (set "SOLR_SSL_OPTS=!SOLR_SSL_OPTS! -Dsolr.ssl.checkPeerName=" ) 
+)  ELSE (set SOLR_SSL_OPTS= ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Authentication options 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT DEFINED SOLR_AUTH_TYPE (IF DEFINED SOLR_AUTHENTICATION_OPTS (
+echo WARNING: SOLR_AUTHENTICATION_OPTS variable configured without associated SOLR_AUTH_TYPE variable  
+ echo          Please configure SOLR_AUTH_TYPE variable with the authentication type to be used.  
+ echo          Currently supported authentication types are [kerberos, basic] 
+) ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF DEFINED SOLR_AUTH_TYPE (IF DEFINED SOLR_AUTHENTICATION_CLIENT_BUILDER (
+echo WARNING: SOLR_AUTHENTICATION_CLIENT_BUILDER and SOLR_AUTH_TYPE variables are configured together  
+ echo          Use SOLR_AUTH_TYPE variable to configure authentication type to be used  
+ echo          Currently supported authentication types are [kerberos, basic]  
+ echo          The value of SOLR_AUTHENTICATION_CLIENT_BUILDER configuration variable will be ignored 
+) ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF DEFINED SOLR_AUTH_TYPE (IF /I "" == "basic" (set SOLR_AUTHENTICATION_CLIENT_BUILDER="org.apache.solr.client.solrj.impl.PreemptiveBasicAuthClientBuilderFactory" )  ELSE (IF /I "" == "kerberos" (set SOLR_AUTHENTICATION_CLIENT_BUILDER="org.apache.solr.client.solrj.impl.PreemptiveBasicAuthClientBuilderFactory" )  ELSE (
+echo ERROR: Value specified for SOLR_AUTH_TYPE configuration variable is invalid.  
+ goto err 
+) ) ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF DEFINED SOLR_AUTHENTICATION_CLIENT_CONFIGURER (
+echo WARNING: Found unsupported configuration variable SOLR_AUTHENTICATION_CLIENT_CONFIGURER  
+ echo          Please start using SOLR_AUTH_TYPE instead 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF DEFINED SOLR_AUTHENTICATION_CLIENT_BUILDER (set AUTHC_CLIENT_BUILDER_ARG="-Dsolr.httpclient.builder.factory=" ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "AUTHC_OPTS= " 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Set the SOLR_TOOL_HOST variable for use when connecting to a running Solr instance 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT "" == "" (set "SOLR_TOOL_HOST=" )  ELSE (set "SOLR_TOOL_HOST=localhost" ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "" == "" (set SOLR_JETTY_HOST=0.0.0.0 ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Verify Java is available 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF DEFINED SOLR_JAVA_HOME set "JAVA_HOME=E:\Program Files\Java\jdk1.8.0_333\jre" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Try to detect JAVA_HOME from the registry 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT DEFINED JAVA_HOME (
+FOR /F "skip=2 tokens=2*" %A IN ('REG QUERY "HKLM\Software\JavaSoft\Java Runtime Environment" /v CurrentVersion') DO set CurVer=%B  
+ FOR /F "skip=2 tokens=2*" %A IN ('REG QUERY "HKLM\Software\JavaSoft\Java Runtime Environment\!CurVer!" /v JavaHome') DO (set "JAVA_HOME=%B" ) 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT DEFINED JAVA_HOME goto need_java_home 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set JAVA_HOME=E:\Program Files\Java\jdk1.8.0_333\jre 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF e == \ SET JAVA_HOME=E:\Program Files\Java\jdk1.8.0_333\jr 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT EXIST "E:\Program Files\Java\jdk1.8.0_333\jre\bin\java.exe" (
+set "SCRIPT_ERROR=java.exe not found in E:\Program Files\Java\jdk1.8.0_333\jre\bin. Please set JAVA_HOME to a valid JRE / JDK directory."  
+ goto err 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "JAVA=E:\Program Files\Java\jdk1.8.0_333\jre\bin\java" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>CALL :resolve_java_info 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>CALL :resolve_java_vendor 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>"E:\Program Files\Java\jdk1.8.0_333\jre\bin\java" -version   2>&1  | findstr /i "IBM J9"  1>nul 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>if 1 == 1 (set "JAVA_VENDOR=Oracle"  )  else (set "JAVA_VENDOR=IBM J9"  ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set JAVA_VENDOR_OUT= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>GOTO :eof 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set JAVA_MAJOR_VERSION=0 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set JAVA_VERSION_INFO= 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set JAVA_BUILD=0 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>FOR /F "usebackq tokens=3" %a IN (`""E:\Program Files\Java\jdk1.8.0_333\jre\bin\java" -version 2>&1 | findstr "version""`) do (
+set JAVA_VERSION_INFO=%a  
+ REM Remove surrounding quotes  
+ set JAVA_VERSION_INFO=!JAVA_VERSION_INFO:"=!  
+ REM Extract the major Java version, e.g. 7, 8, 9, 10 ...  
+ for /F "tokens=1,2 delims=._-" %a in ("!JAVA_VERSION_INFO!") do (if %a GEQ 9 (set JAVA_MAJOR_VERSION=%a )  else (set JAVA_MAJOR_VERSION=%b ) )  
+ REM Don't look for "_{build}" if we're on IBM J9.  
+ if NOT "Oracle" == "IBM J9" (for /F "delims=_ tokens=2" %a in ("!JAVA_VERSION_INFO!") do (set /a JAVA_BUILD=%a ) ) 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>(
+set JAVA_VERSION_INFO="1.8.0_333"  
+ REM Remove surrounding quotes  
+ set JAVA_VERSION_INFO=!JAVA_VERSION_INFO:"=!  
+ REM Extract the major Java version, e.g. 7, 8, 9, 10 ...  
+ for /F "tokens=1,2 delims=._-" %a in ("!JAVA_VERSION_INFO!") do (if "1.8.0_333" GEQ 9 (set JAVA_MAJOR_VERSION="1.8.0_333" )  else (set JAVA_MAJOR_VERSION=%b ) )  
+ REM Don't look for "_{build}" if we're on IBM J9.  
+ if NOT "Oracle" == "IBM J9" (for /F "delims=_ tokens=2" %a in ("!JAVA_VERSION_INFO!") do (set /a JAVA_BUILD="1.8.0_333" ) ) 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>(if 1 GEQ 9 (set JAVA_MAJOR_VERSION=1 )  else (set JAVA_MAJOR_VERSION=8 ) ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>(set /a JAVA_BUILD=333 ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>GOTO :eof 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF !JAVA_MAJOR_VERSION! LSS 8 (
+set "SCRIPT_ERROR=Java 1.8 or later is required to run Solr. Current Java version is: !JAVA_VERSION_INFO! (detected major: !JAVA_MAJOR_VERSION!)"  
+ goto err 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set FIRST_ARG=stop 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF [stop] == [] goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "-help" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "-usage" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "-h" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "--help" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "/?" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "-i" goto get_info 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "-info" goto get_info 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "status" goto get_info 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "version" goto get_version 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "-v" goto get_version 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "-version" goto get_version 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "assert" goto run_assert 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "autoscaling" goto run_autoscaling 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>REM Only allow the command to be the first argument, assume start if not supplied 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "start" goto set_script_cmd 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "stop" goto set_script_cmd 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SCRIPT_CMD=stop 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>SHIFT
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>goto parse_args 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "arg=-k" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "firstTwo=-k" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "" set SCRIPT_CMD=start 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF [-k] == [] goto process_script_cmd 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-help" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-usage" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "/?" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-f" goto set_foreground_mode 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-foreground" goto set_foreground_mode 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-V" goto set_verbose 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-verbose" goto set_verbose 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-v" goto set_debug 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-q" goto set_warn 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-c" goto set_cloud_mode 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-cloud" goto set_cloud_mode 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-d" goto set_server_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-dir" goto set_server_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-s" goto set_solr_home_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-t" goto set_solr_data_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-solr.home" goto set_solr_home_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-e" goto set_example 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-example" goto set_example 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-h" goto set_host 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-host" goto set_host 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-m" goto set_memory 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-memory" goto set_memory 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-p" goto set_port 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-port" goto set_port 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-z" goto set_zookeeper 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-zkhost" goto set_zookeeper 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-zkHost" goto set_zookeeper 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-a" goto set_addl_opts 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-addlopts" goto set_addl_opts 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-j" goto set_addl_jetty_config 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-jettyconfig" goto set_addl_jetty_config 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-noprompt" goto set_noprompt 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-k" == "-k" goto set_stop_key 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "arg=jjk#09s" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "jjk#09s" == "" (
+set SCRIPT_ERROR=Stop key is required!  
+ goto invalid_cmd_line 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set firstChar=j 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "j" == "-" (
+set SCRIPT_ERROR=Expected stop key but found jjk#09s instead!  
+ goto invalid_cmd_line 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set STOP_KEY=jjk#09s 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>SHIFT
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>SHIFT
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>goto parse_args 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "arg=-p" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "firstTwo=-p" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "" set SCRIPT_CMD=start 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF [-p] == [] goto process_script_cmd 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-help" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-usage" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "/?" goto usage 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-f" goto set_foreground_mode 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-foreground" goto set_foreground_mode 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-V" goto set_verbose 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-verbose" goto set_verbose 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-v" goto set_debug 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-q" goto set_warn 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-c" goto set_cloud_mode 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-cloud" goto set_cloud_mode 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-d" goto set_server_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-dir" goto set_server_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-s" goto set_solr_home_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-t" goto set_solr_data_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-solr.home" goto set_solr_home_dir 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-e" goto set_example 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-example" goto set_example 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-h" goto set_host 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-host" goto set_host 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-m" goto set_memory 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-memory" goto set_memory 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "-p" == "-p" goto set_port 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "arg=23232" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "23232" == "" (
+set SCRIPT_ERROR=Port is required!  
+ goto invalid_cmd_line 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set firstChar=2 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "2" == "-" (
+set SCRIPT_ERROR=Expected port but found 23232 instead!  
+ goto invalid_cmd_line 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set SOLR_PORT=23232 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "PASS_TO_RUN_EXAMPLE=-p 23232 !PASS_TO_RUN_EXAMPLE!" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>SHIFT
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>SHIFT
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>goto parse_args 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "arg=" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "firstTwo=~0,2" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "" set SCRIPT_CMD=start 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF [] == [] goto process_script_cmd 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "" == "1" (
+CALL :safe_echo "Using Solr root directory: E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr"  
+ CALL :safe_echo "Using Java: E:\Program Files\Java\jdk1.8.0_333\jre\bin\java"  
+ "E:\Program Files\Java\jdk1.8.0_333\jre\bin\java" -version  
+ 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT "" == "" (set SOLR_HOST_ARG=-Dhost= )  ELSE (set SOLR_HOST_ARG= ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "" == "" set "SOLR_SERVER_DIR=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT EXIST "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server" (
+set "SCRIPT_ERROR=Solr server directory E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server not found!"  
+ goto err 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT "" == "" goto run_example 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr" == "" set "SOLR_HOME=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\solr" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF EXIST "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr" set "SOLR_HOME=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT EXIST "C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr\" (IF EXIST "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr" (set "SOLR_HOME=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr" )  ELSE (
+set "SCRIPT_ERROR=Solr home directory C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr not found!"  
+ goto err 
+) ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "jjk#09s" == "" set STOP_KEY=solrrocks 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "SOLR_LOGS_DIR=C:\Users\Alford\AppData\Roaming\autopsy\var\log\solr" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set "EXAMPLE_DIR=E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\example" 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set TMP_SOLR_HOME=!SOLR_HOME:E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\example=! 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF NOT "C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr" == "C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr" (
+set "SOLR_LOGS_DIR=C:\Users\Alford\Documents\NetBeansProjects\iOSDeviceDataExtractor\build\testuserdir\solr\..\logs"  
+ set "LOG4J_CONFIG=file:///E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\resources\log4j2.xml" 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>set IS_RESTART=0 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "restart" (
+IF "23232" == "" (
+set "SCRIPT_ERROR=Must specify the port when trying to restart Solr."  
+ goto err 
+)  
+ set SCRIPT_CMD=stop  
+ set IS_RESTART=1 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>IF "stop" == "stop" (
+IF "23232" == "" (IF "" == "1" (
+set found_it=0  
+ for /F "usebackq" %i in (`dir /b "C:\Users\Alford\AppData\Roaming\autopsy\var\log\solr" | findstr /i "^solr-.*\.port$"`) do (
+set SOME_SOLR_PORT=  
+ For /F "delims=" %J In ('type "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\bin\%i"') do set SOME_SOLR_PORT=%~J  
+ if NOT "!SOME_SOLR_PORT!" == "" (for /F "tokens=2,5" %j in ('netstat -aon | find "TCP " | find ":0 " | find ":!SOME_SOLR_PORT! "') do (
+ 
+ IF NOT "%k" == "0" (IF "%j" == "0.0.0.0:!SOME_SOLR_PORT!" (
+set found_it=1  
+  
+ IF "8079" == "" set /A STOP_PORT=!SOME_SOLR_PORT! - 1000  
+ "E:\Program Files\Java\jdk1.8.0_333\jre\bin\java"  -Djetty.home="E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server" -jar "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\start.jar" STOP.PORT=!STOP_PORT! STOP.KEY=jjk#09s --stop  
+ del "C:\Users\Alford\AppData\Roaming\autopsy\var\log\solr"\solr-!SOME_SOLR_PORT!.port  
+ timeout /T 5  
+ REM Kill it if it is still running after the graceful shutdown  
+ For /F "tokens=2,5" %M in ('netstat -nao | find "TCP " | find ":0 " | find ":!SOME_SOLR_PORT! "') do (IF "%N" == "%k" (IF "%M" == "0.0.0.0:!SOME_SOLR_PORT!" (
+ 
+ taskkill /f /PID %N 
+) ) ) 
+) ) 
+) ) 
+)  
+ if "!found_it!" == "0" echo No Solr nodes found to stop. 
+)  ELSE (
+set "SCRIPT_ERROR=Must specify the port when trying to stop Solr, or use -all to stop all running nodes on this host."  
+ goto err 
+) )  ELSE (
+set found_it=0  
+ For /F "tokens=2,5" %M in ('netstat -nao | find "TCP " | find ":0 " | find ":23232 "') do (IF NOT "%N" == "0" (IF "%M" == "0.0.0.0:23232" (
+set found_it=1  
+  
+ IF "8079" == "" set /A STOP_PORT=23232 - 1000  
+ "E:\Program Files\Java\jdk1.8.0_333\jre\bin\java"  -Djetty.home="E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server" -jar "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\start.jar" --module=http STOP.PORT=!STOP_PORT! STOP.KEY=jjk#09s --stop  
+ del "C:\Users\Alford\AppData\Roaming\autopsy\var\log\solr"\solr-23232.port  
+ timeout /T 5  
+ REM Kill it if it is still running after the graceful shutdown  
+ For /F "tokens=2,5" %j in ('netstat -nao | find "TCP " | find ":0 " | find ":23232 "') do (IF "%N" == "%k" (IF "%j" == "0.0.0.0:23232" (
+ 
+ taskkill /f /PID %N 
+) ) ) 
+) ) )  
+ if "!found_it!" == "0" echo No Solr found running on port 23232 
+)  
+ IF "!IS_RESTART!" == "0" goto done 
+) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>(IF NOT "6440" == "0" (IF "0.0.0.0:23232" == "0.0.0.0:23232" (
+set found_it=1  
+  
+ IF "8079" == "" set /A STOP_PORT=23232 - 1000  
+ "E:\Program Files\Java\jdk1.8.0_333\jre\bin\java"  -Djetty.home="E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server" -jar "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\start.jar" --module=http STOP.PORT=!STOP_PORT! STOP.KEY=jjk#09s --stop  
+ del "C:\Users\Alford\AppData\Roaming\autopsy\var\log\solr"\solr-23232.port  
+ timeout /T 5  
+ REM Kill it if it is still running after the graceful shutdown  
+ For /F "tokens=2,5" %j in ('netstat -nao | find "TCP " | find ":0 " | find ":23232 "') do (IF "6440" == "%k" (IF "%j" == "0.0.0.0:23232" (
+ 
+ taskkill /f /PID 6440 
+) ) ) 
+) ) ) 
+Stopping Solr process 6440 running on port 23232
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>(IF NOT "6440" == "0" (IF "[::]:23232" == "0.0.0.0:23232" (
+set found_it=1  
+  
+ IF "8079" == "" set /A STOP_PORT=23232 - 1000  
+ "E:\Program Files\Java\jdk1.8.0_333\jre\bin\java"  -Djetty.home="E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server" -jar "E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr\server\start.jar" --module=http STOP.PORT=!STOP_PORT! STOP.KEY=jjk#09s --stop  
+ del "C:\Users\Alford\AppData\Roaming\autopsy\var\log\solr"\solr-23232.port  
+ timeout /T 5  
+ REM Kill it if it is still running after the graceful shutdown  
+ For /F "tokens=2,5" %j in ('netstat -nao | find "TCP " | find ":0 " | find ":23232 "') do (IF "6440" == "%k" (IF "%j" == "0.0.0.0:23232" (
+ 
+ taskkill /f /PID 6440 
+) ) ) 
+) ) ) 
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>ENDLOCAL
+
+E:\Desktop\School Stuff\Singapore Institute of Technology\Software\Autopsy\autopsy-4.19.2\autopsy\solr>exit /b 0 
