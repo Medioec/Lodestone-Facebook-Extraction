@@ -29,6 +29,18 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.sleuthkit.datamodel.Host;
 
+import java.util.List;
+import java.util.ArrayList;
+import org.sleuthkit.datamodel.Content;
+
+import org.sleuthkit.autopsy.casemodule.Case;
+import org.sleuthkit.autopsy.casemodule.services.FileManager;
+import org.sleuthkit.datamodel.LocalFilesDataSource;
+import java.util.UUID;
+import org.sleuthkit.datamodel.AbstractFile;
+import org.sleuthkit.datamodel.TskCoreException;
+import org.sleuthkit.datamodel.TskDataException;
+
 @ServiceProvider(service = DataSourceProcessor.class)
 public class OnlineDataProcessor implements DataSourceProcessor {
 
@@ -70,6 +82,25 @@ public class OnlineDataProcessor implements DataSourceProcessor {
         WebDriver driver = new ChromeDriver();
         driver.get("http://www.youtube.com/");
         //new Thread(new addDeviceDataTask(host, processorPanel.getPanelSettings(), progressMonitor, callback)).start();
+        
+        
+        //// this is just a test, not supposed to run the script here, create a thread to run these instead
+        DataSourceProcessorCallback.DataSourceProcessorResult result = DataSourceProcessorCallback.DataSourceProcessorResult.NO_ERRORS;
+        List<String> errorList = new ArrayList<>();
+        List<Content> newDataSources = new ArrayList<>();
+        List<String> localFilePaths = new ArrayList<>();
+        
+        FileManager fileManager = Case.getCurrentCase().getServices().getFileManager();
+        String newDataSourceName = "Facebook";
+        
+        // local file to add, probably downloaded files
+        localFilePaths.add("D:\\Desktop\\OneDrive - Singapore Institute Of Technology\\Singapore Institute of Technology\\2.1\\Schedule.csmo");
+        
+        try {
+            LocalFilesDataSource newDataSource = fileManager.addLocalFilesDataSource(UUID.randomUUID().toString(), newDataSourceName, "", host, localFilePaths, new ProgressUpdater());
+        } catch (TskCoreException | TskDataException ex) {                 
+        }
+        callback.done(result,errorList,newDataSources);
     }
 
     @Override
@@ -81,5 +112,11 @@ public class OnlineDataProcessor implements DataSourceProcessor {
     public void reset() {
         processorPanel.resetPanel();
     }
-
+    
+    private class ProgressUpdater implements FileManager.FileAddProgressUpdater {        
+        @Override
+        public void fileAdded(AbstractFile file) {
+        }
+    }
 }
+
