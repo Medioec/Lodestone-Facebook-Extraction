@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><module codename="org.gbies.iosdevicedataextractor">
-    <module_version install_time="1665911892104" last="true" origin="installer" specification_version="1.0">
-        <file crc="1653085256" name="config/Modules/org-gbies-iosdevicedataextractor.xml"/>
-        <file crc="916540455" name="modules/ext/gbies-iosbackupextractor-1.0.0.jar"/>
-        <file crc="2608793055" name="modules/org-gbies-iosdevicedataextractor.jar"/>
-    </module_version>
-</module>
