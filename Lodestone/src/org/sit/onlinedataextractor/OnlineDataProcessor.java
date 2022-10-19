@@ -25,8 +25,6 @@ import org.sleuthkit.autopsy.corecomponentinterfaces.DataSourceProcessor;
 import org.sleuthkit.autopsy.corecomponentinterfaces.DataSourceProcessorCallback;
 import org.sleuthkit.autopsy.corecomponentinterfaces.DataSourceProcessorProgressMonitor;
 import org.openide.util.lookup.ServiceProvider;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.sleuthkit.datamodel.Host;
 
 import java.util.List;
@@ -51,8 +49,8 @@ public class OnlineDataProcessor implements DataSourceProcessor {
         processorPanel = new OnlineDataProcessorPanel();
         
         System.setProperty("webdriver.chrome.driver","C:\\Users\\Alford\\Documents\\NetBeansProjects\\Lodestone\\chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
-        driver.get("http://www.google.com/");
+        //WebDriver driver = new ChromeDriver();
+        //driver.get("http://www.google.com/");
     }
 
     @Override
@@ -79,28 +77,8 @@ public class OnlineDataProcessor implements DataSourceProcessor {
 
     @Override // Live
     public void run(Host host, DataSourceProcessorProgressMonitor progressMonitor, DataSourceProcessorCallback callback) {
-        WebDriver driver = new ChromeDriver();
-        driver.get("http://www.youtube.com/");
-        //new Thread(new addDeviceDataTask(host, processorPanel.getPanelSettings(), progressMonitor, callback)).start();
-        
-        
-        //// this is just a test, not supposed to run the script here, create a thread to run these instead
-        DataSourceProcessorCallback.DataSourceProcessorResult result = DataSourceProcessorCallback.DataSourceProcessorResult.NO_ERRORS;
-        List<String> errorList = new ArrayList<>();
-        List<Content> newDataSources = new ArrayList<>();
-        List<String> localFilePaths = new ArrayList<>();
-        
-        FileManager fileManager = Case.getCurrentCase().getServices().getFileManager();
-        String newDataSourceName = "Facebook";
-        
-        // local file to add, probably downloaded files
-        localFilePaths.add("D:\\Desktop\\OneDrive - Singapore Institute Of Technology\\Singapore Institute of Technology\\2.1\\Schedule.csmo");
-        
-        try {
-            LocalFilesDataSource newDataSource = fileManager.addLocalFilesDataSource(UUID.randomUUID().toString(), newDataSourceName, "", host, localFilePaths, new ProgressUpdater());
-        } catch (TskCoreException | TskDataException ex) {                 
-        }
-        callback.done(result,errorList,newDataSources);
+        System.out.println("Starting Processor");
+        new Thread(new addOnlineDataTask(host, processorPanel.getPanelSettings(), progressMonitor, callback)).start();
     }
 
     @Override
