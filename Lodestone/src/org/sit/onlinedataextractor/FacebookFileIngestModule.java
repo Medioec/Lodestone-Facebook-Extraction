@@ -4,8 +4,16 @@
  */
 package org.sit.onlinedataextractor;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonElement;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,6 +41,7 @@ import org.sleuthkit.autopsy.ingest.FileIngestModule;
 import org.sleuthkit.autopsy.ingest.IngestJobContext;
 import org.sleuthkit.autopsy.ingest.IngestMessage;
 import org.sleuthkit.autopsy.ingest.IngestModule.ProcessResult;
+import org.sleuthkit.autopsy.ingest.IngestModuleReferenceCounter;
 import org.sleuthkit.autopsy.ingest.IngestMonitor;
 import org.sleuthkit.autopsy.ingest.IngestServices;
 import org.sleuthkit.autopsy.ingest.ModuleContentEvent;
@@ -40,9 +49,11 @@ import org.sleuthkit.datamodel.AbstractFile;
 import org.sleuthkit.datamodel.Account;
 import org.sleuthkit.datamodel.AccountFileInstance;
 import org.sleuthkit.datamodel.Blackboard;
+import org.sleuthkit.datamodel.Blackboard.BlackboardException;
 import org.sleuthkit.datamodel.BlackboardArtifact;
 import org.sleuthkit.datamodel.BlackboardAttribute;
 import org.sleuthkit.datamodel.BlackboardAttribute.ATTRIBUTE_TYPE;
+import org.sleuthkit.datamodel.BlackboardAttribute.TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE;
 import org.sleuthkit.datamodel.DerivedFile;
 import org.sleuthkit.datamodel.ReadContentInputStream;
 import org.sleuthkit.datamodel.Relationship;
@@ -54,26 +65,187 @@ import org.sleuthkit.datamodel.TskException;
 import org.sleuthkit.datamodel.blackboardutils.CommunicationArtifactsHelper;
 import org.sleuthkit.datamodel.blackboardutils.attributes.MessageAttachments;
 import org.sleuthkit.datamodel.blackboardutils.attributes.MessageAttachments.FileAttachment;
+import org.sleuthkit.datamodel.SleuthkitCase;
 
 /**
  *
  * @author Eric
  */
 public class FacebookFileIngestModule implements FileIngestModule{
+    
+    private static final Logger logger = Logger.getLogger("org.sit.onlinedataextractor.FacebookFileIngestModule");
+    private Case currentCase;
+    private Blackboard blackboard;
+    private IngestJobContext context = null;
+    private static final IngestModuleReferenceCounter refCounter = new IngestModuleReferenceCounter();
 
     @Override
     public ProcessResult process(AbstractFile af) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        blackboard = currentCase.getSleuthkitCase().getBlackboard();
+        logger.log(Level.INFO, "after blackboard");
+        
+        //skip unalloc
+        if ((af.getType().equals(TskData.TSK_DB_FILES_TYPE_ENUM.UNALLOC_BLOCKS))
+                || (af.getType().equals(TskData.TSK_DB_FILES_TYPE_ENUM.SLACK))) {
+            return ProcessResult.OK;
+        }
+        
+        if ((af.isFile() == false)) {
+            return ProcessResult.OK;
+        }
+        
+        if (context.fileIngestIsCancelled()) {
+            return ProcessResult.OK;
+        }
+        
+        if (af.isFile() && "json".equals(af.getNameExtension())){
+            String filename = af.getName();
+            switch (filename) {
+                case "comments.json":
+                    processComments(af);
+                    break;
+            }
+        }
+        
+        return ProcessResult.OK;
     }
 
     @Override
     public void startUp(IngestJobContext context) throws IngestModuleException {
-        FileIngestModule.super.startUp(context); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        this.context = context;
+        refCounter.incrementAndGet(context.getJobId());
+        logger.log(Level.INFO, "File Ingest Started");
+        try{
+            currentCase = Case.getCurrentCaseThrows();
+        }
+        catch(NoCurrentCaseException e){
+            logger.log(Level.SEVERE, "Exception while getting open case.", e);
+            throw new IngestModuleException("Error opening case", e);
+        }
     }
 
     @Override
     public void shutDown() {
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    }
+    
+    private void processComments(AbstractFile af){
+        int intsize;
+        long size = af.getSize();
+        byte[] jsonBytes;
+        if (size > Integer.MAX_VALUE){
+            //do later
+            jsonBytes = new byte[Integer.MAX_VALUE];
+        }
+        else {
+            intsize = (int)size;
+            jsonBytes = new byte[intsize];
+        }
+        try{
+            af.read(jsonBytes, 0, size);
+        }
+        catch(TskCoreException e){
+            logger.log(Level.SEVERE, "File read failure");
+        }
+        
+        String jsonString = new String(jsonBytes, StandardCharsets.UTF_8);
+        JsonParser jsonParser = new JsonParser();
+        JsonObject json = (JsonObject)jsonParser.parse(jsonString);
+        if(json.has("comments_v2")){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type commentTimestamp;
+            BlackboardAttribute.Type commentTitle;
+            BlackboardAttribute.Type commentCommentString;
+            BlackboardAttribute.Type commentAuthor;
+            BlackboardAttribute.Type commentUri;
+            BlackboardAttribute.Type commentUrl;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_COMMENT") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_COMMENT", "Facebook Comment");
+                    commentTimestamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_TIMESTAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.LONG, "Timestamp");
+                    commentTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                    commentCommentString = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_COMMENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Comment");
+                    commentAuthor = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_AUTHOR", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Author");
+                    commentUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
+                    commentUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_COMMENT");
+                    commentTimestamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_TIMESTAMP");
+                    commentTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_TITLE");
+                    commentCommentString = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_COMMENT");
+                    commentAuthor = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_AUTHOR");
+                    commentUri = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_URI");
+                    commentUrl = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_URL");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                // TODO handling
+                return;
+            }
+            
+            JsonArray commentsV2 = json.getAsJsonArray("comments_v2");
+            for (JsonElement comment:commentsV2){
+                
+                long timestamp = -1;
+                String title = "";
+                String commentString = "";
+                String author = "";
+                String uri = "";
+                String url = "";
+                
+                if (comment.isJsonObject()){
+                    JsonObject commentObj = (JsonObject)comment;
+                    title = commentObj.get("title").getAsString();
+                    timestamp = commentObj.get("timestamp").getAsLong();
+                    if (commentObj.has("data")){
+                        JsonObject commentData = (JsonObject)commentObj.getAsJsonArray("data").get(0);
+                        commentString = commentData.getAsJsonObject("comment").get("comment").getAsString();
+                        author = commentData.getAsJsonObject("comment").get("author").getAsString();
+                    }
+                    if (commentObj.has("attachments")){
+                        JsonArray attachments = commentObj.getAsJsonArray("attachments");
+                        for (JsonElement data:attachments){
+                            JsonArray attachArray = ((JsonObject)data).getAsJsonArray("data");
+                            for (JsonElement obj:attachArray){
+                                if (((JsonObject)obj).has("external_context")){
+                                    url = ((JsonObject)obj).getAsJsonObject("external_context").get("url").getAsString();
+                                }
+                                else if (((JsonObject)obj).has("media")){
+                                    uri = ((JsonObject)obj).getAsJsonObject("media").get("uri").getAsString();
+                                }
+                            }
+                        }
+                    }
+                    
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(commentTimestamp, FacebookIngestModuleFactory.getModuleName(), timestamp));
+                    attributelist.add(new BlackboardAttribute(commentTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                    attributelist.add(new BlackboardAttribute(commentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
+                    attributelist.add(new BlackboardAttribute(commentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
+                    attributelist.add(new BlackboardAttribute(commentUri, FacebookIngestModuleFactory.getModuleName(), uri));
+                    attributelist.add(new BlackboardAttribute(commentUrl, FacebookIngestModuleFactory.getModuleName(), url));
+                    
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        // handle exception
+                        return;
+                    }
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No comments_v2 found");
+            return;
+        }
+        
     }
     
 }

@@ -20,6 +20,10 @@ import org.sleuthkit.autopsy.ingest.IngestModuleIngestJobSettings;
 public class FacebookIngestModuleFactory extends IngestModuleFactoryAdapter{
     
     private static final String VERSION_NUMBER = "1.0.0";
+    
+    static String getModuleName(){
+        return "FacebookIngestModuleFactory";
+    }
 
     @Override
     public boolean hasGlobalSettingsPanel() {
