@@ -54,8 +54,7 @@ public class SeleniumAnt {
 //        Thread.sleep(500);
 //        }
 //        catch(InterruptedException ie){
-//        }
-         
+//        }    
         driver.get("https://www.facebook.com/dyi/?tab=all_archives");
         // explicit wait - to wait for the download button to be click-able
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
@@ -70,12 +69,14 @@ public class SeleniumAnt {
         
         //to download number of files based on download information given   
         try{
-        for (int i = 1; i < numFile+1; i++) {
-            System.out.println(i);
+
+        for (int i = 1; i < numFile+1; i++) {     
             driver.findElement(By.cssSelector("[aria-label=Download]")).click();
-            driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
-                    + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
-                    + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
+            if(numFile > 1){
+                driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
+                        + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
+                        + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
+            }
             Thread.sleep(600);
         }
         }
