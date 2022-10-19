@@ -37,7 +37,7 @@ public class SeleniumAnt {
         fb.sendKeys("destinyblazer@live.com");
         WebElement ps = driver.findElement(By.name("pass"));
         //input ur own password and username
-        ps.sendKeys("p@ssw0rd");
+        ps.sendKeys("password");
         WebElement login = driver.findElement(By.name("login"));
         login.click();
 
@@ -56,28 +56,54 @@ public class SeleniumAnt {
         catch(Exception e){
             System.out.println(e);
         }
-        try{
-        Thread.sleep(1000);
-        }
-        catch(InterruptedException ie){
-        }
+//        try{
+//        Thread.sleep(500);
+//        }
+//        catch(InterruptedException ie){
+//        }
          
         driver.get("https://www.facebook.com/dyi/?tab=all_archives");
         // explicit wait - to wait for the download button to be click-able
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
         // click on the Download button as soon as the "Download" button is visible
-        driver.findElement(By.cssSelector("[aria-label=Download]")).click();
         
-        List<WebElement> inputElements = driver.findElements(By.xpath("//x1uvtmcs.x4k7w5x.x1h91t0o.x1beo9mf.xaigb6o.x12ejxvf.x3igimt.xarpa2k.xedcshv.x1lytzrv.x1t2pt76.x7ja8zs.x1n2onr6.x1qrby5j.x1jfb8zj"));
-
-	for (WebElement ml : inputElements) {
-	if (ml.getAttribute("tabIndex") != null) {
-				System.out.println("Tab order is " + ml.getAttribute("tabIndex"));
-    }
-                }
-    
-    
-    
+      //
+        String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
+        System.out.println(numFiles);
+        
+        String numFilesArray[] = numFiles.split(" ", 2);
+        int numFile = Integer.parseInt(numFilesArray[0]); 
+        
+        //to download number of files based on download information given   
+        try{
+        for (int i = 1; i < numFile+1; i++) {
+            System.out.println(i);
+          
+            driver.findElement(By.cssSelector("[aria-label=Download]")).click();
+            driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
+                    + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
+                    + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
+            Thread.sleep(600);
+        }
+         }
+         catch(InterruptedException e){
+            System.out.println(e);
+        }    
+//        try{
+//        driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4'][1]")).click();
+//        Thread.sleep(600);
+//        driver.findElement(By.cssSelector("[aria-label=Download]")).click();
+//        driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4'][2]")).click();
+//        Thread.sleep(300);
+//        driver.findElement(By.cssSelector("[aria-label=Download]")).click();
+//        Thread.sleep(300);
+//        driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4'][3]")).click();
+//         }
+//         catch(InterruptedException e){
+//            System.out.println(e);
+//        }
+       
+  
 }
 }
