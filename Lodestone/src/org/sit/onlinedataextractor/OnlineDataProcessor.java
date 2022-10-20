@@ -1,23 +1,4 @@
-/*
- * Copyright (C) 2021 Grzegorz Bieś, Ernest Bieś
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * iOS Device Data Extractor (Autopsy module), version  1.0
- *
- */
+
 package org.sit.onlinedataextractor;
 
 import java.time.Duration;
@@ -37,7 +18,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.sleuthkit.datamodel.Host;
-//jj
+
 @ServiceProvider(service = DataSourceProcessor.class)
 public class OnlineDataProcessor implements DataSourceProcessor {
 
@@ -55,17 +36,19 @@ public class OnlineDataProcessor implements DataSourceProcessor {
         System.setProperty("webdriver.chrome.driver","A:\\Users\\JJ\\Documents\\GitHub\\Lodestone\\chromedriver.exe");
         //Pass ChromeOptions instance to ChromeDriver Constructor
         WebDriver driver = new ChromeDriver(options);   
-      
+        // explicit wait - to wait for the download button to be click-able
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
         driver.get("https://www.facebook.com/dyi/?referrer=yfi_settings");
         WebElement fb = driver.findElement(By.name("email"));
         fb.sendKeys("destinyblazer@live.com");
         WebElement ps = driver.findElement(By.name("pass"));
         //input ur own password and username
-        ps.sendKeys("p@ssw0rd");
+        ps.sendKeys("passw0rd");
         WebElement login = driver.findElement(By.name("login"));
         login.click();
-
+        
         try{
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label='Format']")));
         WebElement format = driver.findElement(By.cssSelector("[aria-label='Format']"));
         format.click();
         format.sendKeys("j");
@@ -86,8 +69,7 @@ public class OnlineDataProcessor implements DataSourceProcessor {
 //        catch(InterruptedException ie){
 //        }    
         driver.get("https://www.facebook.com/dyi/?tab=all_archives");
-        // explicit wait - to wait for the download button to be click-able
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
+        
         // click on the Download button as soon as the "Download" button is visible; else wait
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
         
