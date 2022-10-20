@@ -16,8 +16,7 @@ public class SeleniumAnt {
     
     public static void main(String[] args) {
         
-        
-        //Create a instance of ChromeOptions class
+       //Create a instance of ChromeOptions class
         ChromeOptions options = new ChromeOptions();
         //Add chrome switch to disable notification - "**--disable-notifications**"
         options.addArguments("--disable-notifications");
@@ -25,20 +24,21 @@ public class SeleniumAnt {
         System.setProperty("webdriver.chrome.driver","A:\\Users\\JJ\\Documents\\GitHub\\Lodestone\\chromedriver.exe");
         //Pass ChromeOptions instance to ChromeDriver Constructor
         WebDriver driver = new ChromeDriver(options);   
-      
+        // explicit wait - to wait for the download button to be click-able
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
         driver.get("https://www.facebook.com/dyi/?referrer=yfi_settings");
         WebElement fb = driver.findElement(By.name("email"));
         fb.sendKeys("destinyblazer@live.com");
         WebElement ps = driver.findElement(By.name("pass"));
         //input ur own password and username
-        ps.sendKeys("p@ssw0rd");
+        ps.sendKeys("passw0rd");
         WebElement login = driver.findElement(By.name("login"));
         login.click();
-
+        
         try{
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label='Format']")));
         WebElement format = driver.findElement(By.cssSelector("[aria-label='Format']"));
         format.click();
-        
         format.sendKeys("j");
         format.sendKeys(Keys.RETURN);
         WebElement ddl = driver.findElement(By.cssSelector("[aria-label='Date range (required)']"));
@@ -57,8 +57,7 @@ public class SeleniumAnt {
 //        catch(InterruptedException ie){
 //        }    
         driver.get("https://www.facebook.com/dyi/?tab=all_archives");
-        // explicit wait - to wait for the download button to be click-able
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
+        
         // click on the Download button as soon as the "Download" button is visible; else wait
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
         
@@ -70,7 +69,6 @@ public class SeleniumAnt {
         
         //to download number of files based on download information given   
         try{
-
         for (int i = 1; i < numFile+1; i++) {     
             driver.findElement(By.cssSelector("[aria-label=Download]")).click();
             if(numFile > 1){
@@ -83,6 +81,6 @@ public class SeleniumAnt {
         }
          catch(InterruptedException e){
             System.out.println(e);
-        }    
+        }       
 }
 }
