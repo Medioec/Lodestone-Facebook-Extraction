@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
+import java.sql.Timestamp;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -156,7 +158,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
-            BlackboardAttribute.Type commentTimestamp;
+            BlackboardAttribute.Type commentDate;
             BlackboardAttribute.Type commentTitle;
             BlackboardAttribute.Type commentCommentString;
             BlackboardAttribute.Type commentAuthor;
@@ -166,7 +168,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 // if artifact type does not exist
                 if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_COMMENT") == null){
                     artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_COMMENT", "Facebook Comment");
-                    commentTimestamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_TIMESTAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.LONG, "Timestamp");
+                    commentDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
                     commentTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
                     commentCommentString = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_COMMENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Comment");
                     commentAuthor = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_AUTHOR", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Author");
@@ -175,7 +177,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 }
                 else{
                     artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_COMMENT");
-                    commentTimestamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_TIMESTAMP");
+                    commentDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_DATE");
                     commentTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_TITLE");
                     commentCommentString = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_COMMENT");
                     commentAuthor = currentCase.getSleuthkitCase().getAttributeType("LS_FBCOMMENT_AUTHOR");
@@ -191,7 +193,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             JsonArray commentsV2 = json.getAsJsonArray("comments_v2");
             for (JsonElement comment:commentsV2){
                 
-                long timestamp = -1;
+                String date = "";
                 String title = "";
                 String commentString = "";
                 String author = "";
@@ -201,7 +203,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 if (comment.isJsonObject()){
                     JsonObject commentObj = (JsonObject)comment;
                     title = commentObj.get("title").getAsString();
-                    timestamp = commentObj.get("timestamp").getAsLong();
+                    date = new Date(new Timestamp(commentObj.get("timestamp").getAsLong()).getTime() * 1000).toString();
                     if (commentObj.has("data")){
                         JsonObject commentData = (JsonObject)commentObj.getAsJsonArray("data").get(0);
                         commentString = commentData.getAsJsonObject("comment").get("comment").getAsString();
@@ -224,7 +226,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     
                     // add variables to attributes
                     Collection<BlackboardAttribute> attributelist = new ArrayList();
-                    attributelist.add(new BlackboardAttribute(commentTimestamp, FacebookIngestModuleFactory.getModuleName(), timestamp));
+                    attributelist.add(new BlackboardAttribute(commentDate, FacebookIngestModuleFactory.getModuleName(), date));
                     attributelist.add(new BlackboardAttribute(commentTitle, FacebookIngestModuleFactory.getModuleName(), title));
                     attributelist.add(new BlackboardAttribute(commentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
                     attributelist.add(new BlackboardAttribute(commentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
