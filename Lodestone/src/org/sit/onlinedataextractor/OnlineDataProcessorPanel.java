@@ -36,22 +36,16 @@ public class OnlineDataProcessorPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private OnlineDataProcessorPanelSettings panelSettings;
-    private String defaultFolderExtraction;
     private boolean panelValid;
 
     public OnlineDataProcessorPanel() {
         initComponents();
         customInit();
-        setComponents(true);
+        setComponents();
     }
 
     private void customInit() {        
         this.panelSettings = new OnlineDataProcessorPanelSettings();
-        this.defaultFolderExtraction = Case.getCurrentCase().getModuleDirectory() + File.separator + "iOSBackup";
-        jTextFieldDefaultFolderExtraction.setText(defaultFolderExtraction);
-        jTextFieldDefaultFolderExtraction.setVisible(false);
-        jTextFieldBackupFolder.setEditable(false);
-        jButtonFolderExtraction.setVisible(false);
         panelValid = true;
     }
 
@@ -64,280 +58,230 @@ public class OnlineDataProcessorPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanelLiveExtraction = new javax.swing.JPanel();
-        jRadioButtonLiveExtraction = new javax.swing.JRadioButton();
-        jCheckBoxChangeDefaultFolder = new javax.swing.JCheckBox();
-        jTextFieldDefaultFolderExtraction = new javax.swing.JTextField();
-        jButtonFolderExtraction = new javax.swing.JButton();
-        jCheckBoxBackupEncrypted = new javax.swing.JCheckBox();
-        jPanelBackupExtraction = new javax.swing.JPanel();
-        jRadioButtonBackupExtraction = new javax.swing.JRadioButton();
-        jTextFieldBackupFolder = new javax.swing.JTextField();
-        jButtonBackupFolder = new javax.swing.JButton();
-        jLabelPassword = new javax.swing.JLabel();
+        jPanelDataExport = new javax.swing.JPanel();
+        jCheckBoxJsonOrHtml = new javax.swing.JCheckBox();
+        jCheckBoxRequestExport = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
+        jPanelDataDownload = new javax.swing.JPanel();
+        jCheckBoxDefaultLatestExport = new javax.swing.JCheckBox();
+        jLabel2 = new javax.swing.JLabel();
+        jPanelCredentials = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
         jPasswordField = new javax.swing.JPasswordField();
-        jLabelDirectory = new javax.swing.JLabel();
-        jCheckBoxExtractToZip = new javax.swing.JCheckBox();
+        jUsernameField = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
-        jPanelLiveExtraction.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanelDataExport.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        jRadioButtonLiveExtraction.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButtonLiveExtraction, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jRadioButtonLiveExtraction.text")); // NOI18N
-        jRadioButtonLiveExtraction.addActionListener(new java.awt.event.ActionListener() {
+        jCheckBoxJsonOrHtml.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBoxJsonOrHtml, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jCheckBoxJsonOrHtml.text")); // NOI18N
+        jCheckBoxJsonOrHtml.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonLiveExtractionActionPerformed(evt);
+                jCheckBoxJsonOrHtmlActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBoxChangeDefaultFolder, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jCheckBoxChangeDefaultFolder.text")); // NOI18N
-        jCheckBoxChangeDefaultFolder.addActionListener(new java.awt.event.ActionListener() {
+        jCheckBoxRequestExport.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBoxRequestExport, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jCheckBoxRequestExport.text")); // NOI18N
+        jCheckBoxRequestExport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxChangeDefaultFolderActionPerformed(evt);
+                jCheckBoxRequestExportActionPerformed(evt);
             }
         });
 
-        jTextFieldDefaultFolderExtraction.setEditable(false);
-        jTextFieldDefaultFolderExtraction.setText(org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jTextFieldDefaultFolderExtraction.text")); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jLabel1.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonFolderExtraction, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jButtonFolderExtraction.text")); // NOI18N
-        jButtonFolderExtraction.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonFolderExtractionActionPerformed(evt);
-            }
-        });
-
-        jCheckBoxBackupEncrypted.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBoxBackupEncrypted, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jCheckBoxBackupEncrypted.text")); // NOI18N
-        jCheckBoxBackupEncrypted.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxBackupEncryptedActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanelLiveExtractionLayout = new javax.swing.GroupLayout(jPanelLiveExtraction);
-        jPanelLiveExtraction.setLayout(jPanelLiveExtractionLayout);
-        jPanelLiveExtractionLayout.setHorizontalGroup(
-            jPanelLiveExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelLiveExtractionLayout.createSequentialGroup()
+        javax.swing.GroupLayout jPanelDataExportLayout = new javax.swing.GroupLayout(jPanelDataExport);
+        jPanelDataExport.setLayout(jPanelDataExportLayout);
+        jPanelDataExportLayout.setHorizontalGroup(
+            jPanelDataExportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelDataExportLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelLiveExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanelLiveExtractionLayout.createSequentialGroup()
-                        .addComponent(jCheckBoxChangeDefaultFolder)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldDefaultFolderExtraction, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelLiveExtractionLayout.createSequentialGroup()
-                        .addComponent(jRadioButtonLiveExtraction)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jCheckBoxBackupEncrypted)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButtonFolderExtraction)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanelDataExportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelDataExportLayout.createSequentialGroup()
+                        .addComponent(jCheckBoxRequestExport)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jCheckBoxJsonOrHtml))
+                    .addGroup(jPanelDataExportLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
-        jPanelLiveExtractionLayout.setVerticalGroup(
-            jPanelLiveExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelLiveExtractionLayout.createSequentialGroup()
+        jPanelDataExportLayout.setVerticalGroup(
+            jPanelDataExportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelDataExportLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelLiveExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButtonLiveExtraction)
-                    .addComponent(jCheckBoxBackupEncrypted))
-                .addGap(4, 4, 4)
-                .addGroup(jPanelLiveExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextFieldDefaultFolderExtraction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonFolderExtraction)
-                    .addComponent(jCheckBoxChangeDefaultFolder))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addGroup(jPanelDataExportLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBoxJsonOrHtml)
+                    .addComponent(jCheckBoxRequestExport))
+                .addContainerGap())
         );
 
-        jPanelBackupExtraction.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanelDataDownload.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButtonBackupExtraction, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jRadioButtonBackupExtraction.text")); // NOI18N
-        jRadioButtonBackupExtraction.addActionListener(new java.awt.event.ActionListener() {
+        jCheckBoxDefaultLatestExport.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBoxDefaultLatestExport, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jCheckBoxDefaultLatestExport.text")); // NOI18N
+        jCheckBoxDefaultLatestExport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButtonBackupExtractionActionPerformed(evt);
+                jCheckBoxDefaultLatestExportActionPerformed(evt);
             }
         });
 
-        jTextFieldBackupFolder.setText(org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jTextFieldBackupFolder.text")); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jLabel2.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButtonBackupFolder, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jButtonBackupFolder.text")); // NOI18N
-        jButtonBackupFolder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonBackupFolderActionPerformed(evt);
-            }
-        });
+        javax.swing.GroupLayout jPanelDataDownloadLayout = new javax.swing.GroupLayout(jPanelDataDownload);
+        jPanelDataDownload.setLayout(jPanelDataDownloadLayout);
+        jPanelDataDownloadLayout.setHorizontalGroup(
+            jPanelDataDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelDataDownloadLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelDataDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBoxDefaultLatestExport)
+                    .addComponent(jLabel2))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanelDataDownloadLayout.setVerticalGroup(
+            jPanelDataDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelDataDownloadLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addComponent(jCheckBoxDefaultLatestExport)
+                .addContainerGap())
+        );
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabelPassword, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jLabelPassword.text")); // NOI18N
+        jPanelCredentials.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jLabel3.text")); // NOI18N
 
         jPasswordField.setText(org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jPasswordField.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabelDirectory, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jLabelDirectory.text")); // NOI18N
+        jUsernameField.setText(org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jUsernameField.text")); // NOI18N
+        jUsernameField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jUsernameFieldActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout jPanelBackupExtractionLayout = new javax.swing.GroupLayout(jPanelBackupExtraction);
-        jPanelBackupExtraction.setLayout(jPanelBackupExtractionLayout);
-        jPanelBackupExtractionLayout.setHorizontalGroup(
-            jPanelBackupExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelBackupExtractionLayout.createSequentialGroup()
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jLabel5.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jLabel4.text")); // NOI18N
+
+        javax.swing.GroupLayout jPanelCredentialsLayout = new javax.swing.GroupLayout(jPanelCredentials);
+        jPanelCredentials.setLayout(jPanelCredentialsLayout);
+        jPanelCredentialsLayout.setHorizontalGroup(
+            jPanelCredentialsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelCredentialsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelBackupExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanelBackupExtractionLayout.createSequentialGroup()
-                        .addComponent(jRadioButtonBackupExtraction)
-                        .addGap(54, 54, 54)
-                        .addComponent(jLabelPassword)
+                .addGroup(jPanelCredentialsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelCredentialsLayout.createSequentialGroup()
+                        .addGroup(jPanelCredentialsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelBackupExtractionLayout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(jLabelDirectory)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldBackupFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonBackupFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanelCredentialsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jUsernameField, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                            .addComponent(jPasswordField)))
+                    .addComponent(jLabel3))
+                .addGap(22, 22, 22))
         );
-        jPanelBackupExtractionLayout.setVerticalGroup(
-            jPanelBackupExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelBackupExtractionLayout.createSequentialGroup()
+        jPanelCredentialsLayout.setVerticalGroup(
+            jPanelCredentialsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelCredentialsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanelBackupExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButtonBackupExtraction)
-                    .addComponent(jLabelPassword)
-                    .addComponent(jPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelBackupExtractionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextFieldBackupFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonBackupFolder)
-                    .addComponent(jLabelDirectory))
+                .addGroup(jPanelCredentialsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jUsernameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelCredentialsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBoxExtractToZip, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jCheckBoxExtractToZip.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jCheckBoxExtractToZip)
-                    .addComponent(jPanelBackupExtraction, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanelLiveExtraction, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jPanelDataDownload, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelDataExport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelCredentials, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanelLiveExtraction, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelBackupExtraction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jCheckBoxExtractToZip)
-                .addContainerGap())
+                .addComponent(jPanelDataExport, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanelDataDownload, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanelCredentials, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jRadioButtonLiveExtractionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonLiveExtractionActionPerformed
-        setComponents(true);        
-    }//GEN-LAST:event_jRadioButtonLiveExtractionActionPerformed
+    private void jCheckBoxDefaultLatestExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxDefaultLatestExportActionPerformed
+        //panelSettings.setDefaultLatestExport(!panelSettings.isDefaultLatestExport());
+    }//GEN-LAST:event_jCheckBoxDefaultLatestExportActionPerformed
 
-    private void jRadioButtonBackupExtractionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonBackupExtractionActionPerformed
-        setComponents(false);
-    }//GEN-LAST:event_jRadioButtonBackupExtractionActionPerformed
-
-    private void jCheckBoxChangeDefaultFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxChangeDefaultFolderActionPerformed
-        if (jCheckBoxChangeDefaultFolder.isSelected()) {
-            jTextFieldDefaultFolderExtraction.setText(defaultFolderExtraction);
-            jTextFieldDefaultFolderExtraction.setVisible(true);
-            jButtonFolderExtraction.setVisible(true);
+    private void jCheckBoxRequestExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxRequestExportActionPerformed
+        if (jCheckBoxRequestExport.isSelected()) {
+            jCheckBoxJsonOrHtml.setEnabled(true);
         } else {
-            jTextFieldDefaultFolderExtraction.setVisible(false);
-            jButtonFolderExtraction.setVisible(false);
+            jCheckBoxJsonOrHtml.setEnabled(false);
         }
-    }//GEN-LAST:event_jCheckBoxChangeDefaultFolderActionPerformed
+        
+        //panelSettings.setDataExport(!panelSettings.isDataExport());
+    }//GEN-LAST:event_jCheckBoxRequestExportActionPerformed
 
-    private void jButtonFolderExtractionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFolderExtractionActionPerformed
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    private void jCheckBoxJsonOrHtmlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxJsonOrHtmlActionPerformed
+        //panelSettings.setJsonOrHtml(!panelSettings.isJsonOrHtml());
+    }//GEN-LAST:event_jCheckBoxJsonOrHtmlActionPerformed
 
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            String directory = chooser.getSelectedFile().getAbsolutePath();
-            jTextFieldDefaultFolderExtraction.setText(directory);
-        }
-    }//GEN-LAST:event_jButtonFolderExtractionActionPerformed
-
-    private void jButtonBackupFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBackupFolderActionPerformed
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            String directory = chooser.getSelectedFile().getAbsolutePath();
-            jTextFieldBackupFolder.setText(directory);
-            jPasswordField.setEnabled(true);
-            panelValid = true;
-            fireUpdateEvent();
-        }
-    }//GEN-LAST:event_jButtonBackupFolderActionPerformed
-
-    private void jCheckBoxBackupEncryptedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxBackupEncryptedActionPerformed
+    private void jUsernameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jUsernameFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBoxBackupEncryptedActionPerformed
+    }//GEN-LAST:event_jUsernameFieldActionPerformed
 
-    private void setComponents(boolean isLiveExtraction) {
-        if (isLiveExtraction) {
-            jRadioButtonLiveExtraction.setSelected(true);
-            jRadioButtonBackupExtraction.setSelected(false);
-
-            jPanelLiveExtraction.setEnabled(true);
-            jCheckBoxChangeDefaultFolder.setEnabled(true);
-            jTextFieldDefaultFolderExtraction.setEnabled(true);
-            jCheckBoxBackupEncrypted.setEnabled(true);
-            jButtonFolderExtraction.setEnabled(true);
-            jTextFieldBackupFolder.setEnabled(false);
-            jPanelBackupExtraction.setEnabled(false);
-            jButtonBackupFolder.setEnabled(false);
-            jPasswordField.setEnabled(false);
-            jLabelPassword.setEnabled(false);
-            panelValid = true;
-        } else {
-            jRadioButtonLiveExtraction.setSelected(false);
-            jRadioButtonBackupExtraction.setSelected(true);
-
-            jPanelLiveExtraction.setEnabled(false);
-            jCheckBoxChangeDefaultFolder.setEnabled(false);
-            jTextFieldDefaultFolderExtraction.setEnabled(false);
-            jCheckBoxBackupEncrypted.setEnabled(false);
-            jButtonFolderExtraction.setEnabled(false);
-            jTextFieldBackupFolder.setEnabled(true);
-            jPanelBackupExtraction.setEnabled(true);
-            jButtonBackupFolder.setEnabled(true);
-            jLabelPassword.setEnabled(true);
-            if ("".equals(jTextFieldBackupFolder.getText())) {
-                panelValid = false;
-                jPasswordField.setEnabled(false);
-            } else {
-                panelValid = true;
-                jPasswordField.setEnabled(true);
-            }
-        }
-        fireUpdateEvent();
+    private void setComponents() {
+        jPanelDataExport.setEnabled(true);
+        jPanelDataDownload.setEnabled(true);
+        jPanelCredentials.setEnabled(true);
+        
+        jCheckBoxRequestExport.setEnabled(true);
+        jCheckBoxJsonOrHtml.setEnabled(true);
+        jCheckBoxDefaultLatestExport.setEnabled(true);
+        jUsernameField.setEnabled(true);
+        jPasswordField.setEnabled(true);
+        
+        panelValid = true;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonBackupFolder;
-    private javax.swing.JButton jButtonFolderExtraction;
-    private javax.swing.JCheckBox jCheckBoxBackupEncrypted;
-    private javax.swing.JCheckBox jCheckBoxChangeDefaultFolder;
-    private javax.swing.JCheckBox jCheckBoxExtractToZip;
-    private javax.swing.JLabel jLabelDirectory;
-    private javax.swing.JLabel jLabelPassword;
-    private javax.swing.JPanel jPanelBackupExtraction;
-    private javax.swing.JPanel jPanelLiveExtraction;
+    private javax.swing.JCheckBox jCheckBoxDefaultLatestExport;
+    private javax.swing.JCheckBox jCheckBoxJsonOrHtml;
+    private javax.swing.JCheckBox jCheckBoxRequestExport;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanelCredentials;
+    private javax.swing.JPanel jPanelDataDownload;
+    private javax.swing.JPanel jPanelDataExport;
     private javax.swing.JPasswordField jPasswordField;
-    private javax.swing.JRadioButton jRadioButtonBackupExtraction;
-    private javax.swing.JRadioButton jRadioButtonLiveExtraction;
-    private javax.swing.JTextField jTextFieldBackupFolder;
-    private javax.swing.JTextField jTextFieldDefaultFolderExtraction;
+    private javax.swing.JTextField jUsernameField;
     // End of variables declaration//GEN-END:variables
 
     public boolean validatePanel() {
@@ -345,33 +289,18 @@ public class OnlineDataProcessorPanel extends javax.swing.JPanel {
     }
 
     public void resetPanel() {
-        setComponents(true);
-        jTextFieldBackupFolder.setText("");
-        jTextFieldDefaultFolderExtraction.setText(defaultFolderExtraction);
+        setComponents();
+        jUsernameField.setText("");
+        jPasswordField.setText("");
     }
 
     public OnlineDataProcessorPanelSettings getPanelSettings() {
-
-        panelSettings.setLiveExtraction(jRadioButtonLiveExtraction.isSelected());
-        panelSettings.setPassword(new String(jPasswordField.getPassword()));
-        if (jRadioButtonLiveExtraction.isSelected()) {
-            panelSettings.setExtractDirectoryName(jTextFieldDefaultFolderExtraction.getText());
-        } else {
-            panelSettings.setExtractDirectoryName(jTextFieldBackupFolder.getText());
-        }
-        panelSettings.setExtractToZip(jCheckBoxExtractToZip.isSelected());
-        panelSettings.setBackupEncrypted(jCheckBoxBackupEncrypted.isSelected());
+        panelSettings.setDataExport(jCheckBoxRequestExport.isSelected());
+        panelSettings.setJsonOrHtml(jCheckBoxJsonOrHtml.isSelected());
+        panelSettings.setDefaultLatestExport(jCheckBoxDefaultLatestExport.isSelected());
+        
+        panelSettings.setUsername(jUsernameField.getText());
+        panelSettings.setPassword(jPasswordField.getText());
         return panelSettings;
     }
-
-    private void fireUpdateEvent() {
-        try {
-            firePropertyChange(OnlineDataProcessor.DSP_PANEL_EVENT.UPDATE_UI.toString(), false, true);
-        } catch (Exception e) {
-            MessageNotifyUtil.Notify.show(Bundle.DeviceDataProcessorPanel_moduleErrorMessage_title(),
-                    Bundle.DeviceDataProcessorPanel_moduleErrorMessage_body(),
-                    MessageNotifyUtil.MessageType.ERROR);
-        }
-    }
-
 }
