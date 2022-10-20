@@ -38,6 +38,7 @@ public class SeleniumAnt {
         try{
         WebElement format = driver.findElement(By.cssSelector("[aria-label='Format']"));
         format.click();
+        
         format.sendKeys("j");
         format.sendKeys(Keys.RETURN);
         WebElement ddl = driver.findElement(By.cssSelector("[aria-label='Date range (required)']"));
