@@ -23,35 +23,42 @@ package org.sit.onlinedataextractor;
 
 
 public class OnlineDataProcessorPanelSettings {
-    private boolean liveExtraction;
-    private String extractDirectoryName;
+    private boolean dataExport;
+    private boolean jsonOrHtml;
+    private boolean defaultLatestExport;
+    private String username;
     private String password;
-    private boolean extractToZip;
-    private boolean backupEncrypted;
 
-    
-    public boolean isExtractToZip() {
-        return extractToZip;
+    public boolean isDataExport() {
+        return dataExport;
     }
 
-    public void setExtractToZip(boolean extractToZip) {
-        this.extractToZip = extractToZip;
-    }
-        
-    public boolean isLiveExtraction() {
-        return liveExtraction;
+    public void setDataExport(boolean dataExport) {
+        this.dataExport = dataExport;
     }
 
-    public void setLiveExtraction(boolean isLiveExtraction) {
-        this.liveExtraction = isLiveExtraction;
+    public boolean isJsonOrHtml() {
+        return jsonOrHtml;
     }
 
-    public String getExtractDirectoryName() {
-        return extractDirectoryName;
+    public void setJsonOrHtml(boolean jsonOrHtml) {
+        this.jsonOrHtml = jsonOrHtml;
     }
 
-    public void setExtractDirectoryName(String extractDirectoryName) {
-        this.extractDirectoryName = extractDirectoryName;
+    public boolean isDefaultLatestExport() {
+        return defaultLatestExport;
+    }
+
+    public void setDefaultLatestExport(boolean defaultLatestExport) {
+        this.defaultLatestExport = defaultLatestExport;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -60,13 +67,5 @@ public class OnlineDataProcessorPanelSettings {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public boolean isBackupEncrypted() {
-        return backupEncrypted;
-    }
-
-    public void setBackupEncrypted(boolean backupEncrypted) {
-        this.backupEncrypted = backupEncrypted;
-    }        
+    }      
 }
