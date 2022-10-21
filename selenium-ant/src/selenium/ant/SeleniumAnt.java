@@ -31,7 +31,7 @@ public class SeleniumAnt {
         fb.sendKeys("destinyblazer@live.com");
         WebElement ps = driver.findElement(By.name("pass"));
         //input ur own password and username
-        ps.sendKeys("passw0rd");
+        ps.sendKeys("passw0rdfree");
         WebElement login = driver.findElement(By.name("login"));
         login.click();
         
@@ -72,6 +72,9 @@ public class SeleniumAnt {
         for (int i = 1; i < numFile+1; i++) {     
             driver.findElement(By.cssSelector("[aria-label=Download]")).click();
             if(numFile > 1){
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
+                        + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
+                        + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")));
                 driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
                         + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
                         + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
