@@ -68,10 +68,7 @@ public class OnlineDataProcessor implements DataSourceProcessor {
 //        }
 //        catch(InterruptedException ie){
 //        }    
-        driver.get("https://www.facebook.com/dyi/?tab=all_archives");
-        
-        // click on the Download button as soon as the "Download" button is visible; else wait
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
+        driver.get("https://www.facebook.com/dyi/?tab=all_archives");   
         
         String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
         System.out.println(numFiles);
@@ -81,7 +78,9 @@ public class OnlineDataProcessor implements DataSourceProcessor {
         
         //to download number of files based on download information given   
         try{
-        for (int i = 1; i < numFile+1; i++) {     
+        for (int i = 1; i < numFile+1; i++) {
+            // click on the Download button as soon as the "Download" button is visible; else wait
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
             driver.findElement(By.cssSelector("[aria-label=Download]")).click();
             if(numFile > 1){
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
