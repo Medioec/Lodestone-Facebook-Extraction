@@ -6,7 +6,6 @@
 package org.sit.onlinedataextractor;
 
 
-import org.openide.util.NbBundle.Messages;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -42,13 +41,14 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+
 /**
  *
  * @author Alford
  */
 public class addOnlineDataTask implements Runnable {
     public static final IngestServices ingestServices = IngestServices.getInstance();
-    public static final Logger logger = ingestServices.getLogger("iOSDeviceDataExtractor"); 
+    public static final Logger logger = ingestServices.getLogger("FacebookDataExtractor"); 
     
     private final DataSourceProcessorProgressMonitor progressMonitor;
     private final DataSourceProcessorCallback callbackObj;
@@ -78,20 +78,17 @@ public class addOnlineDataTask implements Runnable {
     @Override    
     public void run() {
         errorList.clear();
-        
-         //Create a instance of ChromeOptions class
+        //Create a instance of ChromeOptions class
         ChromeOptions options = new ChromeOptions();
         //Add chrome switch to disable notification - "**--disable-notifications**"
         options.addArguments("--disable-notifications");
-        //Set path for driver exe  
-        System.setProperty("webdriver.chrome.driver","A:\\Users\\JJ\\Documents\\GitHub\\Lodestone\\chromedriver.exe");
         //Pass ChromeOptions instance to ChromeDriver Constructor
         WebDriver driver = new ChromeDriver(options);
          // explicit wait - to wait for the download button to be click-able
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
          
         String username = panelSettings.getUsername();
-        String password = panelSettings.getUsername();
+        String password = panelSettings.getPassword();
         Boolean formatType = panelSettings.isJsonOrHtml();
         Boolean LatestExport = panelSettings.isDefaultLatestExport();
               
@@ -157,8 +154,7 @@ public class addOnlineDataTask implements Runnable {
                  catch(InterruptedException e){
                     System.out.println(e);
                 }            
-        }        
-       
+        }
         
         //// this is just a test, not supposed to run the script here, create a thread to run these instead
         DataSourceProcessorCallback.DataSourceProcessorResult result = DataSourceProcessorCallback.DataSourceProcessorResult.NO_ERRORS;

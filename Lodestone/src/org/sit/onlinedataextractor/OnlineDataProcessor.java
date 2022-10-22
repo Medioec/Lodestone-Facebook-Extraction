@@ -1,9 +1,7 @@
-
 package org.sit.onlinedataextractor;
 
-
+import java.io.File;
 import javax.swing.JPanel;
-
 import org.sleuthkit.autopsy.corecomponentinterfaces.DataSourceProcessor;
 import org.sleuthkit.autopsy.corecomponentinterfaces.DataSourceProcessorCallback;
 import org.sleuthkit.autopsy.corecomponentinterfaces.DataSourceProcessorProgressMonitor;
@@ -15,9 +13,12 @@ public class OnlineDataProcessor implements DataSourceProcessor {
 
     private final String modulename = "Extraction data from online cloud sources";
     private final OnlineDataProcessorPanel processorPanel;
+    private final String projectDir;
 
     public OnlineDataProcessor() {
-        processorPanel = new OnlineDataProcessorPanel();     
+        processorPanel = new OnlineDataProcessorPanel();
+        this.projectDir = new File("").getAbsolutePath();
+        System.setProperty("webdriver.chrome.driver",projectDir+"\\chromedriver.exe");
     }
 
     @Override
@@ -36,15 +37,11 @@ public class OnlineDataProcessor implements DataSourceProcessor {
     }
 
     @Override
-    public void run(DataSourceProcessorProgressMonitor progressMonitor, DataSourceProcessorCallback callback) {
-        //WebDriver driver = new ChromeDriver();
-        //driver.get("http://www.yahoo.com/");
-        //new Thread(new addDeviceDataTask(processorPanel.getPanelSettings(), progressMonitor, callback)).start();
-    }
+    public void run(DataSourceProcessorProgressMonitor progressMonitor, DataSourceProcessorCallback callback) {}
 
     @Override // Live
     public void run(Host host, DataSourceProcessorProgressMonitor progressMonitor, DataSourceProcessorCallback callback) {
-       
+        System.out.println("Starting Processor");
         new Thread(new addOnlineDataTask(host, processorPanel.getPanelSettings(), progressMonitor, callback)).start();
     }
 
@@ -57,5 +54,5 @@ public class OnlineDataProcessor implements DataSourceProcessor {
     public void reset() {
         processorPanel.resetPanel();
     }
-
 }
+
