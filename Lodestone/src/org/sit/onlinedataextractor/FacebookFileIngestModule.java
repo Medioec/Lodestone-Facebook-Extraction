@@ -107,6 +107,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 case "comments.json":
                     processComments(af);
                     break;
+                case "posts_and_comments.json":
+                    processReactions(af);
+                    break;
             }
         }
         
@@ -249,5 +252,127 @@ public class FacebookFileIngestModule implements FileIngestModule{
         }
         
     }
+    
+    
+    //testing on reactions
+    private void processReactions(AbstractFile af){
+        int intsize;
+        long size = af.getSize();
+        byte[] jsonBytes;
+        if (size > Integer.MAX_VALUE){
+            //do later
+            jsonBytes = new byte[Integer.MAX_VALUE];
+        }
+        else {
+            intsize = (int)size;
+            jsonBytes = new byte[intsize];
+        }
+        try{
+            af.read(jsonBytes, 0, size);
+        }
+        catch(TskCoreException e){
+            logger.log(Level.SEVERE, "File read failure");
+        }
+        
+        String jsonString = new String(jsonBytes, StandardCharsets.UTF_8);
+        JsonParser jsonParser = new JsonParser();
+        JsonObject json = (JsonObject)jsonParser.parse(jsonString);
+        if(json.has("reactions_v2")){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type reactionDate;
+            BlackboardAttribute.Type reactionTitle;
+            BlackboardAttribute.Type reactionReactionString;
+            BlackboardAttribute.Type reactionAuthor;
+            BlackboardAttribute.Type reactionUri;
+            BlackboardAttribute.Type reactionUrl;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_COMMENT") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_REACTION", "Facebook reaction");
+                    reactionDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBREACTION_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    reactionTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBREACTION_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                    reactionReactionString = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBREACTION_REACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Comment");
+                    reactionAuthor = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBREACTION_AUTHOR", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Author");
+                    reactionUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBREACTION_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
+                    reactionUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBREACTION_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_REACTION");
+                    reactionDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBREACTION_DATE");
+                    reactionTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FBREACTION_TITLE");
+                    reactionReactionString = currentCase.getSleuthkitCase().getAttributeType("LS_FBREACTION_REACTION");
+                    reactionAuthor = currentCase.getSleuthkitCase().getAttributeType("LS_FBREACTION_AUTHOR");
+                    reactionUri = currentCase.getSleuthkitCase().getAttributeType("LS_FFBREACTION_URI");
+                    reactionUrl = currentCase.getSleuthkitCase().getAttributeType("LS_FBREACTION_URL");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                // TODO handling
+                return;
+            }
+            
+            JsonArray reactionsV2 = json.getAsJsonArray("reactions_v2");
+            for (JsonElement reaction:reactionsV2){
+                
+                String date = "";
+                String title = "";
+                String reactionString = "";
+                String actor = "";
+                String uri = "";
+                String url = "";
+                
+                if (reaction.isJsonObject()){
+                    JsonObject reactionObj = (JsonObject)reaction;
+                    title = reactionObj.get("title").getAsString();
+                    date = new Date(new Timestamp(reactionObj.get("timestamp").getAsLong()).getTime() * 1000).toString();
+                    if (reactionObj.has("data")){
+                        JsonObject reactionData = (JsonObject)reactionObj.getAsJsonArray("data").get(0);
+                        reactionString = reactionData.getAsJsonObject("reaction").get("reaction").getAsString();
+                        actor = reactionData.getAsJsonObject("reaction").get("actor").getAsString();
+                    }
+                    if (reactionObj.has("attachments")){
+                        JsonArray attachments = reactionObj.getAsJsonArray("attachments");
+                        for (JsonElement data:attachments){
+                            JsonArray attachArray = ((JsonObject)data).getAsJsonArray("data");
+                            for (JsonElement obj:attachArray){
+                                if (((JsonObject)obj).has("external_context")){
+                                    url = ((JsonObject)obj).getAsJsonObject("external_context").get("url").getAsString();
+                                }
+                                else if (((JsonObject)obj).has("media")){
+                                    uri = ((JsonObject)obj).getAsJsonObject("media").get("uri").getAsString();
+                                }
+                            }
+                        }
+                    }
+                    
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(reactionDate, FacebookIngestModuleFactory.getModuleName(), date));
+                    attributelist.add(new BlackboardAttribute(reactionTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                    attributelist.add(new BlackboardAttribute(reactionReactionString, FacebookIngestModuleFactory.getModuleName(), reactionString));
+                    attributelist.add(new BlackboardAttribute(reactionAuthor, FacebookIngestModuleFactory.getModuleName(), actor));
+                    attributelist.add(new BlackboardAttribute(reactionUri, FacebookIngestModuleFactory.getModuleName(), uri));
+                    attributelist.add(new BlackboardAttribute(reactionUrl, FacebookIngestModuleFactory.getModuleName(), url));
+                    
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        // handle exception
+                        return;
+                    }
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No reactions_v2 found");
+            return;
+        }
+        
+    }
+    
+    
     
 }
