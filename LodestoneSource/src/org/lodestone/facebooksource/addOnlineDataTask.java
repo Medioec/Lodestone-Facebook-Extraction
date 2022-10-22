@@ -151,9 +151,9 @@ public class addOnlineDataTask implements Runnable {
         if(LatestExport == true)
         {
             try{
-                Thread.sleep(200);
+                Thread.sleep(600);
                 driver.get("https://www.facebook.com/dyi/?tab=all_archives");
-                Thread.sleep(100);
+                Thread.sleep(600);
                 String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
                 System.out.println(numFiles);
 
