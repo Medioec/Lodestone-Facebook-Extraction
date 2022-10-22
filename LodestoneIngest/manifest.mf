@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: true
+OpenIDE-Module: org.lodestone.facebookingest
+OpenIDE-Module-Localizing-Bundle: org/lodestone/facebookingest/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
