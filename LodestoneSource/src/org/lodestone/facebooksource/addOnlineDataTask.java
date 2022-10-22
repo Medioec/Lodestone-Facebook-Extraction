@@ -7,6 +7,7 @@ package org.lodestone.facebooksource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import org.openqa.selenium.WebDriver;
@@ -31,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -55,17 +55,24 @@ public class addOnlineDataTask implements Runnable {
     private final Host host;
     
     private boolean hasCriticalError = false;
-    private final List<String> errorList = new ArrayList<>();
     private final OnlineDataProcessorPanelSettings panelSettings;
-    private final List<String> localFilePaths = new ArrayList<>();
-    private final List<Content> newDataSources = new ArrayList<>();
+    private List<String> errorList;
+    private List<String> localFilePaths;
+    private List<Content> newDataSources;
+    private final String modDir;
+    private final String newDataSourceName;
     
     
     public addOnlineDataTask(Host host, OnlineDataProcessorPanelSettings panelSettings, DataSourceProcessorProgressMonitor aProgressMonitor, DataSourceProcessorCallback cbObj){
         this.host = null;
         this.progressMonitor = aProgressMonitor;
         this.callbackObj = cbObj;
-        this.panelSettings = panelSettings;        
+        this.panelSettings = panelSettings;
+        this.errorList = new ArrayList<>();
+        this.localFilePaths = new ArrayList<>();
+        this.newDataSources = new ArrayList<>();
+        this.modDir = Case.getCurrentCase().getModulesOutputDirAbsPath()+"\\Facebook\\";
+        this.newDataSourceName = "Facebook";
     }
     
     @Messages({
@@ -78,10 +85,26 @@ public class addOnlineDataTask implements Runnable {
     @Override    
     public void run() {
         errorList.clear();
+        
+        FileManager fileManager = Case.getCurrentCase().getServices().getFileManager();
+        
+        
         //Create a instance of ChromeOptions class
         ChromeOptions options = new ChromeOptions();
         //Add chrome switch to disable notification - "**--disable-notifications**"
         options.addArguments("--disable-notifications");
+        
+        try {
+            Files.createDirectories(Paths.get(modDir));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+        chromePrefs.put("profile.default_content_settings.popups", 0);
+        chromePrefs.put("download.default_directory", modDir);
+        options.setExperimentalOption("prefs", chromePrefs);
+        
         //Pass ChromeOptions instance to ChromeDriver Constructor
         WebDriver driver = new ChromeDriver(options);
          // explicit wait - to wait for the download button to be click-able
@@ -127,15 +150,18 @@ public class addOnlineDataTask implements Runnable {
         //download files
         if(LatestExport == true)
         {
-            driver.get("https://www.facebook.com/dyi/?tab=all_archives");   
-            String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
-            System.out.println(numFiles);
+            try{
+                Thread.sleep(200);
+                driver.get("https://www.facebook.com/dyi/?tab=all_archives");
+                Thread.sleep(100);
+                String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
+                System.out.println(numFiles);
 
-            String numFilesArray[] = numFiles.split(" ", 2);
-            int numFile = Integer.parseInt(numFilesArray[0]); 
+                String numFilesArray[] = numFiles.split(" ", 2);
+                int numFile = Integer.parseInt(numFilesArray[0]); 
 
-            //to download number of files based on download information given   
-                try{
+                //to download number of files based on download information given   
+                
                 for (int i = 1; i < numFile+1; i++) {
                     // click on the Download button as soon as the "Download" button is visible; else wait
                     wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
@@ -150,53 +176,34 @@ public class addOnlineDataTask implements Runnable {
                     }
                     Thread.sleep(600);
                 }
-                }
-                 catch(InterruptedException e){
-                    System.out.println(e);
-                }            
+            }
+            catch(InterruptedException e){
+               System.out.println(e);
+            }
         }
         
-        //// this is just a test, not supposed to run the script here, create a thread to run these instead
-        DataSourceProcessorCallback.DataSourceProcessorResult result = DataSourceProcessorCallback.DataSourceProcessorResult.NO_ERRORS;
-        List<String> errorList = new ArrayList<>();
-        List<Content> newDataSources = new ArrayList<>();
-        List<String> localFilePaths = new ArrayList<>();
+        errorList = new ArrayList<>();
+        newDataSources = new ArrayList<>();
+        localFilePaths = new ArrayList<>();
         
-        // trying copying local file to module output file
-        FileManager fileManager = Case.getCurrentCase().getServices().getFileManager();
-        String modDir = Case.getCurrentCase().getModulesOutputDirAbsPath();
-        String newDataSourceName = "Facebook";
+        // Adding downloaded files as a Data Source
+        File downloadFolder = new File(modDir);
+        File[] listOfFiles = downloadFolder.listFiles();
         
-        String sourceFilePath = "D:\\Desktop\\OneDrive - Singapore Institute Of Technology\\Singapore Institute of Technology\\2.1\\Schedule.csmo";
-        
-        File source = new File(sourceFilePath);
-        String src_filename = source.getName();
-        String destFilePath = modDir+"\\Facebook\\"+src_filename;
-        File dest = new File(destFilePath);
+        for (File file : listOfFiles) {
+            localFilePaths.add(file.getAbsolutePath());
+            System.out.println(file.getAbsolutePath());
+        }
+        LocalFilesDataSource newDataSource;
         try {
-            Files.createDirectories(Paths.get(modDir+"\\Facebook"));
-            Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        String sourceFilePath1 = "E:\\Desktop\\School Stuff\\Singapore Institute of Technology\\Miscellaneous\\Programming\\Autopsy\\GoogleTakeout\\Outlook.pst";
-        String sourceFilePath2 = "E:\\Desktop\\School Stuff\\Singapore Institute of Technology\\Miscellaneous\\Programming\\Autopsy\\GoogleTakeout\\SolrCore.properties";
-        // local file to add, probably downloaded files
-        localFilePaths.add(destFilePath);
-        localFilePaths.add(sourceFilePath1);
-        localFilePaths.add(sourceFilePath2);
-        try {
-            LocalFilesDataSource newDataSource = fileManager.addLocalFilesDataSource(UUID.randomUUID().toString(), newDataSourceName, "", host, localFilePaths, new ProgressUpdater());
+            newDataSource = fileManager.addLocalFilesDataSource(UUID.randomUUID().toString(), newDataSourceName, "", host, localFilePaths, new ProgressUpdater());
+            newDataSources.add(newDataSource);
         } catch (TskCoreException | TskDataException ex) {
             errorList.add(Bundle.addOnlineDataTask_error_add_files_dataSources());
             logger.log(Level.SEVERE, Bundle.addOnlineDataTask_error_add_files_dataSources());
             hasCriticalError = true;                    
         }
-        System.out.println(source.toPath());
-        System.out.println(src_filename);
-        System.out.println(destFilePath);
+        
         doCallBack();
     }
     
