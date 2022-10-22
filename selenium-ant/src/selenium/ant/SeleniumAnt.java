@@ -31,7 +31,7 @@ public class SeleniumAnt {
         fb.sendKeys("destinyblazer@live.com");
         WebElement ps = driver.findElement(By.name("pass"));
         //input ur own password and username
-        ps.sendKeys("passw0rdfree");
+        ps.sendKeys("p@ssw0rdfree");
         WebElement login = driver.findElement(By.name("login"));
         login.click();
         
