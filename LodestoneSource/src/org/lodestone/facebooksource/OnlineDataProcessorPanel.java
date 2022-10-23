@@ -84,6 +84,7 @@ public class OnlineDataProcessorPanel extends javax.swing.JPanel {
 
         jCheckBoxRequestExport.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(jCheckBoxRequestExport, org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jCheckBoxRequestExport.text")); // NOI18N
+        jCheckBoxRequestExport.setActionCommand(org.openide.util.NbBundle.getMessage(OnlineDataProcessorPanel.class, "OnlineDataProcessorPanel.jCheckBoxRequestExport.actionCommand")); // NOI18N
         jCheckBoxRequestExport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxRequestExportActionPerformed(evt);
