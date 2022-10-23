@@ -128,12 +128,13 @@ public class addOnlineDataTask implements Runnable {
         //calls data request method
         DataRequest(driver,formatType,DataExport);
         //download files, if true wait if there is a pending request, if no pending request = download latest available file.
+        driver.get("https://www.facebook.com/dyi/?tab=all_archives");
         if(LatestExport == true)
         {
             try{
-                Thread.sleep(600);
-                driver.get("https://www.facebook.com/dyi/?tab=all_archives");
-                Thread.sleep(500);
+                
+                
+                Thread.sleep(800);
                 try{
                     //Wait until pending disappears
                 String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")).getText();
@@ -152,7 +153,7 @@ public class addOnlineDataTask implements Runnable {
                 String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
                 String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
                 
-                progressMonitor.setProgressText("Downloading file \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality"\n"+numFiles);
+                progressMonitor.setProgressText("Downloading file \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles);
                 ////span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]
 
                 //to download number of files based on download information given   
@@ -175,6 +176,37 @@ public class addOnlineDataTask implements Runnable {
             catch(InterruptedException e){
                System.out.println(e);
             }
+        }
+        else{
+            try{
+            String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
+                System.out.println(numFiles);
+                String numFilesArray[] = numFiles.split(" ", 2);
+                int numFile = Integer.parseInt(numFilesArray[0]);
+                String fileDate = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]")).getText();
+                String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
+                String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
+                
+                progressMonitor.setProgressText("Downloading file \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles);
+            for (int i = 1; i < numFile+1; i++) {
+                    // click on the Download button as soon as the "Download" button is visible; else wait
+                    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
+                    driver.findElement(By.cssSelector("[aria-label=Download]")).click();
+                    if(numFile > 1){
+                        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
+                                + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
+                                + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")));
+                        driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
+                                + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
+                                + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
+                    }
+                    Thread.sleep(600);
+                }
+            }
+            catch(InterruptedException e){
+               System.out.println(e);
+            }
+            
         }
         
         errorList = new ArrayList<>();
