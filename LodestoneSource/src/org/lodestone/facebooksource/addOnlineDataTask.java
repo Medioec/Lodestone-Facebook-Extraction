@@ -114,6 +114,7 @@ public class addOnlineDataTask implements Runnable {
         String password = panelSettings.getPassword();
         Boolean formatType = panelSettings.isJsonOrHtml();
         Boolean LatestExport = panelSettings.isDefaultLatestExport();
+        Boolean DataExport =panelSettings.isDataExport();
               
         driver.get("https://www.facebook.com/dyi/?referrer=yfi_settings");
         WebElement fb = driver.findElement(By.name("email"));
@@ -123,40 +124,26 @@ public class addOnlineDataTask implements Runnable {
         ps.sendKeys(password);
         WebElement login = driver.findElement(By.name("login"));
         login.click();
-        
-        if(panelSettings.isDataExport()){
-            try{
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label='Format']")));
-            WebElement format = driver.findElement(By.cssSelector("[aria-label='Format']"));
-            format.click();
-            //if true; export file as json, else html
-            if(formatType == true)
-            format.sendKeys("j");
-            else{
-            format.sendKeys("h");}
-
-            format.sendKeys(Keys.RETURN);
-            WebElement ddl = driver.findElement(By.cssSelector("[aria-label='Date range (required)']"));
-            ddl.click();
-            ddl.sendKeys("a");
-            ddl.sendKeys(Keys.RETURN);
-            WebElement requestdl = driver.findElement(By.cssSelector("[aria-label='Request a download']"));
-            requestdl.click();
-            }
-            catch(Exception e){
-            System.out.println(e);
-            }
-        }
-        //download files
+        //calls data request method
+        DataRequest(driver,formatType,DataExport);
+        //download files, if true wait if there is a pending request, if no pending request = download latest available file.
         if(LatestExport == true)
         {
             try{
                 Thread.sleep(600);
                 driver.get("https://www.facebook.com/dyi/?tab=all_archives");
+                Thread.sleep(500);
+                try{
+                    //Wait until pending disappears
+                String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")).getText();
+                wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")));
                 Thread.sleep(600);
+                }
+                catch(Exception e){
+                   System.out.println("No Pending files available for download"); 
+                }
                 String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
                 System.out.println(numFiles);
-
                 String numFilesArray[] = numFiles.split(" ", 2);
                 int numFile = Integer.parseInt(numFilesArray[0]); 
 
@@ -206,6 +193,35 @@ public class addOnlineDataTask implements Runnable {
         
         doCallBack();
     }
+    private void DataRequest(WebDriver driver, Boolean formatType, Boolean dataExport){
+        
+         // explicit wait - to wait for the download button to be click-able
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
+         if(dataExport){
+            try{
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label='Format']")));
+            WebElement format = driver.findElement(By.cssSelector("[aria-label='Format']"));
+            format.click();
+            //if true; export file as json, else html
+            if(formatType == true)
+            format.sendKeys("j");
+            else{
+            format.sendKeys("h");}
+
+            format.sendKeys(Keys.RETURN);
+            WebElement ddl = driver.findElement(By.cssSelector("[aria-label='Date range (required)']"));
+            ddl.click();
+            ddl.sendKeys("a");
+            ddl.sendKeys(Keys.RETURN);
+            WebElement requestdl = driver.findElement(By.cssSelector("[aria-label='Request a download']"));
+            requestdl.click();
+            }
+            catch(Exception e){
+            System.out.println(e);
+            }
+        }
+    }
+    
     
     private void doCallBack() {
         DataSourceProcessorCallback.DataSourceProcessorResult result;
