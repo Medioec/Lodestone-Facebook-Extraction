@@ -128,13 +128,17 @@ public class addOnlineDataTask implements Runnable {
         //calls data request method
         DataRequest(driver,formatType,DataExport);
         //download files, if true wait if there is a pending request, if no pending request = download latest available file.
-        driver.get("https://www.facebook.com/dyi/?tab=all_archives");
+        try{     
+                Thread.sleep(600);
+                driver.get("https://www.facebook.com/dyi/?tab=all_archives");}
+        catch(InterruptedException e){
+               System.out.println(e);
+            }
         if(LatestExport == true)
         {
             try{
                 
-                
-                Thread.sleep(800);
+                Thread.sleep(600);
                 try{
                     //Wait until pending disappears
                 String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")).getText();
@@ -179,7 +183,8 @@ public class addOnlineDataTask implements Runnable {
         }
         else{
             try{
-            String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
+                Thread.sleep(800);
+                String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
                 System.out.println(numFiles);
                 String numFilesArray[] = numFiles.split(" ", 2);
                 int numFile = Integer.parseInt(numFilesArray[0]);
