@@ -40,6 +40,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.lodestone.facebooksource.Bundle;
+import sun.net.ProgressMonitor;
 
 
 /**
@@ -136,6 +137,7 @@ public class addOnlineDataTask implements Runnable {
                 try{
                     //Wait until pending disappears
                 String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")).getText();
+                progressMonitor.setProgressText("Files "+status+" for download, please wait");
                 wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")));
                 Thread.sleep(600);
                 }
@@ -145,7 +147,13 @@ public class addOnlineDataTask implements Runnable {
                 String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
                 System.out.println(numFiles);
                 String numFilesArray[] = numFiles.split(" ", 2);
-                int numFile = Integer.parseInt(numFilesArray[0]); 
+                int numFile = Integer.parseInt(numFilesArray[0]);
+                String fileDate = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]")).getText();
+                String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
+                String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
+                
+                progressMonitor.setProgressText("Downloading file \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality"\n"+numFiles);
+                ////span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]
 
                 //to download number of files based on download information given   
                 
