@@ -49,6 +49,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.zip.ZipFile;
 import org.openide.util.Exceptions;
 import org.openqa.selenium.io.Zip;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -60,6 +61,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
  *
  * @author Alford
  */
+
 public class addOnlineDataTask implements Runnable {
     public static final IngestServices ingestServices = IngestServices.getInstance();
     public static final Logger logger = ingestServices.getLogger("FacebookDataExtractor"); 
@@ -76,7 +78,7 @@ public class addOnlineDataTask implements Runnable {
     private final String modDir;
     private final String newDataSourceName;
     
-    
+
     public addOnlineDataTask(Host host, OnlineDataProcessorPanelSettings panelSettings, DataSourceProcessorProgressMonitor aProgressMonitor, DataSourceProcessorCallback cbObj){
         this.host = null;
         this.progressMonitor = aProgressMonitor;
@@ -131,6 +133,7 @@ public class addOnlineDataTask implements Runnable {
         Boolean DataExport =panelSettings.isDataExport();
               
         driver.get("https://www.facebook.com/dyi/?referrer=yfi_settings");
+        progressMonitor.setProgressText("Attempting to login with Facebook credentials, please wait");
         WebElement fb = driver.findElement(By.name("email"));
         fb.sendKeys(username);
         WebElement ps = driver.findElement(By.name("pass"));
@@ -147,14 +150,14 @@ public class addOnlineDataTask implements Runnable {
         catch(InterruptedException e){
                System.out.println(e);
             }
-        if(LatestExport == true)
+        if(LatestExport)
         {
             try{   
                 Thread.sleep(600);
                 try{
                     //Wait until pending disappears
                 String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")).getText();
-                progressMonitor.setProgressText("Files "+status+" for download, please wait");
+                progressMonitor.setProgressText("Files pending for download, please wait");
                 wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")));
                 Thread.sleep(600);
                 }
@@ -162,14 +165,13 @@ public class addOnlineDataTask implements Runnable {
                    System.out.println("No Pending files available for download"); 
                 }
                 String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
-                System.out.println(numFiles);
                 String numFilesArray[] = numFiles.split(" ", 2);
                 int numFile = Integer.parseInt(numFilesArray[0]);
                 String fileDate = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]")).getText();
                 String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
                 String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
-                
-                progressMonitor.setProgressText("Downloading file \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles);
+                String fileExpiry = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][5]")).getText();
+                progressMonitor.setProgressText("Downloading file(s) \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\n"+fileExpiry);
 
                 //to download number of files based on download information given   
                 
@@ -202,8 +204,8 @@ public class addOnlineDataTask implements Runnable {
                     String fileDate = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]")).getText();
                     String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
                     String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
-
-                        progressMonitor.setProgressText("Downloading file \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles);
+                    String fileExpiry = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][5]")).getText();
+                    progressMonitor.setProgressText("Downloading file(s) \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\n"+fileExpiry);
                         for (int i = 1; i < numFile+1; i++) 
                         {
                             // click on the Download button as soon as the "Download" button is visible; else wait
@@ -222,12 +224,18 @@ public class addOnlineDataTask implements Runnable {
                 }
             catch(InterruptedException e){
                System.out.println(e);
-            }
-            
+            }    
         }
-       
-//        WebDriverWait waitdl = new WebDriverWait(driver,Duration.ofSeconds(2));
-//        waitdl.until(pageobject.filepresent());
+        //placeholder until methods to detect file download is finished so file extraction from zip can be done and added to data source.
+        try{
+            Thread.sleep(15000);
+        }
+         catch(InterruptedException e){
+               System.out.println(e);
+            }
+        //currently not used. meant for expectedconditions for downloads and consistentl checking of files is present.
+       WebDriverWait waitdl = new WebDriverWait(driver,Duration.ofMinutes(120));
+        //        waitdl.until(.filepresent());
         
         errorList = new ArrayList<>();
         newDataSources = new ArrayList<>();
@@ -236,20 +244,22 @@ public class addOnlineDataTask implements Runnable {
         // Adding downloaded files as a Data Source
         File downloadFolder = new File(modDir);
         File[] listOfFiles = downloadFolder.listFiles();
-        
+
       
         for (File file : listOfFiles) {
              //unzipping files from downloadfolder dir
-             UnZipFile uzfile = new UnZipFile();   
-            try {
-               uzfile.UnZipFile(file.getAbsolutePath());
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+            UnZipFile uzfile = new UnZipFile();  
+            if(isZipFile(file.getAbsolutePath()))
+            {
+                try {uzfile.UnZipFile(file.getAbsolutePath());} 
+                catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+                   //newDir without ext name
+                 String newFileDir = file.getAbsolutePath().replaceAll("\\.\\w+","");
+                localFilePaths.add(newFileDir);
+                System.out.println(newFileDir);
             }
-             
-             
-            localFilePaths.add(file.getAbsolutePath());
-            System.out.println(file.getAbsolutePath());
         }
         LocalFilesDataSource newDataSource;
         try {
@@ -263,8 +273,9 @@ public class addOnlineDataTask implements Runnable {
         
         doCallBack();
     }
-    public ExpectedCondition<Boolean> filepresent() {
-    return new ExpectedCondition<Boolean>() {
+        
+        public ExpectedCondition<Boolean> filepresent() {
+         return new ExpectedCondition<Boolean>() {
         @Override
         public Boolean apply(WebDriver driver) {
             File f = new File("D:\\program.txt"); 
@@ -275,7 +286,19 @@ public class addOnlineDataTask implements Runnable {
           return String.format("file to be present within the time specified");
         }
     };
-}
+}   
+    public boolean isZipFile(String path){
+         if (path == null)
+            return false;
+        try {
+            new ZipFile(path).close();
+            return true;
+        } 
+        catch(IOException e){
+            return false;
+        }   
+    }
+    
     private void DataRequest(WebDriver driver, Boolean formatType, Boolean dataExport){
         
          // explicit wait - to wait for the download button to be click-able
@@ -286,7 +309,7 @@ public class addOnlineDataTask implements Runnable {
             WebElement format = driver.findElement(By.cssSelector("[aria-label='Format']"));
             format.click();
             //if true; export file as json, else html
-            if(formatType == true)
+            if(formatType)
             format.sendKeys("j");
             else{
             format.sendKeys("h");}
