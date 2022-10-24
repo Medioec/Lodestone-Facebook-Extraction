@@ -9,79 +9,33 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
-import java.sql.Timestamp;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.lodestone.facebookingest.pojo.FollowingV2;
-import org.lodestone.facebookingest.pojo.FollowingV2.Following;
 import org.lodestone.facebookingest.pojo.FriendRequestsReceivedV2;
-import org.lodestone.facebookingest.pojo.FriendRequestsReceivedV2.ReceivedFriendRequest;
-import org.openide.util.NbBundle;
-import org.openide.util.NbBundle.Messages;
+import org.lodestone.facebookingest.pojo.FriendsV2;
+import org.lodestone.facebookingest.pojo.RejectedFriendsV2;
+import org.lodestone.facebookingest.pojo.FriendRequestsSentV2;
+import org.lodestone.facebookingest.pojo.RemovedFriendsV2;
 import org.sleuthkit.autopsy.casemodule.Case;
 import org.sleuthkit.autopsy.casemodule.NoCurrentCaseException;
-import org.sleuthkit.autopsy.casemodule.services.FileManager;
 import org.sleuthkit.autopsy.coreutils.Logger;
-import org.sleuthkit.autopsy.coreutils.MessageNotifyUtil;
-import org.sleuthkit.autopsy.datamodel.ContentUtils;
 import org.sleuthkit.autopsy.ingest.FileIngestModule;
 import org.sleuthkit.autopsy.ingest.IngestJobContext;
-import org.sleuthkit.autopsy.ingest.IngestMessage;
 import org.sleuthkit.autopsy.ingest.IngestModule.ProcessResult;
 import org.sleuthkit.autopsy.ingest.IngestModuleReferenceCounter;
-import org.sleuthkit.autopsy.ingest.IngestMonitor;
-import org.sleuthkit.autopsy.ingest.IngestServices;
-import org.sleuthkit.autopsy.ingest.ModuleContentEvent;
 import org.sleuthkit.datamodel.AbstractFile;
-import org.sleuthkit.datamodel.Account;
-import org.sleuthkit.datamodel.AccountFileInstance;
 import org.sleuthkit.datamodel.Blackboard;
 import org.sleuthkit.datamodel.Blackboard.BlackboardException;
 import org.sleuthkit.datamodel.BlackboardArtifact;
 import org.sleuthkit.datamodel.BlackboardAttribute;
-import org.sleuthkit.datamodel.BlackboardAttribute.ATTRIBUTE_TYPE;
 import org.sleuthkit.datamodel.BlackboardAttribute.TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE;
-import org.sleuthkit.datamodel.DerivedFile;
-import org.sleuthkit.datamodel.ReadContentInputStream;
-import org.sleuthkit.datamodel.Relationship;
-import org.sleuthkit.datamodel.Score;
 import org.sleuthkit.datamodel.TskCoreException;
 import org.sleuthkit.datamodel.TskData;
 import org.sleuthkit.datamodel.TskDataException;
-import org.sleuthkit.datamodel.TskException;
-import org.sleuthkit.datamodel.blackboardutils.CommunicationArtifactsHelper;
-import org.sleuthkit.datamodel.blackboardutils.attributes.MessageAttachments;
-import org.sleuthkit.datamodel.blackboardutils.attributes.MessageAttachments.FileAttachment;
-import org.sleuthkit.datamodel.SleuthkitCase;
 import org.lodestone.facebookingest.utility.TimestampToDate;
-import org.lodestone.facebookingest.pojo.FriendsV2;
-import org.lodestone.facebookingest.pojo.FriendsV2.FriendsArrV2;
-import org.lodestone.facebookingest.pojo.RejectedFriendsV2;
-import org.lodestone.facebookingest.pojo.RejectedFriendsV2.RejectedRequests;
-import org.lodestone.facebookingest.pojo.FriendRequestsSentV2;
-import org.lodestone.facebookingest.pojo.FriendRequestsSentV2.SentFriendRequest;
-import org.lodestone.facebookingest.pojo.RemovedFriendsV2;
-import org.lodestone.facebookingest.pojo.RemovedFriendsV2.DeletedFriends;
 
 /**
  *
@@ -315,7 +269,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 e.printStackTrace();
                 return;
             }
-            for (FriendsArrV2 friend:friends.friends_v2){
+            for (FriendsV2.FriendsArrV2 friend:friends.friends_v2){
                 String date = new TimestampToDate(friend.timestamp).getDate();
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -365,7 +319,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 e.printStackTrace();
                 return;
             }
-            for (ReceivedFriendRequest request:receivedRequests.received_requests_v2){
+            for (FriendRequestsReceivedV2.ReceivedFriendRequest request:receivedRequests.received_requests_v2){
                 String date = new TimestampToDate(request.timestamp).getDate();
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -415,7 +369,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 e.printStackTrace();
                 return;
             }
-            for (SentFriendRequest request:sentRequests.sent_requests_v2){
+            for (FriendRequestsSentV2.SentFriendRequest request:sentRequests.sent_requests_v2){
                 String date = new TimestampToDate(request.timestamp).getDate();
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -465,7 +419,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 e.printStackTrace();
                 return;
             }
-            for (RejectedRequests rejected:rejectedFriends.rejected_requests_v2){
+            for (RejectedFriendsV2.RejectedRequests rejected:rejectedFriends.rejected_requests_v2){
                 String date = new TimestampToDate(rejected.timestamp).getDate();
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -515,7 +469,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 e.printStackTrace();
                 return;
             }
-            for (DeletedFriends deleted:removedFriends.deleted_friends_v2){
+            for (RemovedFriendsV2.DeletedFriends deleted:removedFriends.deleted_friends_v2){
                 String date = new TimestampToDate(deleted.timestamp).getDate();
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -565,7 +519,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 e.printStackTrace();
                 return;
             }
-            for (Following follow:following.following_v2){
+            for (FollowingV2.Following follow:following.following_v2){
                 String date = new TimestampToDate(follow.timestamp).getDate();
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
