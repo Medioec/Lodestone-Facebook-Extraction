@@ -1,0 +1,30 @@
+{
+  "event_responses_v2": {
+    "events_joined": [
+      {
+        "name": "SteamBoat",
+        "start_timestamp": 1361012400,
+        "end_timestamp": 0
+      },
+      {
+        "name": "Bui Bui Gathering",
+        "start_timestamp": 1347033600,
+        "end_timestamp": 0
+      }
+    ],
+    "events_declined": [
+      {
+        "name": "21st Birthday Celebration",
+        "start_timestamp": 1363492800,
+        "end_timestamp": 0
+      }
+    ],
+    "events_interested": [
+      {
+        "name": "James' 21st birthday Celebration",
+        "start_timestamp": 1369497600,
+        "end_timestamp": 0
+      }
+    ]
+  }
+}
