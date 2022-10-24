@@ -1,0 +1,61 @@
+{
+  "recently_viewed": [
+    {
+      "name": "Posts that have been shown to you in your Feed",
+      "description": "Posts that have been shown to you in your Feed in the last 90 days.",
+      "entries": [
+        {
+          "timestamp": 1666112695,
+          "data": {
+            "name": "E! News's post ",
+            "uri": "https://www.facebook.com/enews/photos/a.92505200735/10158866439195736/?type=3"
+          }
+        },
+        {
+          "timestamp": 1666017351,
+          "data": {
+            "name": "Royston Freyr Neo's post ",
+            "uri": "https://www.facebook.com/Mr.RoystonNeo/posts/pfbid033Z1ns7cVcNsUkcf99RmGVAFPcgwE3bVxJnD8xYgL47JsVb43EirYz69C29RxiRkel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Marketplace interactions",
+      "description": "Your recent interactions on Marketplace",
+      "children": [
+        {
+          "name": "Marketplace tab added",
+          "description": "The day that the tab was added",
+          "entries": [
+            {
+              "data": {
+                "value": ""
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ads",
+      "description": "Ads you've recently viewed",
+      "entries": [
+        {
+          "timestamp": 1666112663,
+          "data": {
+            "name": "Ad by Datadog",
+            "uri": "https://www.facebook.com/datadoghq/posts/pfbid0Xiafo4jh2VmKLK7dNGq7nXZ75P2UGXncdbJR8Gz5Cmq49cKW1WsvemuhBhzyxQ5vl"
+          }
+        },
+        {
+          "timestamp": 1666112648,
+          "data": {
+            "name": "Ad by Disney+ (SG)",
+            "uri": "https://www.facebook.com/DisneyPlusSG/posts/pfbid033Ji1iZk1zTqTFVvNABoZ1MqxWewsnJcjBxMrCvL34JLt3YmCNwstgPKh6YAuv1hcl"
+          }
+        }
+      ]
+    }
+  ]
+}
