@@ -1,0 +1,27 @@
+{
+  "privacy_checkup_interactions_v2": {
+    "privacy_checkup_topic": [
+      {
+        "name": "Who can see what you share",
+        "started_timestamp": 1644922919,
+        "updates_seen": [
+          
+        ]
+      },
+      {
+        "name": "How people can find you on Facebook",
+        "started_timestamp": 1644922901,
+        "updates_seen": [
+          
+        ]
+      },
+      {
+        "name": "Your data settings on Facebook",
+        "started_timestamp": 1644922958,
+        "updates_seen": [
+          
+        ]
+      }
+    ]
+  }
+}

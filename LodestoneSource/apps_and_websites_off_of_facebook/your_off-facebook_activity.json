@@ -1,0 +1,229 @@
+{
+  "off_facebook_activity_v2": [
+    {
+      "name": "Carousell: Sell and Buy",
+      "events": [
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666414860
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666413240
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666409160
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666336680
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666335060
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666332960
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666253940
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666007160
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666005480
+        },
+        {
+          "id": 379979055398817,
+          "type": "CUSTOM",
+          "timestamp": 1666004280
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666002180
+        },
+        {
+          "id": 379979055398817,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666001520
+        }
+      ]
+    },
+    {
+      "name": "Discord: Talk, Chat & Hang Out",
+      "events": [
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666409640
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666362180
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666341300
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666332900
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666330620
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666320840
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666273920
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666271880
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666260120
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666253760
+        },
+        {
+          "id": 515083072013600,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666099680
+        }
+      ]
+    },
+    {
+      "name": "Shopee: 10.10 Brands Festival",
+      "events": [
+        {
+          "id": 1574354049466790,
+          "type": "CUSTOM",
+          "timestamp": 1666368000
+        },
+        {
+          "id": 1574354049466790,
+          "type": "CUSTOM",
+          "timestamp": 1666360800
+        },
+        {
+          "id": 1574354049466790,
+          "type": "CUSTOM",
+          "timestamp": 1666280520
+        },
+        {
+          "id": 1574354049466790,
+          "type": "CUSTOM",
+          "timestamp": 1666195200
+        }
+      ]
+    },
+    {
+      "name": "browserstack.com",
+      "events": [
+        {
+          "id": 138909033453627,
+          "type": "PAGE_VIEW",
+          "timestamp": 1666154640
+        },
+        {
+          "id": 138909033453627,
+          "type": "PAGE_VIEW",
+          "timestamp": 1666153320
+        }
+      ]
+    },
+    {
+      "name": "lambdatest.com",
+      "events": [
+        {
+          "id": 747713245668855,
+          "type": "PAGE_VIEW",
+          "timestamp": 1666153080
+        },
+        {
+          "id": 747713245668855,
+          "type": "PAGE_VIEW",
+          "timestamp": 1666152300
+        },
+        {
+          "id": 747713245668855,
+          "type": "PAGE_VIEW",
+          "timestamp": 1666151100
+        }
+      ]
+    },
+    {
+      "name": "baeldung.com",
+      "events": [
+        {
+          "id": 512471148948613,
+          "type": "PAGE_VIEW",
+          "timestamp": 1666152240
+        }
+      ]
+    },
+    {
+      "name": "theindependent.sg",
+      "events": [
+        {
+          "id": 629349884869548,
+          "type": "PAGE_VIEW",
+          "timestamp": 1666112700
+        },
+        {
+          "id": 3041112499541341,
+          "type": "PAGE_VIEW",
+          "timestamp": 1666112700
+        }
+      ]
+    },
+    {
+      "name": "Singtel Dash",
+      "events": [
+        {
+          "id": 2374601432619244,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666095300
+        },
+        {
+          "id": 2374601432619244,
+          "type": "ACTIVATE_APP",
+          "timestamp": 1666094880
+        }
+      ]
+    }
+  ]
+}

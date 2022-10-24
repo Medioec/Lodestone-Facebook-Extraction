@@ -42,6 +42,19 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.lodestone.facebooksource.Bundle;
 import sun.net.ProgressMonitor;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+import org.openide.util.Exceptions;
+import org.openqa.selenium.io.Zip;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+
+
+
 
 /**
  *
@@ -212,6 +225,9 @@ public class addOnlineDataTask implements Runnable {
             }
             
         }
+       
+//        WebDriverWait waitdl = new WebDriverWait(driver,Duration.ofSeconds(2));
+//        waitdl.until(pageobject.filepresent());
         
         errorList = new ArrayList<>();
         newDataSources = new ArrayList<>();
@@ -221,7 +237,17 @@ public class addOnlineDataTask implements Runnable {
         File downloadFolder = new File(modDir);
         File[] listOfFiles = downloadFolder.listFiles();
         
+      
         for (File file : listOfFiles) {
+             //unzipping files from downloadfolder dir
+             UnZipFile uzfile = new UnZipFile();   
+            try {
+               uzfile.UnZipFile(file.getAbsolutePath());
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+             
+             
             localFilePaths.add(file.getAbsolutePath());
             System.out.println(file.getAbsolutePath());
         }
@@ -237,6 +263,19 @@ public class addOnlineDataTask implements Runnable {
         
         doCallBack();
     }
+    public ExpectedCondition<Boolean> filepresent() {
+    return new ExpectedCondition<Boolean>() {
+        @Override
+        public Boolean apply(WebDriver driver) {
+            File f = new File("D:\\program.txt"); 
+            return f.exists();
+        }
+        @Override
+        public String toString() {
+          return String.format("file to be present within the time specified");
+        }
+    };
+}
     private void DataRequest(WebDriver driver, Boolean formatType, Boolean dataExport){
         
          // explicit wait - to wait for the download button to be click-able
