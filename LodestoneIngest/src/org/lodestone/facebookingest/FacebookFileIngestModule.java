@@ -19,6 +19,7 @@ import org.lodestone.facebookingest.pojo.FriendsV2;
 import org.lodestone.facebookingest.pojo.RejectedFriendsV2;
 import org.lodestone.facebookingest.pojo.FriendRequestsSentV2;
 import org.lodestone.facebookingest.pojo.RemovedFriendsV2;
+import org.lodestone.facebookingest.utility.TimestampToDate;
 import org.sleuthkit.autopsy.casemodule.Case;
 import org.sleuthkit.autopsy.casemodule.NoCurrentCaseException;
 import org.sleuthkit.autopsy.coreutils.Logger;
@@ -35,7 +36,6 @@ import org.sleuthkit.datamodel.BlackboardAttribute.TSK_BLACKBOARD_ATTRIBUTE_VALU
 import org.sleuthkit.datamodel.TskCoreException;
 import org.sleuthkit.datamodel.TskData;
 import org.sleuthkit.datamodel.TskDataException;
-import org.lodestone.facebookingest.utility.TimestampToDate;
 
 /**
  *
@@ -277,7 +277,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(friendDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -327,7 +327,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(receivedRequestDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -377,7 +377,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(sentRequestDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -427,7 +427,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(rejectedDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -477,7 +477,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(rejectedDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -527,7 +527,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(followedDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -593,7 +593,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(groupInteractionUri, FacebookIngestModuleFactory.getModuleName(), uri));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -665,7 +665,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(peopleInteractionUri, FacebookIngestModuleFactory.getModuleName(), uri));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -741,7 +741,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(hasInPersonStoreVisit, FacebookIngestModuleFactory.getModuleName(), inPersonStoreVisit));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -811,7 +811,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(advertismentDate, FacebookIngestModuleFactory.getModuleName(), date));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -893,7 +893,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(appDateRemoved, FacebookIngestModuleFactory.getModuleName(), removedDate));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -973,7 +973,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                             attributelist.add(new BlackboardAttribute(activityDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                             try{
-                                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                             }
                             catch (TskCoreException | BlackboardException e){
                                 e.printStackTrace();
@@ -1068,23 +1068,22 @@ public class FacebookFileIngestModule implements FileIngestModule{
                             }
                         }
                     }
-                    
-                    // add variables to attributes
-                    Collection<BlackboardAttribute> attributelist = new ArrayList();
-                    attributelist.add(new BlackboardAttribute(commentDate, FacebookIngestModuleFactory.getModuleName(), date));
-                    attributelist.add(new BlackboardAttribute(commentTitle, FacebookIngestModuleFactory.getModuleName(), title));
-                    attributelist.add(new BlackboardAttribute(commentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
-                    attributelist.add(new BlackboardAttribute(commentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
-                    attributelist.add(new BlackboardAttribute(commentUri, FacebookIngestModuleFactory.getModuleName(), uri));
-                    attributelist.add(new BlackboardAttribute(commentUrl, FacebookIngestModuleFactory.getModuleName(), url));
-                    
-                    try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
-                    }
-                    catch (TskCoreException | BlackboardException e){
-                        e.printStackTrace();
-                        return;
-                    }
+                }
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(commentDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(commentTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                attributelist.add(new BlackboardAttribute(commentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
+                attributelist.add(new BlackboardAttribute(commentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
+                attributelist.add(new BlackboardAttribute(commentUri, FacebookIngestModuleFactory.getModuleName(), uri));
+                attributelist.add(new BlackboardAttribute(commentUrl, FacebookIngestModuleFactory.getModuleName(), url));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
                 }
             }
         }
@@ -1183,7 +1182,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(reactionUrl, FacebookIngestModuleFactory.getModuleName(), url));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
