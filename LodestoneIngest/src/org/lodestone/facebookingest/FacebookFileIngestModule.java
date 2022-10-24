@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
+import org.lodestone.facebookingest.pojo.CommentsV2;
 import org.lodestone.facebookingest.pojo.FollowingV2;
 import org.lodestone.facebookingest.pojo.FriendRequestsReceivedV2;
 import org.lodestone.facebookingest.pojo.FriendsV2;
@@ -993,9 +994,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
     * @param  af  JSON file
     */
     private void processJSONcomments(AbstractFile af){
-        JsonObject json = parseAFtoJson(af);
-        
-        if(json.has("comments_v2")){
+        String json = parseAFtoString(af);
+        CommentsV2 comments = new Gson().fromJson(json, CommentsV2.class);
+        if(comments.comments_v2 != null){
             
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
@@ -1031,9 +1032,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 return;
             }
             
-            JsonArray commentsV2 = json.getAsJsonArray("comments_v2");
-            for (JsonElement comment:commentsV2){
-                
+            for (CommentsV2.Comments_V2 comment:comments.comments_v2){
                 String date = "";
                 String title = "";
                 String commentString = "";
@@ -1041,46 +1040,41 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 String uri = "";
                 String url = "";
                 
-                if (comment.isJsonObject()){
-                    JsonObject commentObj = (JsonObject)comment;
-                    title = commentObj.get("title").getAsString();
-                    date = longToDate(commentObj.get("timestamp").getAsLong());
-                    if (commentObj.has("data")){
-                        JsonObject commentData = (JsonObject)commentObj.getAsJsonArray("data").get(0);
-                        commentString = commentData.getAsJsonObject("comment").get("comment").getAsString();
-                        author = commentData.getAsJsonObject("comment").get("author").getAsString();
+                date = new TimestampToDate(comment.timestamp).getDate();
+                title = comment.title;
+                if (comment.data != null){
+                    for (CommentsV2.Comments_V2.Data data:comment.data){
+                        commentString = data.comment.comment;
+                        author = data.comment.author;
                     }
-                    if (commentObj.has("attachments")){
-                        JsonArray attachments = commentObj.getAsJsonArray("attachments");
-                        for (JsonElement data:attachments){
-                            JsonArray attachArray = ((JsonObject)data).getAsJsonArray("data");
-                            for (JsonElement obj:attachArray){
-                                if (((JsonObject)obj).has("external_context")){
-                                    url = ((JsonObject)obj).getAsJsonObject("external_context").get("url").getAsString();
-                                }
-                                else if (((JsonObject)obj).has("media")){
-                                    uri = ((JsonObject)obj).getAsJsonObject("media").get("uri").getAsString();
-                                }
+                }
+                if (comment.attachments != null){
+                    for (CommentsV2.Comments_V2.Attachments attachment:comment.attachments){
+                        for (CommentsV2.Comments_V2.Attachments.Data attachmentData:attachment.data){
+                            if (attachmentData.external_context != null){
+                                url = attachmentData.external_context.url;
+                            }
+                            if (attachmentData.media != null){
+                                uri = attachmentData.media.uri;
                             }
                         }
                     }
-                    
-                    // add variables to attributes
-                    Collection<BlackboardAttribute> attributelist = new ArrayList();
-                    attributelist.add(new BlackboardAttribute(commentDate, FacebookIngestModuleFactory.getModuleName(), date));
-                    attributelist.add(new BlackboardAttribute(commentTitle, FacebookIngestModuleFactory.getModuleName(), title));
-                    attributelist.add(new BlackboardAttribute(commentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
-                    attributelist.add(new BlackboardAttribute(commentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
-                    attributelist.add(new BlackboardAttribute(commentUri, FacebookIngestModuleFactory.getModuleName(), uri));
-                    attributelist.add(new BlackboardAttribute(commentUrl, FacebookIngestModuleFactory.getModuleName(), url));
-                    
-                    try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
-                    }
-                    catch (TskCoreException | BlackboardException e){
-                        e.printStackTrace();
-                        return;
-                    }
+                }
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(commentDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(commentTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                attributelist.add(new BlackboardAttribute(commentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
+                attributelist.add(new BlackboardAttribute(commentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
+                attributelist.add(new BlackboardAttribute(commentUri, FacebookIngestModuleFactory.getModuleName(), uri));
+                attributelist.add(new BlackboardAttribute(commentUrl, FacebookIngestModuleFactory.getModuleName(), url));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
                 }
             }
         }
@@ -1508,5 +1502,34 @@ public class FacebookFileIngestModule implements FileIngestModule{
         JsonParser jsonParser = new JsonParser();
         JsonObject json = (JsonObject)jsonParser.parse(jsonString);
         return json;
+    }
+    
+    /**
+    * Read file and parse JSON as String
+    *
+    * @param  af  JSON file
+    * @return String
+    */
+    private String parseAFtoString(AbstractFile af){
+        int intsize;
+        long size = af.getSize();
+        byte[] jsonBytes;
+        if (size > Integer.MAX_VALUE){
+            //do later
+            jsonBytes = new byte[Integer.MAX_VALUE];
+        }
+        else {
+            intsize = (int)size;
+            jsonBytes = new byte[intsize];
+        }
+        try{
+            af.read(jsonBytes, 0, size);
+        }
+        catch(TskCoreException e){
+            logger.log(Level.SEVERE, "File read failure");
+        }
+        
+        String AFString = new String(jsonBytes, StandardCharsets.UTF_8);
+        return AFString;
     }
 }
