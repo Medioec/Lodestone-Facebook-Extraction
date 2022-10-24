@@ -13,14 +13,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
-import org.lodestone.facebookingest.pojo.CommentsV2;
 import org.lodestone.facebookingest.pojo.FollowingV2;
 import org.lodestone.facebookingest.pojo.FriendRequestsReceivedV2;
 import org.lodestone.facebookingest.pojo.FriendsV2;
 import org.lodestone.facebookingest.pojo.RejectedFriendsV2;
 import org.lodestone.facebookingest.pojo.FriendRequestsSentV2;
 import org.lodestone.facebookingest.pojo.RemovedFriendsV2;
-import org.lodestone.facebookingest.utility.TimestampToDate;
 import org.sleuthkit.autopsy.casemodule.Case;
 import org.sleuthkit.autopsy.casemodule.NoCurrentCaseException;
 import org.sleuthkit.autopsy.coreutils.Logger;
@@ -37,6 +35,7 @@ import org.sleuthkit.datamodel.BlackboardAttribute.TSK_BLACKBOARD_ATTRIBUTE_VALU
 import org.sleuthkit.datamodel.TskCoreException;
 import org.sleuthkit.datamodel.TskData;
 import org.sleuthkit.datamodel.TskDataException;
+import org.lodestone.facebookingest.utility.TimestampToDate;
 
 /**
  *
@@ -184,12 +183,15 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 case "your_search_history.json":
                     break;
                 case "account_activity.json":
+                    processJSONaccount_activity(af);
                     break;
                 case "browser_cookies.json":
                     break;
                 case "email_address_verifications.json":
+                    processJSONemail_address_verifications(af);
                     break;
                 case "ip_address_activity.json":
+                    processJSONip_address_activity(af);
                     break;
                 case "logins_and_logouts.json":
                     break;
@@ -238,6 +240,275 @@ public class FacebookFileIngestModule implements FileIngestModule{
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
     
+    
+    /**
+    * Process ip_address_activity.json file and add data as Data Artifact
+    * Facebook reaction data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONip_address_activity(AbstractFile af){
+        JsonObject json = parseAFtoJson(af);
+        
+        if(json.has("used_ip_address_v2")){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type ipAddressIP;
+            BlackboardAttribute.Type ipAddressAction;
+            BlackboardAttribute.Type ipAddressDate;
+            BlackboardAttribute.Type ipAddressUserAgent;
+
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_IP_ADDRESS_ACTIVITY") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_IP_ADDRESS_ACTIVITY", "Facebook ip address acvitivity");
+                    ipAddressIP = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBIPACTIVITY_IPADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                    ipAddressAction = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBIPACTIVITY_ACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address Action");
+                    ipAddressDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBIPACTIVITY_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    ipAddressUserAgent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBIPACTIVITY_USER_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User Agent");
+  
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_IP_ADDRESS_ACTIVITY");
+                    ipAddressIP = currentCase.getSleuthkitCase().getAttributeType("LS_FBIPACTIVITY_IPADDRESS");
+                    ipAddressAction = currentCase.getSleuthkitCase().getAttributeType("LS_FBIPACTIVITY_ACTION");
+                    ipAddressDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBIPACTIVITY_DATE");
+                    ipAddressUserAgent = currentCase.getSleuthkitCase().getAttributeType("LS_FBIPACTIVITY_USER_AGENT");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            JsonArray ipAddressActivityV2 = json.getAsJsonArray("used_ip_address_v2");
+            for (JsonElement ipAddressActivity:ipAddressActivityV2){
+                
+                String ipAddress = "";
+                String action = "";
+                String date = "";
+                String userAgent = "";
+
+                if (ipAddressActivity.isJsonObject()){
+                    JsonObject reactionObj = (JsonObject)ipAddressActivity;
+                    ipAddress = reactionObj.get("ip").getAsString();
+                    action = reactionObj.get("action").getAsString();
+                    date = new TimestampToDate(ipAddressActivity.getAsJsonObject().get("timestamp").getAsLong()).getDate();
+                    userAgent = reactionObj.get("user_agent").getAsString();
+                  
+                    
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(ipAddressIP, FacebookIngestModuleFactory.getModuleName(), ipAddress));
+                    attributelist.add(new BlackboardAttribute(ipAddressAction, FacebookIngestModuleFactory.getModuleName(), action));
+                    attributelist.add(new BlackboardAttribute(ipAddressDate, FacebookIngestModuleFactory.getModuleName(), date));
+                    attributelist.add(new BlackboardAttribute(ipAddressUserAgent, FacebookIngestModuleFactory.getModuleName(), userAgent));
+
+                    
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No used_ip_address_v2 found");
+            return;
+        }
+    }
+
+    
+    
+    /**
+    * Process email_address_verifications.json file and add data as Data Artifact
+    * Facebook reaction data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONemail_address_verifications(AbstractFile af){
+        JsonObject json = parseAFtoJson(af);
+        
+        if(json.has("contact_verifications_v2")){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type emailVerifyContact;
+            BlackboardAttribute.Type emailVerifyContactType;
+            BlackboardAttribute.Type emailVerifyDate;
+
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_EMAIL_ADDRESS_VERIFICATIONS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_EMAIL_ADDRESS_VERIFICATIONS", "Facebook email address verifications");
+                    emailVerifyContact = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBEMAILVERIFY_CONTACT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Contact");
+                    emailVerifyContactType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBEMAILVERIFY_CONTACT_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Contact Type");
+                    emailVerifyDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBEMAILVERIFY_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+  
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_EMAIL_ADDRESS_VERIFICATIONS");
+                    emailVerifyContact = currentCase.getSleuthkitCase().getAttributeType("LS_FBEMAILVERIFY_CONTACT");
+                    emailVerifyContactType = currentCase.getSleuthkitCase().getAttributeType("LS_FBEMAILVERIFY_CONTACT_TYPE");
+                    emailVerifyDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBEMAILVERIFY_DATE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            JsonArray emailVerifyV2 = json.getAsJsonArray("contact_verifications_v2");
+            for (JsonElement emailVerify:emailVerifyV2){
+                
+                String contact = "";
+                String contactType = "";
+                String date = "";
+
+                if (emailVerify.isJsonObject()){
+                    JsonObject reactionObj = (JsonObject)emailVerify;
+                    contact = reactionObj.get("contact").getAsString();
+                    contactType = reactionObj.get("contact_type").getAsString();
+                    date = new TimestampToDate(emailVerify.getAsJsonObject().get("verification_time").getAsLong()).getDate();
+                  
+                    
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(emailVerifyContact, FacebookIngestModuleFactory.getModuleName(), contact));
+                    attributelist.add(new BlackboardAttribute(emailVerifyContactType, FacebookIngestModuleFactory.getModuleName(), contactType));
+                    attributelist.add(new BlackboardAttribute(emailVerifyDate, FacebookIngestModuleFactory.getModuleName(), date));
+
+                    
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No contact_verifications_v2 found");
+            return;
+        }
+    }
+   
+    
+    /**
+    * Process email_address_verifications.json file and add data as Data Artifact
+    * Facebook reaction data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONaccount_activity(AbstractFile af){
+        JsonObject json = parseAFtoJson(af);
+        
+        if(json.has("account_activity_v2")){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type activityAction;
+            BlackboardAttribute.Type activityDate;
+            BlackboardAttribute.Type activityIPAdd;
+            BlackboardAttribute.Type activityUserAgent;
+            BlackboardAttribute.Type activitydatr_cookie;
+            BlackboardAttribute.Type activityCity;
+            BlackboardAttribute.Type activityRegion;
+            BlackboardAttribute.Type activityCountry;
+            BlackboardAttribute.Type activitySite;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_ACCOUNT_ACTIVITY") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_ACCOUNT_ACTIVITY", "Facebook account activity");
+                    activityAction = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_ACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Action");
+                    activityDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    activityIPAdd = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_IPADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                    activityUserAgent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_USER_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User Agent");
+                    activitydatr_cookie = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_DATR_COOKIE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Datr_Cookie");
+                    activityCity = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_CITY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "City");
+                    activityRegion = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_REGION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Region");
+                    activityCountry = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_COUNTRY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Country");
+                    activitySite = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_SITE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Site");        
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_ACCOUNT_ACTIVITY");
+                    activityAction = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_ACTION");
+                    activityDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_DATE");
+                    activityIPAdd = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_IPADDRESS");
+                    activityUserAgent = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_USER_AGENT");
+                    activitydatr_cookie = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_DATR_COOKIE");
+                    activityCity = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_CITY");
+                    activityRegion = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_REGION");
+                    activityCountry = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_COUNTRY");
+                    activitySite = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_SITE");                         
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            JsonArray activityV2 = json.getAsJsonArray("account_activity_v2");
+            for (JsonElement activity:activityV2){
+                
+                String action = "";
+                String date = "";
+                String ipAdd = "";
+                String userAgent = "";
+                String datr_cookie = "";
+                String city = "";
+                String region = "";
+                String country = "";
+                String site = "";
+                
+                if (activity.isJsonObject()){
+                    JsonObject activityObj = (JsonObject)activity;
+                    action = activityObj.get("action").getAsString();
+                    date = new TimestampToDate(activity.getAsJsonObject().get("timestamp").getAsLong()).getDate();
+                    ipAdd = activityObj.get("ip_address").getAsString();
+                    userAgent = activityObj.get("user_agent").getAsString();
+                    datr_cookie = activityObj.get("datr_cookie").getAsString();
+                    city = activityObj.get("city").getAsString();
+                    region = activityObj.get("region").getAsString();
+                    country = activityObj.get("country").getAsString();
+                    site = activityObj.get("site_name").getAsString();
+                    
+                    
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(activityAction, FacebookIngestModuleFactory.getModuleName(), action));
+                    attributelist.add(new BlackboardAttribute(activityDate, FacebookIngestModuleFactory.getModuleName(), date));
+                    attributelist.add(new BlackboardAttribute(activityIPAdd, FacebookIngestModuleFactory.getModuleName(), ipAdd));
+                    attributelist.add(new BlackboardAttribute(activityUserAgent, FacebookIngestModuleFactory.getModuleName(), userAgent));
+                    attributelist.add(new BlackboardAttribute(activitydatr_cookie, FacebookIngestModuleFactory.getModuleName(), datr_cookie));
+                    attributelist.add(new BlackboardAttribute(activityCity, FacebookIngestModuleFactory.getModuleName(), city));
+                    attributelist.add(new BlackboardAttribute(activityRegion, FacebookIngestModuleFactory.getModuleName(), region));
+                    attributelist.add(new BlackboardAttribute(activityCountry, FacebookIngestModuleFactory.getModuleName(), country));
+                    attributelist.add(new BlackboardAttribute(activitySite, FacebookIngestModuleFactory.getModuleName(), site));
+                    
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No account_activity_v2 found");
+            return;
+        }
+    }
+
+    
     /**
      * Process friends.json file and add data as Data Artifact
      * Facebook friends data
@@ -278,7 +549,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(friendDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -328,7 +599,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(receivedRequestDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -378,7 +649,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(sentRequestDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -428,7 +699,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(rejectedDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -478,7 +749,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(rejectedDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -528,7 +799,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(followedDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                 try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                 }
                 catch (TskCoreException | BlackboardException e){
                     e.printStackTrace();
@@ -594,7 +865,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(groupInteractionUri, FacebookIngestModuleFactory.getModuleName(), uri));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -666,7 +937,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(peopleInteractionUri, FacebookIngestModuleFactory.getModuleName(), uri));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -742,7 +1013,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(hasInPersonStoreVisit, FacebookIngestModuleFactory.getModuleName(), inPersonStoreVisit));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -812,7 +1083,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(advertismentDate, FacebookIngestModuleFactory.getModuleName(), date));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -894,7 +1165,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(appDateRemoved, FacebookIngestModuleFactory.getModuleName(), removedDate));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -974,7 +1245,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                             attributelist.add(new BlackboardAttribute(activityDate, FacebookIngestModuleFactory.getModuleName(), date));
 
                             try{
-                                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                             }
                             catch (TskCoreException | BlackboardException e){
                                 e.printStackTrace();
@@ -998,9 +1269,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
     * @param  af  JSON file
     */
     private void processJSONcomments(AbstractFile af){
-        String json = parseAFtoString(af);
-        CommentsV2 comments = new Gson().fromJson(json, CommentsV2.class);
-        if(comments.comments_v2 != null){
+        JsonObject json = parseAFtoJson(af);
+        
+        if(json.has("comments_v2")){
             
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
@@ -1036,7 +1307,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 return;
             }
             
-            for (CommentsV2.Comments_V2 comment:comments.comments_v2){
+            JsonArray commentsV2 = json.getAsJsonArray("comments_v2");
+            for (JsonElement comment:commentsV2){
+                
                 String date = "";
                 String title = "";
                 String commentString = "";
@@ -1044,41 +1317,46 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 String uri = "";
                 String url = "";
                 
-                date = new TimestampToDate(comment.timestamp).getDate();
-                title = comment.title;
-                if (comment.data != null){
-                    for (CommentsV2.Comments_V2.Data data:comment.data){
-                        commentString = data.comment.comment;
-                        author = data.comment.author;
+                if (comment.isJsonObject()){
+                    JsonObject commentObj = (JsonObject)comment;
+                    title = commentObj.get("title").getAsString();
+                    date = new TimestampToDate(commentObj.get("timestamp").getAsLong()).getDate();
+                    if (commentObj.has("data")){
+                        JsonObject commentData = (JsonObject)commentObj.getAsJsonArray("data").get(0);
+                        commentString = commentData.getAsJsonObject("comment").get("comment").getAsString();
+                        author = commentData.getAsJsonObject("comment").get("author").getAsString();
                     }
-                }
-                if (comment.attachments != null){
-                    for (CommentsV2.Comments_V2.Attachments attachment:comment.attachments){
-                        for (CommentsV2.Comments_V2.Attachments.Data attachmentData:attachment.data){
-                            if (attachmentData.external_context != null){
-                                url = attachmentData.external_context.url;
-                            }
-                            if (attachmentData.media != null){
-                                uri = attachmentData.media.uri;
+                    if (commentObj.has("attachments")){
+                        JsonArray attachments = commentObj.getAsJsonArray("attachments");
+                        for (JsonElement data:attachments){
+                            JsonArray attachArray = ((JsonObject)data).getAsJsonArray("data");
+                            for (JsonElement obj:attachArray){
+                                if (((JsonObject)obj).has("external_context")){
+                                    url = ((JsonObject)obj).getAsJsonObject("external_context").get("url").getAsString();
+                                }
+                                else if (((JsonObject)obj).has("media")){
+                                    uri = ((JsonObject)obj).getAsJsonObject("media").get("uri").getAsString();
+                                }
                             }
                         }
                     }
-                }
-                // add variables to attributes
-                Collection<BlackboardAttribute> attributelist = new ArrayList();
-                attributelist.add(new BlackboardAttribute(commentDate, FacebookIngestModuleFactory.getModuleName(), date));
-                attributelist.add(new BlackboardAttribute(commentTitle, FacebookIngestModuleFactory.getModuleName(), title));
-                attributelist.add(new BlackboardAttribute(commentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
-                attributelist.add(new BlackboardAttribute(commentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
-                attributelist.add(new BlackboardAttribute(commentUri, FacebookIngestModuleFactory.getModuleName(), uri));
-                attributelist.add(new BlackboardAttribute(commentUrl, FacebookIngestModuleFactory.getModuleName(), url));
-
-                try{
-                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
-                }
-                catch (TskCoreException | BlackboardException e){
-                    e.printStackTrace();
-                    return;
+                    
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(commentDate, FacebookIngestModuleFactory.getModuleName(), date));
+                    attributelist.add(new BlackboardAttribute(commentTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                    attributelist.add(new BlackboardAttribute(commentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
+                    attributelist.add(new BlackboardAttribute(commentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
+                    attributelist.add(new BlackboardAttribute(commentUri, FacebookIngestModuleFactory.getModuleName(), uri));
+                    attributelist.add(new BlackboardAttribute(commentUrl, FacebookIngestModuleFactory.getModuleName(), url));
+                    
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
                 }
             }
         }
@@ -1177,7 +1455,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(reactionUrl, FacebookIngestModuleFactory.getModuleName(), url));
                     
                     try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
                     }
                     catch (TskCoreException | BlackboardException e){
                         e.printStackTrace();
@@ -1248,7 +1526,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             logger.log(Level.SEVERE, "File read failure");
         }
         
-        String AFString = new String(jsonBytes, StandardCharsets.UTF_8);
-        return AFString;
+        String jsonString = new String(jsonBytes, StandardCharsets.UTF_8);
+        return jsonString;
     }
 }
