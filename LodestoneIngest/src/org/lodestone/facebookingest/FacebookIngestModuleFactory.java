@@ -4,12 +4,10 @@
  */
 package org.lodestone.facebookingest;
 
-import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.sleuthkit.autopsy.ingest.FileIngestModule;
 import org.sleuthkit.autopsy.ingest.IngestModuleFactory;
 import org.sleuthkit.autopsy.ingest.IngestModuleFactoryAdapter;
-import org.sleuthkit.autopsy.ingest.IngestModuleGlobalSettingsPanel;
 import org.sleuthkit.autopsy.ingest.IngestModuleIngestJobSettings;
 
 /**
@@ -32,7 +30,7 @@ public class FacebookIngestModuleFactory extends IngestModuleFactoryAdapter{
     
     @Override
     public String getModuleDisplayName() {
-        String name = "FacebookIngestModule";
+        String name = "Facebook Ingest Module";
         return name;
     }
 
