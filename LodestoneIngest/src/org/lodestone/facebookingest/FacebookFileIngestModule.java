@@ -13,12 +13,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
+import org.lodestone.facebookingest.pojo.GroupInteractionsV2;
 import org.lodestone.facebookingest.pojo.CommentsV2;
 import org.lodestone.facebookingest.pojo.FollowingV2;
 import org.lodestone.facebookingest.pojo.FriendRequestsReceivedV2;
 import org.lodestone.facebookingest.pojo.FriendsV2;
 import org.lodestone.facebookingest.pojo.RejectedFriendsV2;
 import org.lodestone.facebookingest.pojo.FriendRequestsSentV2;
+import org.lodestone.facebookingest.pojo.PeopleInteractionsV2;
 import org.lodestone.facebookingest.pojo.RemovedFriendsV2;
 import org.lodestone.facebookingest.utility.TimestampToDate;
 import org.sleuthkit.autopsy.casemodule.Case;
@@ -184,15 +186,15 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 case "your_search_history.json":
                     break;
                 case "account_activity.json":
-					processJSONaccount_activity(af);
+                    processJSONaccount_activity(af);
                     break;
                 case "browser_cookies.json":
                     break;
                 case "email_address_verifications.json":
-					processJSONemail_address_verifications(af);
+                    processJSONemail_address_verifications(af);
                     break;
                 case "ip_address_activity.json":
-					processJSONip_address_activity(af);
+                    processJSONip_address_activity(af);
                     break;
                 case "logins_and_logouts.json":
                     break;
@@ -242,14 +244,13 @@ public class FacebookFileIngestModule implements FileIngestModule{
     }
     
 	
-	/**
+    /**
     * Process ip_address_activity.json file and add data as Data Artifact
-    * Facebook reaction data.
+    * Facebook IP address activity data.
     *
     * @param  af  JSON file
     */
-	
-	private void processJSONip_address_activity(AbstractFile af){
+    private void processJSONip_address_activity(AbstractFile af){
         JsonObject json = parseAFtoJson(af);
         
         if(json.has("used_ip_address_v2")){
@@ -323,8 +324,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
             return;
         }
     }
-
-    
     
     /**
     * Process email_address_verifications.json file and add data as Data Artifact
@@ -400,7 +399,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
             return;
         }
     }
-   
     
     /**
     * Process account_activity.json file and add data as Data Artifact
@@ -509,9 +507,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             return;
         }
     }
-	
-	
-	
+    
     /**
      * Process friends.json file and add data as Data Artifact
      * Facebook friends data
@@ -815,14 +811,16 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process group_interactions.json file and add data as Data Artifact
     * Facebook group interaction data.
+    * Uses POJO GroupInteractionsV2.java
     *
     * @param  af  JSON file
     */
     private void processJSONgroup_interactions(AbstractFile af){
-        JsonObject json = parseAFtoJson(af);
-        
-        if(json.has("group_interactions_v2")){
-            
+        String json = parseAFtoString(af);
+        GroupInteractionsV2 groupInteractions = new Gson().fromJson(json, GroupInteractionsV2.class);
+
+        if(groupInteractions.group_interactions_v2 != null){
+
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
             BlackboardAttribute.Type groupInteractionName;
@@ -847,32 +845,31 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 e.printStackTrace();
                 return;
             }
-            
-            JsonArray entries = json.getAsJsonArray("group_interactions_v2").get(0).getAsJsonObject().getAsJsonArray("entries");
-            for (JsonElement entry:entries){
-                
-                String name = "";
-                String value = "";
-                String uri = "";
-                
-                if (entry.isJsonObject()){
-                    JsonObject entryObj = entry.getAsJsonObject().get("data").getAsJsonObject();
-                    name = entryObj.get("name").getAsString();
-                    value = entryObj.get("value").getAsString();
-                    uri = entryObj.get("uri").getAsString();
-                    
-                    // add variables to attributes
-                    Collection<BlackboardAttribute> attributelist = new ArrayList();
-                    attributelist.add(new BlackboardAttribute(groupInteractionName, FacebookIngestModuleFactory.getModuleName(), name));
-                    attributelist.add(new BlackboardAttribute(groupInteractionValue, FacebookIngestModuleFactory.getModuleName(), value));
-                    attributelist.add(new BlackboardAttribute(groupInteractionUri, FacebookIngestModuleFactory.getModuleName(), uri));
-                    
-                    try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
-                    }
-                    catch (TskCoreException | BlackboardException e){
-                        e.printStackTrace();
-                        return;
+
+            for (GroupInteractionsV2.GroupInteractions_V2 groupInteraction:groupInteractions.group_interactions_v2) {
+                for (GroupInteractionsV2.GroupInteractions_V2.Entries entry:groupInteraction.entries) {
+                    String name = "";
+                    String value = "";
+                    String uri = "";
+
+                    if (entry.data != null) {
+                        name = entry.data.name;
+                        value = entry.data.value;
+                        uri = entry.data.uri;
+
+                        // add variables to attributes
+                        Collection<BlackboardAttribute> attributelist = new ArrayList();
+                        attributelist.add(new BlackboardAttribute(groupInteractionName, FacebookIngestModuleFactory.getModuleName(), name));
+                        attributelist.add(new BlackboardAttribute(groupInteractionValue, FacebookIngestModuleFactory.getModuleName(), value));
+                        attributelist.add(new BlackboardAttribute(groupInteractionUri, FacebookIngestModuleFactory.getModuleName(), uri));
+
+                        try{
+                            blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        }
+                        catch (TskCoreException | BlackboardException e){
+                            e.printStackTrace();
+                            return;
+                        }
                     }
                 }
             }
@@ -886,13 +883,15 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process people_and_friends.json file and add data as Data Artifact
     * Facebook people and friend interaction data.
+    * Uses POJO PeopleInteractionsV2.java
     *
     * @param  af  JSON file
     */
     private void processJSONpeople_and_friends(AbstractFile af){
-        JsonObject json = parseAFtoJson(af);
-        
-        if(json.has("people_interactions_v2")){
+        String json = parseAFtoString(af);
+        PeopleInteractionsV2 peopleInteractions = new Gson().fromJson(json, PeopleInteractionsV2.class);
+
+        if(peopleInteractions.people_interactions_v2 != null){
             
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
@@ -919,32 +918,30 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 return;
             }
             
-            JsonArray entries = json.getAsJsonArray("people_interactions_v2").get(0).getAsJsonObject().getAsJsonArray("entries");
-            
-            for (JsonElement entry:entries){
-                
-                String date = "";
-                String name = "";
-                String uri = "";
-                
-                if (entry.isJsonObject()){
-                    date = new TimestampToDate(entry.getAsJsonObject().get("timestamp").getAsLong()).getDate();
-                    JsonObject entryObj = entry.getAsJsonObject().get("data").getAsJsonObject();
-                    name = entryObj.get("name").getAsString();
-                    uri = entryObj.get("uri").getAsString();
-                    
-                    // add variables to attributes
-                    Collection<BlackboardAttribute> attributelist = new ArrayList();
-                    attributelist.add(new BlackboardAttribute(peopleInteractionDate, FacebookIngestModuleFactory.getModuleName(), date));
-                    attributelist.add(new BlackboardAttribute(peopleInteractionName, FacebookIngestModuleFactory.getModuleName(), name));
-                    attributelist.add(new BlackboardAttribute(peopleInteractionUri, FacebookIngestModuleFactory.getModuleName(), uri));
-                    
-                    try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
-                    }
-                    catch (TskCoreException | BlackboardException e){
-                        e.printStackTrace();
-                        return;
+            for (PeopleInteractionsV2.PeopleInteractions_V2 peopleInteraction:peopleInteractions.people_interactions_v2) {
+                for (PeopleInteractionsV2.PeopleInteractions_V2.Entries entry:peopleInteraction.entries) {
+                    String date = "";
+                    String name = "";
+                    String uri = "";
+
+                    if (entry.data != null) {
+                        date = new TimestampToDate(entry.timestamp).getDate();
+                        name = entry.data.name;
+                        uri = entry.data.uri;
+
+                        // add variables to attributes
+                        Collection<BlackboardAttribute> attributelist = new ArrayList();
+                        attributelist.add(new BlackboardAttribute(peopleInteractionDate, FacebookIngestModuleFactory.getModuleName(), date));
+                        attributelist.add(new BlackboardAttribute(peopleInteractionName, FacebookIngestModuleFactory.getModuleName(), name));
+                        attributelist.add(new BlackboardAttribute(peopleInteractionUri, FacebookIngestModuleFactory.getModuleName(), uri));
+
+                        try{
+                            blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        }
+                        catch (TskCoreException | BlackboardException e){
+                            e.printStackTrace();
+                            return;
+                        }
                     }
                 }
             }
