@@ -128,10 +128,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONyour_comments_in_groups(af);
                     break;
                 case "your_group_membership_activity.json":
-                    //processJSON(af);
+                    processJSONyour_group_membership_activity(af);
                     break;
                 case "your_posts_in_groups.json":
-                    //processJSON(af);
+                    //processJSONyour_posts_in_groups(af);
                     break;
                 case "last_location.json":
                     //processJSON(af);
@@ -2142,6 +2142,339 @@ public class FacebookFileIngestModule implements FileIngestModule{
             return;
         }
     }
+    
+    /**
+    * Process your_group_membership_activity.json file and add data as Data Artifact
+    * Facebook user group membership data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONyour_group_membership_activity(AbstractFile af){
+        String json = parseAFtoString(af);
+        GroupsJoinedV2 groupsJoined = new Gson().fromJson(json, GroupsJoinedV2.class);
+        if(groupsJoined.groups_joined_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type groupJoinedDate;
+            BlackboardAttribute.Type groupName;
+            BlackboardAttribute.Type groupJoinedTitle;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_GROUP_JOINED") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_GROUP_JOINED", "Facebook Groups Joined");
+                    groupJoinedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUP_JOINED_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Joined");
+                    groupName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUP_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group Name");
+                    groupJoinedTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUP_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_GROUP_JOINED");
+                    groupJoinedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUP_JOINED_DATE");
+                    groupName = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUP_NAME");
+                    groupJoinedTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUP_TITLE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (GroupsJoinedV2.GroupsJoined_V2 group:groupsJoined.groups_joined_v2){
+                
+                String date = new TimestampToDate(group.timestamp).getDate();
+                String name = group.data.name;
+                String title = group.title;
+                
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(groupJoinedDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(groupName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(groupJoinedTitle, FacebookIngestModuleFactory.getModuleName(), title));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No groups_joined_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process your_posts_in_groups.json file and add data as Data Artifact
+    * Facebook user posts in groups data.
+    *
+    * @param  af  JSON file
+    */
+    /*private void processJSONyour_posts_in_groups(AbstractFile af){
+        try{
+        String json = parseAFtoString(af);
+        GroupPostsV2 groupPosts = new Gson().fromJson(json, GroupPostsV2.class);
+        if(groupPosts.group_posts_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type groupPost_date;
+            BlackboardAttribute.Type groupPost_title;
+            BlackboardAttribute.Type groupPost_post;
+            BlackboardAttribute.Type groupPost_saleTitle;
+            BlackboardAttribute.Type groupPost_salePrice;
+            BlackboardAttribute.Type groupPost_saleSeller;
+            BlackboardAttribute.Type groupPost_saleCreatedDate;
+            BlackboardAttribute.Type groupPost_saleUpdatedDate;
+            BlackboardAttribute.Type groupPost_saleCategory;
+            BlackboardAttribute.Type groupPost_saleMarketplace;
+            BlackboardAttribute.Type groupPost_saleLocationName;
+            BlackboardAttribute.Type groupPost_saleLocationLatitude;
+            BlackboardAttribute.Type groupPost_saleLocationLongitude;
+            BlackboardAttribute.Type groupPost_uri;
+            BlackboardAttribute.Type groupPost_attachmentCreatedDate;
+            BlackboardAttribute.Type groupPost_description;
+            BlackboardAttribute.Type groupPost_attachmentUploadIp;
+            BlackboardAttribute.Type groupPost_attachmentTakenDate;
+            BlackboardAttribute.Type groupPost_url;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_GROUP_POST") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_GROUP_POST", "Facebook Groups Joined");
+                    groupPost_date = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Posted");
+                    groupPost_title = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                    groupPost_post = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_POST", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Post");
+                    groupPost_saleTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Title");
+                    groupPost_salePrice = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_PRICE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Price");
+                    groupPost_saleSeller = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_SELLER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Seller");
+                    groupPost_saleCreatedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Date Created");
+                    groupPost_saleUpdatedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_DATE_UPDATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Date Update");
+                    groupPost_saleCategory = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_CATEGORY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Category");
+                    groupPost_saleMarketplace = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_MARKETPLACE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Marketplace");
+                    groupPost_saleLocationName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_LOCATION_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Location Name");
+                    groupPost_saleLocationLatitude = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_LOCATION_LATITUDE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Location Latitude");
+                    groupPost_saleLocationLongitude = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_IS_LOCATION_LONGITUDE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Item Sale Location Longitude");
+                    groupPost_uri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
+                    groupPost_attachmentCreatedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_AT_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Attachment Date Created");
+                    groupPost_description = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_AT_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Attachment Description");
+                    groupPost_attachmentUploadIp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_AT_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Attachment Uploaded from IP");
+                    groupPost_attachmentTakenDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_AT_DATE_TAKEN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Attachment Date Taken");
+                    groupPost_url = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_GROUP_POST");
+                    groupPost_date = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_DATE");
+                    groupPost_title = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_TITLE");
+                    groupPost_post = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_POST");
+                    groupPost_saleTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_TITLE");
+                    groupPost_salePrice = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_PRICE");
+                    groupPost_saleSeller = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_SELLER");
+                    groupPost_saleCreatedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_DATE_CREATED");
+                    groupPost_saleUpdatedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_DATE_UPDATED");
+                    groupPost_saleCategory = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_CATEGORY");
+                    groupPost_saleMarketplace = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_MARKETPLACE");
+                    groupPost_saleLocationName = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_LOCATION_NAME");
+                    groupPost_saleLocationLatitude = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_LOCATION_LATITUDE");
+                    groupPost_saleLocationLongitude = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_IS_LOCATION_LONGITUDE");
+                    groupPost_uri = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_URI");
+                    groupPost_attachmentCreatedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_AT_DATE_CREATED");
+                    groupPost_description = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_AT_DESCRIPTION");
+                    groupPost_attachmentUploadIp = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_AT_IP");
+                    groupPost_attachmentTakenDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_AT_DATE_TAKEN");
+                    groupPost_url = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPPOST_URL");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (GroupPostsV2.GroupPosts_V2 groupPost:groupPosts.group_posts_v2){
+                
+                String date = new TimestampToDate(groupPost.timestamp).getDate();
+                String title = groupPost.title;
+                String post = "";
+                
+                // Marketplace variables
+                String saleTitle = "";
+                String salePrice = "";
+                String saleSeller = "";
+                String saleCreatedDate = "";
+                String saleUpdatedDate = "";
+                String saleCategory = "";
+                String saleMarketplace = "";
+                String saleLocationName = "";
+                String saleLocationLatitude = "";
+                String saleLocationLongitude = "";
+                
+                // Media attachment variables
+                String uri = "";
+                String attachmentCreatedDate = "";
+                String description = "";
+                String attachmentUploadIp = "";
+                String attachmentTakenDate = "";
+                
+                // External Context variables
+                String url = "";
+                
+                // Post data
+                if (groupPost.data != null){
+                    for (GroupPostsV2.GroupPosts_V2.Data postData:groupPost.data) {
+                        post = postData.post;
+                    }
+                }
+                
+                
+                if (groupPost.attachments != null){
+                    boolean marketplaceInPost = false;
+                    boolean attachmentInPost = false;
+                    boolean externalContextInPost = false;
+                    // Marketplace and External Context data
+                    for (GroupPostsV2.GroupPosts_V2.Attachments attachmentData:groupPost.attachments) {
+                        if (attachmentData.for_sale_item != null){
+                            saleTitle = attachmentData.for_sale_item.title;
+                            salePrice = attachmentData.for_sale_item.price;
+                            saleSeller = attachmentData.for_sale_item.seller;
+                            saleCreatedDate = new TimestampToDate(attachmentData.for_sale_item.created_timestamp).getDate();
+                            saleUpdatedDate = new TimestampToDate(attachmentData.for_sale_item.updated_timestamp).getDate();
+                            saleCategory = attachmentData.for_sale_item.category;
+                            saleMarketplace = attachmentData.for_sale_item.marketplace;
+                            saleLocationName = attachmentData.for_sale_item.location.name;
+                            saleLocationLatitude = attachmentData.for_sale_item.location.coordinate.latitude;
+                            saleLocationLongitude = attachmentData.for_sale_item.location.coordinate.longitude;
+                            marketplaceInPost = true;
+                        }
+                        if (attachmentData.external_context != null){
+                            url = attachmentData.external_context.url;
+                            externalContextInPost = true;
+                        }
+                        if (attachmentData.media != null){
+                            attachmentInPost = true;
+                        }
+                    }
+                    
+                    // Attachment data
+                    if (attachmentInPost) {
+                        // Attachment data
+                        for (GroupPostsV2.GroupPosts_V2.Attachments attachmentData:groupPost.attachments) {
+                            if (attachmentData.media != null){
+                                uri = attachmentData.media.uri;
+                                attachmentCreatedDate = new TimestampToDate(attachmentData.media.creation_timestamp).getDate();
+                                description = attachmentData.media.description;
+                                for (GroupPostsV2.GroupPosts_V2.Attachments.Media.MediaMetaData.PhotoMetaData.ExifData exifData:attachmentData.media.media_metadata.photo_metadata.exif_data) {
+                                    attachmentUploadIp = exifData.upload_ip;
+                                    attachmentTakenDate = new TimestampToDate(exifData.taken_timestamp).getDate();
+                                }
+                                // add variables to attributes
+                                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                                attributelist.add(new BlackboardAttribute(groupPost_date, FacebookIngestModuleFactory.getModuleName(), date));
+                                attributelist.add(new BlackboardAttribute(groupPost_title, FacebookIngestModuleFactory.getModuleName(), title));
+                                attributelist.add(new BlackboardAttribute(groupPost_post, FacebookIngestModuleFactory.getModuleName(), post));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleTitle, FacebookIngestModuleFactory.getModuleName(), saleTitle));
+                                attributelist.add(new BlackboardAttribute(groupPost_salePrice, FacebookIngestModuleFactory.getModuleName(), salePrice));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleSeller, FacebookIngestModuleFactory.getModuleName(), saleSeller));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleCreatedDate, FacebookIngestModuleFactory.getModuleName(), saleCreatedDate));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleUpdatedDate, FacebookIngestModuleFactory.getModuleName(), saleUpdatedDate));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleCategory, FacebookIngestModuleFactory.getModuleName(), saleCategory));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleMarketplace, FacebookIngestModuleFactory.getModuleName(), saleMarketplace));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleLocationName, FacebookIngestModuleFactory.getModuleName(), saleLocationName));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleLocationLatitude, FacebookIngestModuleFactory.getModuleName(), saleLocationLatitude));
+                                attributelist.add(new BlackboardAttribute(groupPost_saleLocationLongitude, FacebookIngestModuleFactory.getModuleName(), saleLocationLongitude));
+                                attributelist.add(new BlackboardAttribute(groupPost_uri, FacebookIngestModuleFactory.getModuleName(), uri));
+                                attributelist.add(new BlackboardAttribute(groupPost_attachmentCreatedDate, FacebookIngestModuleFactory.getModuleName(), attachmentCreatedDate));
+                                attributelist.add(new BlackboardAttribute(groupPost_description, FacebookIngestModuleFactory.getModuleName(), description));
+                                attributelist.add(new BlackboardAttribute(groupPost_attachmentUploadIp, FacebookIngestModuleFactory.getModuleName(), attachmentUploadIp));
+                                attributelist.add(new BlackboardAttribute(groupPost_attachmentTakenDate, FacebookIngestModuleFactory.getModuleName(), attachmentTakenDate));
+                                attributelist.add(new BlackboardAttribute(groupPost_url, FacebookIngestModuleFactory.getModuleName(), url));
+
+                                try{
+                                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                                }
+                                catch (TskCoreException | BlackboardException e){
+                                    e.printStackTrace();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    else if (marketplaceInPost || externalContextInPost) {
+                        // add variables to attributes
+                        Collection<BlackboardAttribute> attributelist = new ArrayList();
+                        attributelist.add(new BlackboardAttribute(groupPost_date, FacebookIngestModuleFactory.getModuleName(), date));
+                        attributelist.add(new BlackboardAttribute(groupPost_title, FacebookIngestModuleFactory.getModuleName(), title));
+                        attributelist.add(new BlackboardAttribute(groupPost_post, FacebookIngestModuleFactory.getModuleName(), post));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleTitle, FacebookIngestModuleFactory.getModuleName(), saleTitle));
+                        attributelist.add(new BlackboardAttribute(groupPost_salePrice, FacebookIngestModuleFactory.getModuleName(), salePrice));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleSeller, FacebookIngestModuleFactory.getModuleName(), saleSeller));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleCreatedDate, FacebookIngestModuleFactory.getModuleName(), saleCreatedDate));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleUpdatedDate, FacebookIngestModuleFactory.getModuleName(), saleUpdatedDate));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleCategory, FacebookIngestModuleFactory.getModuleName(), saleCategory));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleMarketplace, FacebookIngestModuleFactory.getModuleName(), saleMarketplace));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleLocationName, FacebookIngestModuleFactory.getModuleName(), saleLocationName));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleLocationLatitude, FacebookIngestModuleFactory.getModuleName(), saleLocationLatitude));
+                        attributelist.add(new BlackboardAttribute(groupPost_saleLocationLongitude, FacebookIngestModuleFactory.getModuleName(), saleLocationLongitude));
+                        attributelist.add(new BlackboardAttribute(groupPost_uri, FacebookIngestModuleFactory.getModuleName(), uri));
+                        attributelist.add(new BlackboardAttribute(groupPost_attachmentCreatedDate, FacebookIngestModuleFactory.getModuleName(), attachmentCreatedDate));
+                        attributelist.add(new BlackboardAttribute(groupPost_description, FacebookIngestModuleFactory.getModuleName(), description));
+                        attributelist.add(new BlackboardAttribute(groupPost_attachmentUploadIp, FacebookIngestModuleFactory.getModuleName(), attachmentUploadIp));
+                        attributelist.add(new BlackboardAttribute(groupPost_attachmentTakenDate, FacebookIngestModuleFactory.getModuleName(), attachmentTakenDate));
+                        attributelist.add(new BlackboardAttribute(groupPost_url, FacebookIngestModuleFactory.getModuleName(), url));
+
+                        try{
+                            blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        }
+                        catch (TskCoreException | BlackboardException e){
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                }
+                else {
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(groupPost_date, FacebookIngestModuleFactory.getModuleName(), date));
+                    attributelist.add(new BlackboardAttribute(groupPost_title, FacebookIngestModuleFactory.getModuleName(), title));
+                    attributelist.add(new BlackboardAttribute(groupPost_post, FacebookIngestModuleFactory.getModuleName(), post));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleTitle, FacebookIngestModuleFactory.getModuleName(), saleTitle));
+                    attributelist.add(new BlackboardAttribute(groupPost_salePrice, FacebookIngestModuleFactory.getModuleName(), salePrice));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleSeller, FacebookIngestModuleFactory.getModuleName(), saleSeller));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleCreatedDate, FacebookIngestModuleFactory.getModuleName(), saleCreatedDate));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleUpdatedDate, FacebookIngestModuleFactory.getModuleName(), saleUpdatedDate));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleCategory, FacebookIngestModuleFactory.getModuleName(), saleCategory));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleMarketplace, FacebookIngestModuleFactory.getModuleName(), saleMarketplace));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleLocationName, FacebookIngestModuleFactory.getModuleName(), saleLocationName));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleLocationLatitude, FacebookIngestModuleFactory.getModuleName(), saleLocationLatitude));
+                    attributelist.add(new BlackboardAttribute(groupPost_saleLocationLongitude, FacebookIngestModuleFactory.getModuleName(), saleLocationLongitude));
+                    attributelist.add(new BlackboardAttribute(groupPost_uri, FacebookIngestModuleFactory.getModuleName(), uri));
+                    attributelist.add(new BlackboardAttribute(groupPost_attachmentCreatedDate, FacebookIngestModuleFactory.getModuleName(), attachmentCreatedDate));
+                    attributelist.add(new BlackboardAttribute(groupPost_description, FacebookIngestModuleFactory.getModuleName(), description));
+                    attributelist.add(new BlackboardAttribute(groupPost_attachmentUploadIp, FacebookIngestModuleFactory.getModuleName(), attachmentUploadIp));
+                    attributelist.add(new BlackboardAttribute(groupPost_attachmentTakenDate, FacebookIngestModuleFactory.getModuleName(), attachmentTakenDate));
+                    attributelist.add(new BlackboardAttribute(groupPost_url, FacebookIngestModuleFactory.getModuleName(), url));
+
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+                
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No groups_joined_v2 found");
+            return;
+        }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
+    }*/
     
     /**
     * Read file and parse JSON as JsonObject
