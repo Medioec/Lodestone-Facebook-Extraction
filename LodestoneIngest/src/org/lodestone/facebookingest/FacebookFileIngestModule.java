@@ -91,20 +91,20 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 case "posts_and_comments.json":
                     processJSONposts_and_comments(af);
                     break;
-                case "use_of_wallets_across_accounts.json":
-                    break;
-                case "items_sold.json":
+                case "accounts_center.json":
+                    processJSONaccounts_center(af);
                     break;
                 case "event_invitations.json":
+                    processJSONevent_invitations(af);
                     break;
                 case "your_event_responses.json":
                     processJSONyour_event_responses(af);
                     break;
-                case "marketplace_notifications.json":
+                case "items_sold.json":
+                    processJSONitems_sold(af);
                     break;
                 case "payment_history.json":
-                    break;
-                case "reduce.json":
+                    processJSONpayment_history(af);
                     break;
                 case "friends.json":
                     processJSONfriends(af);
@@ -125,62 +125,91 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONwho_you_follow(af);
                     break;
                 case "your_comments_in_groups.json":
+                    processJSONyour_comments_in_groups(af);
                     break;
                 case "your_group_membership_activity.json":
+                    //processJSON(af);
                     break;
                 case "your_posts_in_groups.json":
+                    //processJSON(af);
                     break;
                 case "last_location.json":
+                    //processJSON(af);
                     break;
                 case "primary_location.json":
+                    //processJSON(af);
                     break;
                 case "primary_public_location.json":
+                    //processJSON(af);
                     break;
                 case "timezone.json":
+                    //processJSON(af);
                     break;
                 case "autofill_information.json":
+                    //processJSON(af);
                     break;
                 case "secret_conversations.json":
+                    //processJSON(af);
                     break;
                 case "support_messages.json":
+                    //processJSON(af);
                     break;
                 case "message_1.json":
+                    //processJSON(af);
                     break;
                 case "notifications.json":
+                    //processJSON(af);
                     break;
                 case "ads_interests.json":
+                    //processJSON(af);
                     break;
                 case "friend_peer_group.json":
+                    //processJSON(af);
                     break;
                 case "pages_and_profiles_you_follow.json":
+                    //processJSON(af);
                     break;
                 case "pages_you've_liked.json":
+                    //processJSON(af);
                     break;
                 case "your_posts_1.json":
+                    //processJSON(af);
                     break;
                 case "your_uncategorized_photos.json":
+                    //processJSON(af);
                     break;
                 case "your_videos.json":
+                    //processJSON(af);
                     break;
                 case "0.json":
+                    //processJSON(af);
                     break;
                 case "1.json":
+                    //processJSON(af);
                     break;
                 case "2.json":
+                    //processJSON(af);
                     break;
                 case "3.json":
+                    //processJSON(af);
                     break;
                 case "language_and_locale.json":
+                    //processJSON(af);
                     break;
                 case "profile_information.json":
+                    //processJSON(af);
                     break;
                 case "profile_update_history.json":
+                    //processJSON(af);
                     break;
                 case "collections.json":
+                    //processJSON(af);
                     break;
                 case "your_saved_items.json":
+                    //processJSON(af);
                     break;
                 case "your_search_history.json":
+                    //processJSON(af);
                     break;
                 case "account_activity.json":
                     processJSONaccount_activity(af);
@@ -194,26 +223,37 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONip_address_activity(af);
                     break;
                 case "logins_and_logouts.json":
+                    //processJSON(af);
                     break;
                 case "login_protection_data.json":
+                    //processJSON(af);
                     break;
                 case "mobile_devices.json":
+                    //processJSON(af);
                     break;
                 case "record_details.json":
+                    //processJSON(af);
                     break;
                 case "where_you're_logged_in.json":
+                    //processJSON(af);
                     break;
                 case "your_facebook_activity_history.json":
+                    //processJSON(af);
                     break;
                 case "location.json":
+                    //processJSON(af);
                     break;
                 case "voting_reminders.json":
+                    //processJSON(af);
                     break;
                 case "recently_viewed.json":
+                    //processJSON(af);
                     break;
                 case "recently_visited.json":
+                    //processJSON(af);
                     break;
                 case "your_topics.json":
+                    //processJSON(af);
                     break;
             }
         }
@@ -789,14 +829,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
 
             for (GroupInteractionsV2.GroupInteractions_V2 groupInteraction:groupInteractions.group_interactions_v2) {
                 for (GroupInteractionsV2.GroupInteractions_V2.Entries entry:groupInteraction.entries) {
-                    String name = "";
-                    String value = "";
-                    String uri = "";
-
                     if (entry.data != null) {
-                        name = entry.data.name;
-                        value = entry.data.value;
-                        uri = entry.data.uri;
+                        String name = entry.data.name;
+                        String value = entry.data.value;
+                        String uri = entry.data.uri;
 
                         // add variables to attributes
                         Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -861,14 +897,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             for (PeopleInteractionsV2.PeopleInteractions_V2 peopleInteraction:peopleInteractions.people_interactions_v2) {
                 for (PeopleInteractionsV2.PeopleInteractions_V2.Entries entry:peopleInteraction.entries) {
-                    String date = "";
-                    String name = "";
-                    String uri = "";
-
                     if (entry.data != null) {
-                        date = new TimestampToDate(entry.timestamp).getDate();
-                        name = entry.data.name;
-                        uri = entry.data.uri;
+                        String date = new TimestampToDate(entry.timestamp).getDate();
+                        String name = entry.data.name;
+                        String uri = entry.data.uri;
 
                         // add variables to attributes
                         Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -933,15 +965,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             for (CustomAudienceAllTypesV2.Advertiser advertiser:advertisers.custom_audiences_all_types_v2){
                 
-                String name = "";
-                String dataFile = "";
-                String remarketing = "";
-                String inPersonStoreVisit = "";
-                
-                name = advertiser.advertiser_name;
-                dataFile = advertiser.has_data_file_custom_audience;
-                remarketing = advertiser.has_remarketing_custom_audience;
-                inPersonStoreVisit = advertiser.has_in_person_store_visit;
+                String name = advertiser.advertiser_name;
+                String dataFile = advertiser.has_data_file_custom_audience;
+                String remarketing = advertiser.has_remarketing_custom_audience;
+                String inPersonStoreVisit = advertiser.has_in_person_store_visit;
                 
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -1002,13 +1029,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             for (HistoryV2.Advertisement advertisement:advertisements.history_v2){
                 
-                String title = "";
-                String action = "";
-                String date = "";
-                
-                title = advertisement.title;
-                action = advertisement.action;
-                date = new TimestampToDate(advertisement.timestamp).getDate();
+                String title = advertisement.title;
+                String action = advertisement.action;
+                String date = new TimestampToDate(advertisement.timestamp).getDate();
 
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -1074,17 +1097,11 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             for (InstalledAppsV2.InstalledApp app:installedApps.installed_apps_v2){
                 
-                String name = "";
-                String addedDate = "";
-                String scopedId = "";
-                String category = "";
-                String removedDate = "";
-                
-                name = app.name;
-                addedDate = new TimestampToDate(app.added_timestamp).getDate();
-                scopedId = app.user_app_scoped_id;
-                category = app.category;
-                removedDate = new TimestampToDate(app.removed_timestamp).getDate();
+                String name = app.name;
+                String addedDate = new TimestampToDate(app.added_timestamp).getDate();
+                String scopedId = app.user_app_scoped_id;
+                String category = app.category;
+                String removedDate = new TimestampToDate(app.removed_timestamp).getDate();
 
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -1149,12 +1166,11 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             for (OffFacebookActivityV2.Organisation organisation:offFacebookActivity.off_facebook_activity_v2){
                 
-                String name = "";
                 String id = "";
                 String type = "";
                 String date = "";
                 
-                name = organisation.name;
+                String name = organisation.name;
                 if (organisation.events != null){
                     for (OffFacebookActivityV2.Organisation.Event event:organisation.events){
                         id = event.id;
@@ -1231,15 +1247,13 @@ public class FacebookFileIngestModule implements FileIngestModule{
             }
             
             for (CommentsV2.Comments_V2 comment:comments.comments_v2){
-                String date = "";
-                String title = "";
                 String commentString = "";
                 String author = "";
                 String uri = "";
                 String url = "";
                 
-                date = new TimestampToDate(comment.timestamp).getDate();
-                title = comment.title;
+                String date = new TimestampToDate(comment.timestamp).getDate();
+                String title = comment.title;
                 if (comment.data != null){
                     for (CommentsV2.Comments_V2.Data data:comment.data){
                         commentString = data.comment.comment;
@@ -1325,13 +1339,11 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             for (ReactionsV2.Reactions_V2 reaction:reactions.reactions_v2){
                 
-                String date = "";
-                String title = "";
                 String reactionString = "";
                 String actor = "";
                 
-                title = reaction.title;
-                date = new TimestampToDate(reaction.timestamp).getDate();
+                String title = reaction.title;
+                String date = new TimestampToDate(reaction.timestamp).getDate();
                 for (ReactionsV2.Reactions_V2.Data reactionData:reaction.data){
                     reactionString = reactionData.reaction.reaction;
                     actor = reactionData.reaction.actor;
@@ -1359,8 +1371,149 @@ public class FacebookFileIngestModule implements FileIngestModule{
     }
     
     /**
-    * Process posts_and_comments.json file and add data as Data Artifact
-    * Facebook reaction data.
+    * Process accounts_center.json file and add data as Data Artifact
+    * Facebook account center data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONaccounts_center(AbstractFile af){
+        String json = parseAFtoString(af);
+        AccountsCenterV2 accountCenter = new Gson().fromJson(json, AccountsCenterV2.class);
+        if(accountCenter.accounts_center_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type accountCenterServiceName;
+            BlackboardAttribute.Type accountCenterAppId;
+            BlackboardAttribute.Type accountCenterUsername;
+            BlackboardAttribute.Type accountCenterEmail;
+            BlackboardAttribute.Type accountCenterName;
+            BlackboardAttribute.Type accountCenterDate;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_ACCOUNT_CENTER") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_ACCOUNT_CENTER", "Facebook Account Center");
+                    accountCenterServiceName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_SERVICENAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Service Name");
+                    accountCenterAppId = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_APPID", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "App ID");
+                    accountCenterUsername = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_USERNAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Username");
+                    accountCenterEmail = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_EMAIL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Email");
+                    accountCenterName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                    accountCenterDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Linked Date");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_ACCOUNT_CENTER");
+                    accountCenterServiceName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_SERVICENAME");
+                    accountCenterAppId = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_APPID");
+                    accountCenterUsername = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_USERNAME");
+                    accountCenterEmail = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_EMAIL");
+                    accountCenterName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_NAME");
+                    accountCenterDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ACCOUNT_CENTER_DATE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (AccountsCenterV2.AccountsCenter_V2.Service serviceLinked:accountCenter.accounts_center_v2.linked_accounts){
+                
+                String service_name = serviceLinked.service_name;
+                String native_app_id = serviceLinked.native_app_id;
+                String username = serviceLinked.username;
+                String email = serviceLinked.email;
+                String name = serviceLinked.name;
+                String date = new TimestampToDate(serviceLinked.linked_time).getDate();
+                        
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(accountCenterServiceName, FacebookIngestModuleFactory.getModuleName(), service_name));
+                attributelist.add(new BlackboardAttribute(accountCenterAppId, FacebookIngestModuleFactory.getModuleName(), native_app_id));
+                attributelist.add(new BlackboardAttribute(accountCenterUsername, FacebookIngestModuleFactory.getModuleName(), username));
+                attributelist.add(new BlackboardAttribute(accountCenterEmail, FacebookIngestModuleFactory.getModuleName(), email));
+                attributelist.add(new BlackboardAttribute(accountCenterName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(accountCenterDate, FacebookIngestModuleFactory.getModuleName(), date));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else {
+            logger.log(Level.INFO, "No accounts_center_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process event_invitations.json file and add data as Data Artifact
+    * Facebook events user is invited to data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONevent_invitations(AbstractFile af){
+        String json = parseAFtoString(af);
+        EventsInvitedV2 eventResponse = new Gson().fromJson(json, EventsInvitedV2.class);
+        if(eventResponse.events_invited_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type eventResponseName;
+            BlackboardAttribute.Type eventResponseStartDate;
+            BlackboardAttribute.Type eventResponseEndDate;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_EVENT_INVITATION") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_EVENT_INVITATION", "Facebook Event Invitation");
+                    eventResponseName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_EVENT_INVITATION_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Event Name");
+                    eventResponseStartDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_EVENT_INVITATION_STARTDATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Start Date");
+                    eventResponseEndDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_EVENT_INVITATION_ENDDATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "End Date");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_EVENT_INVITATION");
+                    eventResponseName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_EVENT_INVITATION_NAME");
+                    eventResponseStartDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_EVENT_INVITATION_STARTDATE");
+                    eventResponseEndDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_EVENT_INVITATION_ENDDATE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (EventsInvitedV2.EventInvitation eventInvited:eventResponse.events_invited_v2){
+                
+                String name = eventInvited.name;
+                String startDate = new TimestampToDate(eventInvited.start_timestamp).getDate();
+                String endDate = new TimestampToDate(eventInvited.end_timestamp).getDate();
+                        
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(eventResponseName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(eventResponseStartDate, FacebookIngestModuleFactory.getModuleName(), startDate));
+                attributelist.add(new BlackboardAttribute(eventResponseEndDate, FacebookIngestModuleFactory.getModuleName(), endDate));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No events_invited_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process your_event_responses.json file and add data as Data Artifact
+    * Facebook event response data.
     *
     * @param  af  JSON file
     */
@@ -1400,14 +1553,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
             // Loop for events_joined
             for (EventResponseV2.EventResponse_V2.EventsJoined eventJoined:eventResponse.event_responses_v2.events_joined){
                 
-                String name = "";
                 String reply = "Joined";
-                String startDate = "";
-                String endDate = "";
-                
-                name = eventJoined.name;
-                startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
-                endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
+                String name = eventJoined.name;
+                String startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
+                String endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
                         
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -1428,14 +1577,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
             // Loop for events_declined
             for (EventResponseV2.EventResponse_V2.EventsJoined eventJoined:eventResponse.event_responses_v2.events_declined){
                 
-                String name = "";
                 String reply = "Declined";
-                String startDate = "";
-                String endDate = "";
-                
-                name = eventJoined.name;
-                startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
-                endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
+                String name = eventJoined.name;
+                String startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
+                String endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
                         
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -1456,14 +1601,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
             // Loop for events_interested
             for (EventResponseV2.EventResponse_V2.EventsJoined eventJoined:eventResponse.event_responses_v2.events_interested){
                 
-                String name = "";
                 String reply = "Interested";
-                String startDate = "";
-                String endDate = "";
-                
-                name = eventJoined.name;
-                startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
-                endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
+                String name = eventJoined.name;
+                String startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
+                String endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
                         
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -1482,11 +1623,308 @@ public class FacebookFileIngestModule implements FileIngestModule{
             }
         }
         else{
-            logger.log(Level.INFO, "No reactions_v2 found");
+            logger.log(Level.INFO, "No event_responses_v2 found");
             return;
         }
     }
     
+    /**
+    * Process items_sold.json file and add data as Data Artifact
+    * Facebook marketplace items sold data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONitems_sold(AbstractFile af){
+        String json = parseAFtoString(af);
+        ItemsSellingV2 itemsSelling = new Gson().fromJson(json, ItemsSellingV2.class);
+        if(itemsSelling.items_selling_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type itemsSellingTitle;
+            BlackboardAttribute.Type itemsSellingPrice;
+            BlackboardAttribute.Type itemsSellingSeller;
+            BlackboardAttribute.Type itemsSellingCreatedDate;
+            BlackboardAttribute.Type itemsSellingUpdatedDate;
+            BlackboardAttribute.Type itemsSellingCategory;
+            BlackboardAttribute.Type itemsSellingMarketplace;
+            BlackboardAttribute.Type itemsSellingLocationName;
+            BlackboardAttribute.Type itemsSellingLocationLatitude;
+            BlackboardAttribute.Type itemsSellingLocationLongitude;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_ITEMS_SELLING") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_ITEMS_SELLING", "Facebook Items Selling");
+                    itemsSellingTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                    itemsSellingPrice = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_PRICE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Price");
+                    itemsSellingSeller = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_SELLER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Seller");
+                    itemsSellingCreatedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_CREATED_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Created Date");
+                    itemsSellingUpdatedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_UPDATED_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Latest Updated Date");
+                    itemsSellingCategory = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_CATEGORY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Category");
+                    itemsSellingMarketplace = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_MARKETPLACE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Marketplace Group");
+                    itemsSellingLocationName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_LOCATION_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Location Name");
+                    itemsSellingLocationLatitude = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_LOCATION_LATITUDE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Latitude");
+                    itemsSellingLocationLongitude = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_ITEMS_SELLING_LOCATION_LONGITUDE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Longitude");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_ITEMS_SELLING");
+                    itemsSellingTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_TITLE");
+                    itemsSellingPrice = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_PRICE");
+                    itemsSellingSeller = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_SELLER");
+                    itemsSellingCreatedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_CREATED_DATE");
+                    itemsSellingUpdatedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_UPDATED_DATE");
+                    itemsSellingCategory = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_CATEGORY");
+                    itemsSellingMarketplace = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_MARKETPLACE");
+                    itemsSellingLocationName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_LOCATION_NAME");
+                    itemsSellingLocationLatitude = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_LOCATION_LATITUDE");
+                    itemsSellingLocationLongitude = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_ITEMS_SELLING_LOCATION_LONGITUDE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (ItemsSellingV2.ItemsSelling_V2 item:itemsSelling.items_selling_v2){
+                
+                String title = item.title;
+                String price = item.price;
+                String seller = item.seller;
+                String created_timestamp = new TimestampToDate(item.created_timestamp).getDate();
+                String updated_timestamp = new TimestampToDate(item.updated_timestamp).getDate();
+                String category = item.category;
+                String marketplace = item.marketplace;
+                String locationName = item.location.name;
+                String latitude = item.location.coordinate.latitude;
+                String longitude = item.location.coordinate.longitude;
+                        
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(itemsSellingTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                attributelist.add(new BlackboardAttribute(itemsSellingPrice, FacebookIngestModuleFactory.getModuleName(), price));
+                attributelist.add(new BlackboardAttribute(itemsSellingSeller, FacebookIngestModuleFactory.getModuleName(), seller));
+                attributelist.add(new BlackboardAttribute(itemsSellingCreatedDate, FacebookIngestModuleFactory.getModuleName(), created_timestamp));
+                attributelist.add(new BlackboardAttribute(itemsSellingUpdatedDate, FacebookIngestModuleFactory.getModuleName(), updated_timestamp));
+                attributelist.add(new BlackboardAttribute(itemsSellingCategory, FacebookIngestModuleFactory.getModuleName(), category));
+                attributelist.add(new BlackboardAttribute(itemsSellingMarketplace, FacebookIngestModuleFactory.getModuleName(), marketplace));
+                attributelist.add(new BlackboardAttribute(itemsSellingLocationName, FacebookIngestModuleFactory.getModuleName(), locationName));
+                attributelist.add(new BlackboardAttribute(itemsSellingLocationLatitude, FacebookIngestModuleFactory.getModuleName(), latitude));
+                attributelist.add(new BlackboardAttribute(itemsSellingLocationLongitude, FacebookIngestModuleFactory.getModuleName(), longitude));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No event_responses_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process payment_history.json file and add data as Data Artifact
+    * Facebook payment history data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONpayment_history(AbstractFile af){
+        String json = parseAFtoString(af);
+        PaymentsV2 paymentHistory = new Gson().fromJson(json, PaymentsV2.class);
+        if(paymentHistory.payments_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type paymentHistoryPreferredCurrency;
+            BlackboardAttribute.Type paymentHistoryPaymentDate;
+            BlackboardAttribute.Type paymentHistoryPaymentAmount;
+            BlackboardAttribute.Type paymentHistoryPaymentCurrency;
+            BlackboardAttribute.Type paymentHistoryPaymentSender;
+            BlackboardAttribute.Type paymentHistoryPaymentReceiver;
+            BlackboardAttribute.Type paymentHistoryPaymentType;
+            BlackboardAttribute.Type paymentHistoryPaymentStatus;
+            BlackboardAttribute.Type paymentHistoryPaymentMethod;
+            BlackboardAttribute.Type paymentHistoryPaymentIP;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAYMENT_HISTORY") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PAYMENT_HISTORY", "Facebook Payment History");
+                    paymentHistoryPreferredCurrency = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_HISTORY_PREFERRED_CURRENCY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User-preferred Currency");
+                    paymentHistoryPaymentDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    paymentHistoryPaymentAmount = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_AMOUNT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Amount");
+                    paymentHistoryPaymentCurrency = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_CURRENCY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Currency");
+                    paymentHistoryPaymentSender = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_SENDER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Sender");
+                    paymentHistoryPaymentReceiver = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_RECEIVER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Receiver");
+                    paymentHistoryPaymentType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Type");
+                    paymentHistoryPaymentStatus = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_STATUS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Status");
+                    paymentHistoryPaymentMethod = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_METHOD", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Payment Method");
+                    paymentHistoryPaymentIP = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAYMENT_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAYMENT_HISTORY");
+                    paymentHistoryPreferredCurrency = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_HISTORY_PREFERRED_CURRENCY");
+                    paymentHistoryPaymentDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_DATE");
+                    paymentHistoryPaymentAmount = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_AMOUNT");
+                    paymentHistoryPaymentCurrency = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_CURRENCY");
+                    paymentHistoryPaymentSender = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_SENDER");
+                    paymentHistoryPaymentReceiver = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_RECEIVER");
+                    paymentHistoryPaymentType = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_TYPE");
+                    paymentHistoryPaymentStatus = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_STATUS");
+                    paymentHistoryPaymentMethod = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_METHOD");
+                    paymentHistoryPaymentIP = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAYMENT_IP");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            String preferredCurrency = paymentHistory.payments_v2.preferred_currency;
+            
+            for (PaymentsV2.Payments_V2.Payment payment:paymentHistory.payments_v2.payments){
+                
+                String paymentDate = new TimestampToDate(payment.created_timestamp).getDate();
+                String paymentAmount = payment.amount;
+                String paymentCurrency = payment.currency;
+                String paymentSender = payment.sender;
+                String paymentReceiver = payment.receiver;
+                String paymentType = payment.type;
+                String paymentStatus = payment.status;
+                String paymentMethod = payment.payment_method;
+                String paymentIP = payment.ip;
+                        
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(paymentHistoryPreferredCurrency, FacebookIngestModuleFactory.getModuleName(), preferredCurrency));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentDate, FacebookIngestModuleFactory.getModuleName(), paymentDate));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentAmount, FacebookIngestModuleFactory.getModuleName(), paymentAmount));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentCurrency, FacebookIngestModuleFactory.getModuleName(), paymentCurrency));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentSender, FacebookIngestModuleFactory.getModuleName(), paymentSender));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentReceiver, FacebookIngestModuleFactory.getModuleName(), paymentReceiver));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentType, FacebookIngestModuleFactory.getModuleName(), paymentType));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentStatus, FacebookIngestModuleFactory.getModuleName(), paymentStatus));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentMethod, FacebookIngestModuleFactory.getModuleName(), paymentMethod));
+                attributelist.add(new BlackboardAttribute(paymentHistoryPaymentIP, FacebookIngestModuleFactory.getModuleName(), paymentIP));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No event_responses_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process your_comments_in_groups.json file and add data as Data Artifact
+    * Facebook user comments in groups data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONyour_comments_in_groups(AbstractFile af){
+        String json = parseAFtoString(af);
+        GroupCommentsV2 groupComments = new Gson().fromJson(json, GroupCommentsV2.class);
+        if(groupComments.group_comments_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type groupCommentDate;
+            BlackboardAttribute.Type groupCommentTitle;
+            BlackboardAttribute.Type groupCommentCommentString;
+            BlackboardAttribute.Type groupCommentAuthor;
+            BlackboardAttribute.Type groupCommentGroup;
+            BlackboardAttribute.Type groupCommentUri;
+            BlackboardAttribute.Type groupCommentUrl;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_GROUP_COMMENT") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_GROUP_COMMENT", "Facebook Group Comment");
+                    groupCommentDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    groupCommentTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                    groupCommentCommentString = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_COMMENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Comment");
+                    groupCommentAuthor = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_AUTHOR", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Author");
+                    groupCommentGroup = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_GROUP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group");
+                    groupCommentUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
+                    groupCommentUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_GROUP_COMMENT");
+                    groupCommentDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPCOMMENT_DATE");
+                    groupCommentTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPCOMMENT_TITLE");
+                    groupCommentCommentString = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPCOMMENT_COMMENT");
+                    groupCommentAuthor = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPCOMMENT_AUTHOR");
+                    groupCommentGroup = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPCOMMENT_GROUP");
+                    groupCommentUri = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPCOMMENT_URI");
+                    groupCommentUrl = currentCase.getSleuthkitCase().getAttributeType("LS_FBGROUPCOMMENT_URL");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (GroupCommentsV2.GroupComments_V2 comment:groupComments.group_comments_v2){
+                String commentString = "";
+                String author = "";
+                String group = "";
+                String uri = "";
+                String url = "";
+                
+                String date = new TimestampToDate(comment.timestamp).getDate();
+                String title = comment.title;
+                if (comment.data != null){
+                    for (GroupCommentsV2.GroupComments_V2.Data data:comment.data){
+                        commentString = data.comment.comment;
+                        author = data.comment.author;
+                        group = data.comment.group;
+                    }
+                }
+                if (comment.attachments != null){
+                    for (GroupCommentsV2.GroupComments_V2.Attachments attachment:comment.attachments){
+                        for (GroupCommentsV2.GroupComments_V2.Attachments.Data attachmentData:attachment.data){
+                            if (attachmentData.external_context != null){
+                                url = attachmentData.external_context.url;
+                            }
+                            if (attachmentData.media != null){
+                                uri = attachmentData.media.uri;
+                            }
+                        }
+                    }
+                }
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(groupCommentDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(groupCommentTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                attributelist.add(new BlackboardAttribute(groupCommentCommentString, FacebookIngestModuleFactory.getModuleName(), commentString));
+                attributelist.add(new BlackboardAttribute(groupCommentAuthor, FacebookIngestModuleFactory.getModuleName(), author));
+                attributelist.add(new BlackboardAttribute(groupCommentGroup, FacebookIngestModuleFactory.getModuleName(), group));
+                attributelist.add(new BlackboardAttribute(groupCommentUri, FacebookIngestModuleFactory.getModuleName(), uri));
+                attributelist.add(new BlackboardAttribute(groupCommentUrl, FacebookIngestModuleFactory.getModuleName(), url));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No group_comments_v2 found");
+            return;
+        }
+    }
     
     /**
     * Read file and parse JSON as JsonObject
