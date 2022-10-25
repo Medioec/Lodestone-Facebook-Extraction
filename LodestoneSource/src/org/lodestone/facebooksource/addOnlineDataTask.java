@@ -172,6 +172,7 @@ public class addOnlineDataTask implements Runnable {
         }
         //placeholder until methods to detect file download is finished so file extraction from zip can be done and added to data source.
         try{
+            progressMonitor.setProgressText("6mins Wait time for download");
             Thread.sleep(360000);
         }
          catch(InterruptedException e){
