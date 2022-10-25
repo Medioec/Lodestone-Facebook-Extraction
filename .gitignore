@@ -20,9 +20,6 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-/Sample iOSDeviceDataExtractor/build/
-/Sample Code iOSDeviceDataExtractor/build/
-/Sample Code iOSDeviceDataExtractor/nbproject/private/
 /Lodestone/build/
 Lodestone/nbproject/platform.properties
 Lodestone/nbproject/private/platform-private.properties
