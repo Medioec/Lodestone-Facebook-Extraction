@@ -141,6 +141,7 @@ public class addOnlineDataTask implements Runnable {
         ps.sendKeys(password);
         WebElement login = driver.findElement(By.name("login"));
         login.click();
+        
         //calls data request method
         DataRequest(driver,formatType,DataExport);
         //download files, if true wait if there is a pending request, if no pending request = download latest available file.
@@ -152,10 +153,8 @@ public class addOnlineDataTask implements Runnable {
             }
         if(LatestExport)
         {
-            try{   
-                Thread.sleep(600);
-                try{
-                    //Wait until pending disappears
+            try{
+                //Wait until pending disappears
                 String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")).getText();
                 progressMonitor.setProgressText("Files pending for download, please wait");
                 wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")));
@@ -164,71 +163,16 @@ public class addOnlineDataTask implements Runnable {
                 catch(Exception e){
                    System.out.println("No Pending files available for download"); 
                 }
-                String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
-                String numFilesArray[] = numFiles.split(" ", 2);
-                int numFile = Integer.parseInt(numFilesArray[0]);
-                String fileDate = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]")).getText();
-                String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
-                String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
-                String fileExpiry = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][5]")).getText();
-                progressMonitor.setProgressText("Downloading file(s) \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\n"+fileExpiry);
-
-                //to download number of files based on download information given   
-                
-                for (int i = 1; i < numFile+1; i++) {
-                    // click on the Download button as soon as the "Download" button is visible; else wait
-                    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
-                    driver.findElement(By.cssSelector("[aria-label=Download]")).click();
-                    if(numFile > 1){
-                        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
-                                + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
-                                + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")));
-                        driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
-                                + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
-                                + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
-                    }
-                    Thread.sleep(600);
-                }
-            }
-            catch(InterruptedException e){
-               System.out.println(e);
-            }
+                //calls Datadownload method
+                DataDownload(driver);
         }
         else{
-            try{
-                    Thread.sleep(800);
-                    String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
-                    System.out.println(numFiles);
-                    String numFilesArray[] = numFiles.split(" ", 2);
-                    int numFile = Integer.parseInt(numFilesArray[0]);
-                    String fileDate = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]")).getText();
-                    String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
-                    String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
-                    String fileExpiry = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][5]")).getText();
-                    progressMonitor.setProgressText("Downloading file(s) \n"+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\n"+fileExpiry);
-                        for (int i = 1; i < numFile+1; i++) 
-                        {
-                            // click on the Download button as soon as the "Download" button is visible; else wait
-                            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
-                            driver.findElement(By.cssSelector("[aria-label=Download]")).click();
-                            if(numFile > 1){
-                                wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
-                                        + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
-                                        + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")));
-                                driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
-                                        + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
-                                        + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
-                            }
-                            Thread.sleep(600);
-                        }
-                }
-            catch(InterruptedException e){
-               System.out.println(e);
-            }    
+            //calls Datadownload method
+            DataDownload(driver);
         }
         //placeholder until methods to detect file download is finished so file extraction from zip can be done and added to data source.
         try{
-            Thread.sleep(15000);
+            Thread.sleep(360000);
         }
          catch(InterruptedException e){
                System.out.println(e);
@@ -247,7 +191,7 @@ public class addOnlineDataTask implements Runnable {
 
       
         for (File file : listOfFiles) {
-             //unzipping files from downloadfolder dir
+            //unzipping files from downloadfolder dir after all downloads are completed.
             UnZipFile uzfile = new UnZipFile();  
             if(isZipFile(file.getAbsolutePath()))
             {
@@ -255,14 +199,16 @@ public class addOnlineDataTask implements Runnable {
                 catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }
-                   //newDir without ext name
-                 String newFileDir = file.getAbsolutePath().replaceAll("\\.\\w+","");
+                  //newDir without ext name
+                String newFileDir = file.getAbsolutePath().replaceAll("\\.\\w+","");
+                //add unzipped files to localfilepaths list
                 localFilePaths.add(newFileDir);
                 System.out.println(newFileDir);
             }
         }
         LocalFilesDataSource newDataSource;
         try {
+            progressMonitor.setProgressText("Adding files to data source");
             newDataSource = fileManager.addLocalFilesDataSource(UUID.randomUUID().toString(), newDataSourceName, "", host, localFilePaths, new ProgressUpdater());
             newDataSources.add(newDataSource);
         } catch (TskCoreException | TskDataException ex) {
@@ -287,7 +233,7 @@ public class addOnlineDataTask implements Runnable {
         }
     };
 }   
-    public boolean isZipFile(String path){
+    private boolean isZipFile(String path){
          if (path == null)
             return false;
         try {
@@ -299,6 +245,44 @@ public class addOnlineDataTask implements Runnable {
         }   
     }
     
+     private void DataDownload(WebDriver driver){
+        
+         try{       
+                    progressMonitor.setProgressText("Initiating download of files");
+                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
+                    Thread.sleep(800);
+                    String numFiles = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][4]")).getText();
+                    System.out.println(numFiles);
+                    String numFilesArray[] = numFiles.split(" ", 2);
+                    int numFile = Integer.parseInt(numFilesArray[0]);
+                    String fileDate = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]")).getText();
+                    String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
+                    String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
+                    String fileExpiry = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][5]")).getText();
+                    //display file request details that it is attempting to download from
+                    progressMonitor.setProgressText("Downloading file(s) "+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\nDownload: "+fileExpiry);
+                        for (int i = 1; i < numFile+1; i++) 
+                        {
+                            // click on the Download button as soon as the "Download" button is visible; else wait
+                            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
+                            driver.findElement(By.cssSelector("[aria-label=Download]")).click();
+                            //click on sub elements, if number of files exceed 1 means subelements are present in dropdownlist.
+                            if(numFile > 1){
+                                wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
+                                        + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
+                                        + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")));
+                                driver.findElement(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
+                                        + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
+                                        + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
+                            }
+                            Thread.sleep(600);
+                        }
+                }
+            catch(InterruptedException e){
+               System.out.println(e);
+            }  
+    }
+     
     private void DataRequest(WebDriver driver, Boolean formatType, Boolean dataExport){
         
          // explicit wait - to wait for the download button to be click-able
