@@ -14,14 +14,11 @@ public class OffFacebookActivityV2 {
     public List<Organisation> off_facebook_activity_v2;
     public class Organisation{
         public String name;
-        public List<Events> events;
-        public class Events {
-            public Event event;
-            public class Event {
-                public String id;
-                public String type;
-                public long timestamp;
-            }
+        public List<Event> events;
+        public class Event {
+            public String id;
+            public String type;
+            public long timestamp;
         }
     }
 }
