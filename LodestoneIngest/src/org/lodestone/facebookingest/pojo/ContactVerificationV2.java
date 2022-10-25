@@ -15,6 +15,6 @@ public class ContactVerificationV2 {
     public class Contact{
         public String contact;
         public String contact_type;
-        public String verification_time;
+        public long verification_time;
     }
 }
