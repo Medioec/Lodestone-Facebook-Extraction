@@ -241,77 +241,58 @@ public class FacebookFileIngestModule implements FileIngestModule{
     * @param  af  JSON file
     */
     private void processJSONip_address_activity(AbstractFile af){
-        JsonObject json = parseAFtoJson(af);
-        
-        if(json.has("used_ip_address_v2")){
-            
+        String json = parseAFtoString(af);
+        UsedIpAddressV2 usedIpAddress = new Gson().fromJson(json, UsedIpAddressV2.class);
+        if (usedIpAddress.used_ip_address_v2 != null){
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
-            BlackboardAttribute.Type ipAddressIP;
-            BlackboardAttribute.Type ipAddressAction;
-            BlackboardAttribute.Type ipAddressDate;
-            BlackboardAttribute.Type ipAddressUserAgent;
-
+            BlackboardAttribute.Type artifactIP;
+            BlackboardAttribute.Type artifactAction;
+            BlackboardAttribute.Type artifactTimeStamp;
+            BlackboardAttribute.Type artifactUserAgent;
             try{
                 // if artifact type does not exist
-                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_IP_ADDRESS_ACTIVITY") == null){
-                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_IP_ADDRESS_ACTIVITY", "Facebook ip address acvitivity");
-                    ipAddressIP = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBIPACTIVITY_IPADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
-                    ipAddressAction = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBIPACTIVITY_ACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address Action");
-                    ipAddressDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBIPACTIVITY_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
-                    ipAddressUserAgent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBIPACTIVITY_USER_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User Agent");
-  
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_IP_ADDRESS_ACTIVITY") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_IP_ADDRESS_ACTIVITY", "Facebook IP Address Activity");
+                    artifactIP = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBADDRESSACTIVITY_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                    artifactAction = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBADDRESSACTIVITY_ACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Action");
+                    artifactTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBADDRESSACTIVITY_TIME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Time");
+                    artifactUserAgent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBADDRESSACTIVITY_USER_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User Agent");                   
                 }
                 else{
-                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_IP_ADDRESS_ACTIVITY");
-                    ipAddressIP = currentCase.getSleuthkitCase().getAttributeType("LS_FBIPACTIVITY_IPADDRESS");
-                    ipAddressAction = currentCase.getSleuthkitCase().getAttributeType("LS_FBIPACTIVITY_ACTION");
-                    ipAddressDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBIPACTIVITY_DATE");
-                    ipAddressUserAgent = currentCase.getSleuthkitCase().getAttributeType("LS_FBIPACTIVITY_USER_AGENT");
-                }
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FBADDRESSACTIVITY_IP_ADDRESS_ACTIVITY");
+                    artifactIP = currentCase.getSleuthkitCase().getAttributeType("LS_FBADDRESSACTIVITY_IP");
+                    artifactAction = currentCase.getSleuthkitCase().getAttributeType("LS_FBADDRESSACTIVITY_ACTION");
+                    artifactTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBADDRESSACTIVITY_TIME");
+                    artifactUserAgent = currentCase.getSleuthkitCase().getAttributeType("LS_FBADDRESSACTIVITY_USER_AGENT");
+                }   
+                
             }
             catch (TskCoreException | TskDataException e){
                 e.printStackTrace();
                 return;
             }
-            
-            JsonArray ipAddressActivityV2 = json.getAsJsonArray("used_ip_address_v2");
-            for (JsonElement ipAddressActivity:ipAddressActivityV2){
+            for (UsedIpAddressV2.IP usedIp:usedIpAddress.used_ip_address_v2){
+                String ip = usedIp.ip;
+                String action = usedIp.action;
+                String date = new TimestampToDate(usedIp.timestamp).getDate();
+                String user_agent = usedIp.user_agent;
                 
-                String ipAddress = "";
-                String action = "";
-                String date = "";
-                String userAgent = "";
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(artifactIP, FacebookIngestModuleFactory.getModuleName(), ip));
+                attributelist.add(new BlackboardAttribute(artifactAction, FacebookIngestModuleFactory.getModuleName(), action));
+                attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(artifactUserAgent, FacebookIngestModuleFactory.getModuleName(), user_agent));
 
-                if (ipAddressActivity.isJsonObject()){
-                    JsonObject reactionObj = (JsonObject)ipAddressActivity;
-                    ipAddress = reactionObj.get("ip").getAsString();
-                    action = reactionObj.get("action").getAsString();
-                    date = new TimestampToDate(ipAddressActivity.getAsJsonObject().get("timestamp").getAsLong()).getDate();
-                    userAgent = reactionObj.get("user_agent").getAsString();
-                  
-                    
-                    // add variables to attributes
-                    Collection<BlackboardAttribute> attributelist = new ArrayList();
-                    attributelist.add(new BlackboardAttribute(ipAddressIP, FacebookIngestModuleFactory.getModuleName(), ipAddress));
-                    attributelist.add(new BlackboardAttribute(ipAddressAction, FacebookIngestModuleFactory.getModuleName(), action));
-                    attributelist.add(new BlackboardAttribute(ipAddressDate, FacebookIngestModuleFactory.getModuleName(), date));
-                    attributelist.add(new BlackboardAttribute(ipAddressUserAgent, FacebookIngestModuleFactory.getModuleName(), userAgent));
-
-                    
-                    try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
-                    }
-                    catch (TskCoreException | BlackboardException e){
-                        e.printStackTrace();
-                        return;
-                    }
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
                 }
             }
-        }
-        else{
-            logger.log(Level.INFO, "No used_ip_address_v2 found");
-            return;
         }
     }
     
@@ -322,71 +303,53 @@ public class FacebookFileIngestModule implements FileIngestModule{
     * @param  af  JSON file
     */
     private void processJSONemail_address_verifications(AbstractFile af){
-        JsonObject json = parseAFtoJson(af);
-        
-        if(json.has("contact_verifications_v2")){
-            
+        String json = parseAFtoString(af);
+        ContactVerificationV2 contactVerificationV2 = new Gson().fromJson(json,ContactVerificationV2.class);
+        if (contactVerificationV2.contact_verifications_v2 != null){
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
-            BlackboardAttribute.Type emailVerifyContact;
-            BlackboardAttribute.Type emailVerifyContactType;
-            BlackboardAttribute.Type emailVerifyDate;
-
-            try{
+            BlackboardAttribute.Type artifactContact;
+            BlackboardAttribute.Type artifactContact_type;
+            BlackboardAttribute.Type artifactVerification_time;
+            try{ 
                 // if artifact type does not exist
-                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_EMAIL_ADDRESS_VERIFICATIONS") == null){
-                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_EMAIL_ADDRESS_VERIFICATIONS", "Facebook email address verifications");
-                    emailVerifyContact = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBEMAILVERIFY_CONTACT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Contact");
-                    emailVerifyContactType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBEMAILVERIFY_CONTACT_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Contact Type");
-                    emailVerifyDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBEMAILVERIFY_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
-  
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_CONTACT_VERIFICATIONV2") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_CONTACT_VERIFICATIONV2", "Facebook Contact Verification");
+                    artifactContact = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_CONTACT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Contact");
+                    artifactContact_type = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_CONTACT_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Contact Type");
+                    artifactVerification_time = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_TIME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Verification Time");
                 }
                 else{
-                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_EMAIL_ADDRESS_VERIFICATIONS");
-                    emailVerifyContact = currentCase.getSleuthkitCase().getAttributeType("LS_FBEMAILVERIFY_CONTACT");
-                    emailVerifyContactType = currentCase.getSleuthkitCase().getAttributeType("LS_FBEMAILVERIFY_CONTACT_TYPE");
-                    emailVerifyDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBEMAILVERIFY_DATE");
-                }
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_CONTACT_VERIFICATIONV2");
+                    artifactContact = currentCase.getSleuthkitCase().getAttributeType("LS_FB_CONTACT");
+                    artifactContact_type = currentCase.getSleuthkitCase().getAttributeType("LS_FB_CONTACT_TYPE");
+                    artifactVerification_time = currentCase.getSleuthkitCase().getAttributeType("LS_FB_TIME");
+                }   
+                
             }
             catch (TskCoreException | TskDataException e){
                 e.printStackTrace();
                 return;
             }
-            
-            JsonArray emailVerifyV2 = json.getAsJsonArray("contact_verifications_v2");
-            for (JsonElement emailVerify:emailVerifyV2){
+            for (ContactVerificationV2.Contact validContact:contactVerificationV2.contact_verifications_v2){
+                String contact = validContact.contact;
+                String contact_type = validContact.contact;
+                String verification_time = new TimestampToDate(validContact.verification_time).getDate();
                 
-                String contact = "";
-                String contactType = "";
-                String date = "";
-
-                if (emailVerify.isJsonObject()){
-                    JsonObject reactionObj = (JsonObject)emailVerify;
-                    contact = reactionObj.get("contact").getAsString();
-                    contactType = reactionObj.get("contact_type").getAsString();
-                    date = new TimestampToDate(emailVerify.getAsJsonObject().get("verification_time").getAsLong()).getDate();
-                  
-                    
-                    // add variables to attributes
-                    Collection<BlackboardAttribute> attributelist = new ArrayList();
-                    attributelist.add(new BlackboardAttribute(emailVerifyContact, FacebookIngestModuleFactory.getModuleName(), contact));
-                    attributelist.add(new BlackboardAttribute(emailVerifyContactType, FacebookIngestModuleFactory.getModuleName(), contactType));
-                    attributelist.add(new BlackboardAttribute(emailVerifyDate, FacebookIngestModuleFactory.getModuleName(), date));
-
-                    
-                    try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
-                    }
-                    catch (TskCoreException | BlackboardException e){
-                        e.printStackTrace();
-                        return;
-                    }
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(artifactContact, FacebookIngestModuleFactory.getModuleName(), contact));
+                attributelist.add(new BlackboardAttribute(artifactContact_type, FacebookIngestModuleFactory.getModuleName(), contact_type));
+                attributelist.add(new BlackboardAttribute(artifactVerification_time, FacebookIngestModuleFactory.getModuleName(), verification_time));
+               
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
                 }
             }
-        }
-        else{
-            logger.log(Level.INFO, "No contact_verifications_v2 found");
-            return;
         }
     }
     
@@ -397,104 +360,85 @@ public class FacebookFileIngestModule implements FileIngestModule{
     * @param  af  JSON file
     */
     private void processJSONaccount_activity(AbstractFile af){
-        JsonObject json = parseAFtoJson(af);
-        
-        if(json.has("account_activity_v2")){
-            
+        String json = parseAFtoString(af);
+        AccountActivityV2 accountActivityV2 = new Gson().fromJson(json, AccountActivityV2.class);
+        if (accountActivityV2.account_activity_v2 != null){
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
-            BlackboardAttribute.Type activityAction;
-            BlackboardAttribute.Type activityDate;
-            BlackboardAttribute.Type activityIPAdd;
-            BlackboardAttribute.Type activityUserAgent;
-            BlackboardAttribute.Type activitydatr_cookie;
-            BlackboardAttribute.Type activityCity;
-            BlackboardAttribute.Type activityRegion;
-            BlackboardAttribute.Type activityCountry;
-            BlackboardAttribute.Type activitySite;
+            BlackboardAttribute.Type artifactAction;
+            BlackboardAttribute.Type artifactTimeStamp;
+            BlackboardAttribute.Type artifactIP_Address;
+            BlackboardAttribute.Type artifactUser_agent;
+            BlackboardAttribute.Type artifactDatr_cookie;
+            BlackboardAttribute.Type artifactCity;
+            BlackboardAttribute.Type artifactRegion;
+            BlackboardAttribute.Type artifactCountry;
+            BlackboardAttribute.Type artifactSite_name;
             try{
                 // if artifact type does not exist
-                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_ACCOUNT_ACTIVITY") == null){
-                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_ACCOUNT_ACTIVITY", "Facebook account activity");
-                    activityAction = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_ACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Action");
-                    activityDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
-                    activityIPAdd = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_IPADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
-                    activityUserAgent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_USER_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User Agent");
-                    activitydatr_cookie = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_DATR_COOKIE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Datr_Cookie");
-                    activityCity = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_CITY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "City");
-                    activityRegion = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_REGION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Region");
-                    activityCountry = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_COUNTRY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Country");
-                    activitySite = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVITY_SITE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Site");        
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_ACCOUNT_ACTIVITY") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_ACCOUNT_ACTIVITY", "Account Activity");
+                    artifactAction = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_ACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Action");
+                    artifactTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Time Stamp");
+                    artifactIP_Address = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_IP_ADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                    artifactUser_agent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_USER_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User Agent");
+                    artifactDatr_cookie = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_DATR_COOKIE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Datr_cookie");
+                    artifactCity = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_DATR_CITY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "City");
+                    artifactRegion = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_DATR_REGION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Region");
+                    artifactCountry = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_DATR_COUNTRY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Country");
+                    artifactSite_name = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_DATR_SITE_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Site Name");
+                    
                 }
                 else{
-                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_ACCOUNT_ACTIVITY");
-                    activityAction = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_ACTION");
-                    activityDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_DATE");
-                    activityIPAdd = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_IPADDRESS");
-                    activityUserAgent = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_USER_AGENT");
-                    activitydatr_cookie = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_DATR_COOKIE");
-                    activityCity = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_CITY");
-                    activityRegion = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_REGION");
-                    activityCountry = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_COUNTRY");
-                    activitySite = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVITY_SITE");                         
-                }
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_ACCOUNT_ACTIVITY");
+                    artifactAction = currentCase.getSleuthkitCase().getAttributeType("LS_FBACCOUNTACTIVITY_ACTION");
+                    artifactTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBACCOUNTACTIVITY_TIME_STAMP");
+                    artifactIP_Address = currentCase.getSleuthkitCase().getAttributeType("LS_FBACCOUNTACTIVITY_IP_ADDRESS");
+                    artifactUser_agent = currentCase.getSleuthkitCase().getAttributeType("LS_FBACCOUNTACTIVITY_USER_AGENT");
+                    artifactDatr_cookie = currentCase.getSleuthkitCase().getAttributeType("LS_FBACCOUNTACTIVITY_DATR_COOKIE");
+                    artifactCity = currentCase.getSleuthkitCase().getAttributeType("LS_FBACCOUNTACTIVITY_DATR_CITY");
+                    artifactRegion = currentCase.getSleuthkitCase().getAttributeType("LS_FBACCOUNTACTIVITY_DATR_REGION");
+                    artifactCountry = currentCase.getSleuthkitCase().getAttributeType("LS_FB_ACCOUNTACTIVITY_DATR_COUNTRY");
+                    artifactSite_name = currentCase.getSleuthkitCase().getAttributeType("LS_FB_ACCOUNTACTIVITY_DATR_SITE_NAME");
+                    
+                }   
+                
             }
             catch (TskCoreException | TskDataException e){
                 e.printStackTrace();
                 return;
             }
-            
-            JsonArray activityV2 = json.getAsJsonArray("account_activity_v2");
-            for (JsonElement activity:activityV2){
+            for (AccountActivityV2.Actions accountActivity:accountActivityV2.account_activity_v2){
+                String action = accountActivity.action;
+                String timeStamp = new TimestampToDate(accountActivity.timestamp).getDate();
+                String ip = accountActivity.ip_address;
+                String user_agent = accountActivity.user_agent;
+                String datr_cookie = accountActivity.datr_cookie;
+                String city = accountActivity.city;
+                String region = accountActivity.region;
+                String country = accountActivity.country;
+                String site_name = accountActivity.site_name;
                 
-                String action = "";
-                String date = "";
-                String ipAdd = "";
-                String userAgent = "";
-                String datr_cookie = "";
-                String city = "";
-                String region = "";
-                String country = "";
-                String site = "";
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(artifactAction, FacebookIngestModuleFactory.getModuleName(), action));
+                attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
+                attributelist.add(new BlackboardAttribute(artifactIP_Address, FacebookIngestModuleFactory.getModuleName(), ip));
+                attributelist.add(new BlackboardAttribute(artifactUser_agent, FacebookIngestModuleFactory.getModuleName(), user_agent));
+                attributelist.add(new BlackboardAttribute(artifactDatr_cookie, FacebookIngestModuleFactory.getModuleName(), datr_cookie));
+                attributelist.add(new BlackboardAttribute(artifactCity, FacebookIngestModuleFactory.getModuleName(), city));
+                attributelist.add(new BlackboardAttribute(artifactRegion, FacebookIngestModuleFactory.getModuleName(), region));
+                attributelist.add(new BlackboardAttribute(artifactCountry, FacebookIngestModuleFactory.getModuleName(), country));
+                attributelist.add(new BlackboardAttribute(artifactSite_name, FacebookIngestModuleFactory.getModuleName(), site_name));
                 
-                if (activity.isJsonObject()){
-                    JsonObject activityObj = (JsonObject)activity;
-                    action = activityObj.get("action").getAsString();
-                    date = new TimestampToDate(activity.getAsJsonObject().get("timestamp").getAsLong()).getDate();
-                    ipAdd = activityObj.get("ip_address").getAsString();
-                    userAgent = activityObj.get("user_agent").getAsString();
-                    datr_cookie = activityObj.get("datr_cookie").getAsString();
-                    city = activityObj.get("city").getAsString();
-                    region = activityObj.get("region").getAsString();
-                    country = activityObj.get("country").getAsString();
-                    site = activityObj.get("site_name").getAsString();
-                    
-                    
-                    // add variables to attributes
-                    Collection<BlackboardAttribute> attributelist = new ArrayList();
-                    attributelist.add(new BlackboardAttribute(activityAction, FacebookIngestModuleFactory.getModuleName(), action));
-                    attributelist.add(new BlackboardAttribute(activityDate, FacebookIngestModuleFactory.getModuleName(), date));
-                    attributelist.add(new BlackboardAttribute(activityIPAdd, FacebookIngestModuleFactory.getModuleName(), ipAdd));
-                    attributelist.add(new BlackboardAttribute(activityUserAgent, FacebookIngestModuleFactory.getModuleName(), userAgent));
-                    attributelist.add(new BlackboardAttribute(activitydatr_cookie, FacebookIngestModuleFactory.getModuleName(), datr_cookie));
-                    attributelist.add(new BlackboardAttribute(activityCity, FacebookIngestModuleFactory.getModuleName(), city));
-                    attributelist.add(new BlackboardAttribute(activityRegion, FacebookIngestModuleFactory.getModuleName(), region));
-                    attributelist.add(new BlackboardAttribute(activityCountry, FacebookIngestModuleFactory.getModuleName(), country));
-                    attributelist.add(new BlackboardAttribute(activitySite, FacebookIngestModuleFactory.getModuleName(), site));
-                    
-                    try{
-                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), "FacebookFileIngestModule");
-                    }
-                    catch (TskCoreException | BlackboardException e){
-                        e.printStackTrace();
-                        return;
-                    }
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
                 }
             }
-        }
-        else{
-            logger.log(Level.INFO, "No account_activity_v2 found");
-            return;
         }
     }
     
