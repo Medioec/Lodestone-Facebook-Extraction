@@ -248,6 +248,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 case "your_topics.json":
                     //processJSON(af);
                     break;
+                case "places_you've_created.json":
+                    processJSONplaces_youve_created(af);
+                    break;
             }
         }
         
@@ -273,6 +276,63 @@ public class FacebookFileIngestModule implements FileIngestModule{
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
     
+    /**
+    * Process your_places_v2.json file and add data as Data Artifact
+    * Facebook IP address activity data.
+    * Uses POJO YourPlacesV2.json
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONplaces_youve_created(AbstractFile af){
+        String json = parseAFtoString(af);
+        YourPlacesV2 yourPlaces = new Gson().fromJson(json, YourPlacesV2.class);
+        if (yourPlaces.your_places_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type placeName;
+            BlackboardAttribute.Type placeAddress;
+            BlackboardAttribute.Type placeUrl;
+            BlackboardAttribute.Type placeTimestamp;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_YOURPLACES") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_YOURPLACES", "Facebook Your Places");
+                    placeName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                    placeAddress = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_ADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Address");
+                    placeUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                    placeTimestamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_TIMESTAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_FRIENDS");
+                    placeName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_YOURPLACES_NAME");
+                    placeAddress = currentCase.getSleuthkitCase().getAttributeType("LS_FB_YOURPLACES_ADDRESS");
+                    placeUrl = currentCase.getSleuthkitCase().getAttributeType("LS_FB_YOURPLACES_URL");
+                    placeTimestamp = currentCase.getSleuthkitCase().getAttributeType("LS_FB_YOURPLACES_TIMESTAMP");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (YourPlacesV2.Your_Places_V2 place:yourPlaces.your_places_v2){
+                String date = new TimestampToDate(place.creation_timestamp).getDate();
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(placeName, FacebookIngestModuleFactory.getModuleName(), place.name));
+                attributelist.add(new BlackboardAttribute(placeAddress, FacebookIngestModuleFactory.getModuleName(), place.address));
+                attributelist.add(new BlackboardAttribute(placeUrl, FacebookIngestModuleFactory.getModuleName(), place.url));
+                attributelist.add(new BlackboardAttribute(placeTimestamp, FacebookIngestModuleFactory.getModuleName(), date));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+    }
 	
     /**
     * Process ip_address_activity.json file and add data as Data Artifact
@@ -1197,6 +1257,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process comments.json file and add data as Data Artifact
     * Facebook comment data.
+    * Uses POJO CommentsV2.java
     *
     * @param  af  JSON file
     */
