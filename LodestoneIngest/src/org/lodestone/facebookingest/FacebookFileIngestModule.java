@@ -94,6 +94,11 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     break;
                 case "items_sold.json":
                     break;
+                case "event_invitations.json":
+                    break;
+                case "your_event_responses.json":
+                    processJSONyour_event_responses(af);
+                    break;
                 case "marketplace_notifications.json":
                     break;
                 case "payment_history.json":
@@ -1686,6 +1691,136 @@ public class FacebookFileIngestModule implements FileIngestModule{
             return new Date(new Timestamp(timestamp).getTime() * 1000).toString();
         }
     }
+    
+    /**
+    * Process posts_and_comments.json file and add data as Data Artifact
+    * Facebook reaction data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONyour_event_responses(AbstractFile af){
+        String json = parseAFtoString(af);
+        EventResponseV2 eventResponse = new Gson().fromJson(json, EventResponseV2.class);
+        if(eventResponse.event_responses_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type eventResponseName;
+            BlackboardAttribute.Type eventReply;
+            BlackboardAttribute.Type eventResponseStartDate;
+            BlackboardAttribute.Type eventResponseEndDate;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_EVENT_RESPONSE") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_EVENT_RESPONSE", "Facebook Event Response");
+                    eventResponseName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_EVENT_RESPONSE_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Event Name");
+                    eventReply = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_EVENT_REPLY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Response");
+                    eventResponseStartDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_EVENT_RESPONSE_STARTDATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Start Date");
+                    eventResponseEndDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_EVENT_RESPONSE_ENDDATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "End Date");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_EVENT_RESPONSE");
+                    eventResponseName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_EVENT_RESPONSE_NAME");
+                    eventReply = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_EVENT_REPLY");
+                    eventResponseStartDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_EVENT_RESPONSE_STARTDATE");
+                    eventResponseEndDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_EVENT_RESPONSE_ENDDATE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            // Loop for events_joined
+            for (EventResponseV2.EventResponse_V2.EventsJoined eventJoined:eventResponse.event_responses_v2.events_joined){
+                
+                String name = "";
+                String reply = "Joined";
+                String startDate = "";
+                String endDate = "";
+                
+                name = eventJoined.name;
+                startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
+                endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
+                        
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(eventResponseName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(eventReply, FacebookIngestModuleFactory.getModuleName(), reply));
+                attributelist.add(new BlackboardAttribute(eventResponseStartDate, FacebookIngestModuleFactory.getModuleName(), startDate));
+                attributelist.add(new BlackboardAttribute(eventResponseEndDate, FacebookIngestModuleFactory.getModuleName(), endDate));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+            
+            // Loop for events_declined
+            for (EventResponseV2.EventResponse_V2.EventsJoined eventJoined:eventResponse.event_responses_v2.events_declined){
+                
+                String name = "";
+                String reply = "Declined";
+                String startDate = "";
+                String endDate = "";
+                
+                name = eventJoined.name;
+                startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
+                endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
+                        
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(eventResponseName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(eventReply, FacebookIngestModuleFactory.getModuleName(), reply));
+                attributelist.add(new BlackboardAttribute(eventResponseStartDate, FacebookIngestModuleFactory.getModuleName(), startDate));
+                attributelist.add(new BlackboardAttribute(eventResponseEndDate, FacebookIngestModuleFactory.getModuleName(), endDate));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+            
+            // Loop for events_interested
+            for (EventResponseV2.EventResponse_V2.EventsJoined eventJoined:eventResponse.event_responses_v2.events_interested){
+                
+                String name = "";
+                String reply = "Interested";
+                String startDate = "";
+                String endDate = "";
+                
+                name = eventJoined.name;
+                startDate = new TimestampToDate(eventJoined.start_timestamp).getDate();
+                endDate = new TimestampToDate(eventJoined.end_timestamp).getDate();
+                        
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(eventResponseName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(eventReply, FacebookIngestModuleFactory.getModuleName(), reply));
+                attributelist.add(new BlackboardAttribute(eventResponseStartDate, FacebookIngestModuleFactory.getModuleName(), startDate));
+                attributelist.add(new BlackboardAttribute(eventResponseEndDate, FacebookIngestModuleFactory.getModuleName(), endDate));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No reactions_v2 found");
+            return;
+        }
+    }
+    
     
     /**
     * Read file and parse JSON as JsonObject
