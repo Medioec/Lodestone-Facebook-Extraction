@@ -222,7 +222,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     //processJSON(af);
                     break;
                 case "mobile_devices.json":
-                    //processJSON(af);
+                    processJSONmobile_devices(af);
                     break;
                 case "record_details.json":
                     //processJSON(af);
@@ -274,6 +274,162 @@ public class FacebookFileIngestModule implements FileIngestModule{
     @Override
     public void shutDown() {
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    }
+    
+    /**
+    * Process mobile_devices.json file and add data as Data Artifact
+    * Facebook IP address activity data.
+    * Uses POJO DevicesV2.json
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONmobile_devices(AbstractFile af){
+        String json = parseAFtoString(af);
+        MobileDevicesV2 yourDevice = new Gson().fromJson(json, MobileDevicesV2.class);
+        if (yourDevice.devices_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type type;
+            BlackboardAttribute.Type os;
+            BlackboardAttribute.Type updateTime;
+            BlackboardAttribute.Type advertiserId;
+            BlackboardAttribute.Type uuid;
+            BlackboardAttribute.Type tokenType;
+            BlackboardAttribute.Type redactToken;
+            BlackboardAttribute.Type familyDeviceId;
+            BlackboardAttribute.Type deviceLocale;
+            BlackboardAttribute.Type disabled;
+            BlackboardAttribute.Type clientUpdateTime;
+            BlackboardAttribute.Type creationTime;
+            BlackboardAttribute.Type appVersion;
+            BlackboardAttribute.Type locale;
+            BlackboardAttribute.Type osVersion;
+            BlackboardAttribute.Type token;
+            BlackboardAttribute.Type deviceId;
+            
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_MOBILEDEVICES") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_MOBILEDEVICES", "Facebook Mobile Devices");
+                    type = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Type");
+                    os = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_OS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "OS");
+                    updateTime = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_UPDATETIME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Update Time");
+                    advertiserId = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_ADVERTISERID", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Advertiser ID");
+                    uuid = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_UUID", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "UUID");
+                    tokenType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_TOKENTYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Token Type");
+                    redactToken = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_REDACTTOKEN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Redacted Token");
+                    familyDeviceId = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_FAMILYDEVICEID", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Family Device ID");
+                    deviceLocale = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_DEVICELOCALE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Device Locale");
+                    disabled = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_DISABLED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Disabled");
+                    clientUpdateTime = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_CLIENTUPDATETIME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Client Update Time");
+                    creationTime = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_CREATIONTIME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Creation Time");
+                    appVersion = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_APPVERSION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "App Version");
+                    locale = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_LOCALE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Locale");
+                    osVersion = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_OSVERSION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "OS Version");
+                    token = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_TOKEN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Token");
+                    deviceId = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MOBILEDEVICES_DEVICEID", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Device ID");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_MOBILEDEVICES");
+                    type = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_TYPE");
+                    os = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_OS");
+                    updateTime = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_UPDATETIME");
+                    advertiserId = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_ADVERTISERID");
+                    uuid = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_UUID");
+                    tokenType = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_TOKENTYPE");
+                    redactToken = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_REDACTTOKEN");
+                    familyDeviceId = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_FAMILYDEVICEID");
+                    deviceLocale = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_DEVICELOCALE");
+                    disabled = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_DISABLED");
+                    clientUpdateTime = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_CLIENTUPDATETIME");
+                    creationTime = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_CREATIONTIME");
+                    appVersion = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_APPVERSION");
+                    locale = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_LOCALE");
+                    osVersion = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_OSVERSION");
+                    token = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_TOKEN");
+                    deviceId = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MOBILEDEVICES_DEVICEID");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (MobileDevicesV2.Devices_V2 device:yourDevice.devices_v2){
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(type, FacebookIngestModuleFactory.getModuleName(), device.type));
+                attributelist.add(new BlackboardAttribute(os, FacebookIngestModuleFactory.getModuleName(), device.os));
+                attributelist.add(new BlackboardAttribute(updateTime, FacebookIngestModuleFactory.getModuleName(), new TimestampToDate(device.update_time).getDate()));
+                attributelist.add(new BlackboardAttribute(advertiserId, FacebookIngestModuleFactory.getModuleName(), device.advertiser_id));
+                attributelist.add(new BlackboardAttribute(uuid, FacebookIngestModuleFactory.getModuleName(), device.uuid));
+                attributelist.add(new BlackboardAttribute(familyDeviceId, FacebookIngestModuleFactory.getModuleName(), device.family_device_id));
+                attributelist.add(new BlackboardAttribute(deviceLocale, FacebookIngestModuleFactory.getModuleName(), device.device_locale));
+                for (String deviceToken:device.redact_tokens){
+                    String tokenTypeString = "Redacted Token";
+                    attributelist.add(new BlackboardAttribute(tokenType, FacebookIngestModuleFactory.getModuleName(), tokenTypeString));
+                    
+                    attributelist.add(new BlackboardAttribute(redactToken, FacebookIngestModuleFactory.getModuleName(), deviceToken));
+                    
+                    String empty = "";
+                    attributelist.add(new BlackboardAttribute(disabled, FacebookIngestModuleFactory.getModuleName(), empty));
+                    attributelist.add(new BlackboardAttribute(clientUpdateTime, FacebookIngestModuleFactory.getModuleName(), empty));
+                    attributelist.add(new BlackboardAttribute(creationTime, FacebookIngestModuleFactory.getModuleName(), empty));
+                    attributelist.add(new BlackboardAttribute(appVersion, FacebookIngestModuleFactory.getModuleName(), empty));
+                    attributelist.add(new BlackboardAttribute(locale, FacebookIngestModuleFactory.getModuleName(), empty));
+                    attributelist.add(new BlackboardAttribute(osVersion, FacebookIngestModuleFactory.getModuleName(), empty));
+                    attributelist.add(new BlackboardAttribute(token, FacebookIngestModuleFactory.getModuleName(), empty));
+                    attributelist.add(new BlackboardAttribute(deviceId, FacebookIngestModuleFactory.getModuleName(), empty));
+                    
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                    // remove attributes when done
+                    int removeCount = 10;
+                    ArrayList<BlackboardAttribute> arrList = (ArrayList<BlackboardAttribute>)attributelist;
+                    for (int i = 0; i < removeCount; i++){
+                        int arrSize = arrList.size();
+                        arrList.remove(arrSize - 1);
+                    }
+                }
+                
+                for (MobileDevicesV2.Devices_V2.Push_Tokens pushToken:device.push_tokens){
+                    String tokenTypeString = "Push Token";
+                    attributelist.add(new BlackboardAttribute(tokenType, FacebookIngestModuleFactory.getModuleName(), tokenTypeString));
+
+                    String empty = "";
+                    
+                    attributelist.add(new BlackboardAttribute(redactToken, FacebookIngestModuleFactory.getModuleName(), empty));
+                    
+                    attributelist.add(new BlackboardAttribute(disabled, FacebookIngestModuleFactory.getModuleName(), pushToken.disabled));
+                    attributelist.add(new BlackboardAttribute(clientUpdateTime, FacebookIngestModuleFactory.getModuleName(), new TimestampToDate(pushToken.client_update_time).getDate()));
+                    attributelist.add(new BlackboardAttribute(creationTime, FacebookIngestModuleFactory.getModuleName(), new TimestampToDate(pushToken.creation_time).getDate()));
+                    attributelist.add(new BlackboardAttribute(appVersion, FacebookIngestModuleFactory.getModuleName(), pushToken.app_version));
+                    attributelist.add(new BlackboardAttribute(locale, FacebookIngestModuleFactory.getModuleName(), pushToken.locale));
+                    attributelist.add(new BlackboardAttribute(osVersion, FacebookIngestModuleFactory.getModuleName(), pushToken.os_version));
+                    attributelist.add(new BlackboardAttribute(token, FacebookIngestModuleFactory.getModuleName(), pushToken.token));
+                    attributelist.add(new BlackboardAttribute(deviceId, FacebookIngestModuleFactory.getModuleName(), pushToken.device_id));
+                    
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                    // remove attributes when done
+                    int removeCount = 1;
+                    ArrayList<BlackboardAttribute> arrList = (ArrayList<BlackboardAttribute>)attributelist;
+                    for (int i = 0; i < removeCount; i++){
+                        int arrSize = arrList.size();
+                        arrList.remove(arrSize - 1);
+                    }
+                }
+            }
+        }
     }
     
     /**
