@@ -216,10 +216,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONip_address_activity(af);
                     break;
                 case "logins_and_logouts.json":
-                    //processJSON(af);
+                    processJSONlogins_and_logouts(af);
                     break;
                 case "login_protection_data.json":
-                    processJSONlogin_protection_data_v2(af);
+                    processJSONlogin_protection_data(af);
                     break;
                 case "mobile_devices.json":
                     processJSONmobile_devices(af);
@@ -276,6 +276,68 @@ public class FacebookFileIngestModule implements FileIngestModule{
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
     
+    /**
+    * Process account_accesses_v2.json file and add data as Data Artifact
+    * Facebook account_accesses_v2 data.
+    * Uses POJO account_accesses_v2.json
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONlogins_and_logouts(AbstractFile af){
+        String json = parseAFtoString(af);
+        LoginsAndLogoutsV2 loginsAndLogouts = new Gson().fromJson(json, LoginsAndLogoutsV2.class);
+        if (loginsAndLogouts.account_accesses_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type artifactAction;
+            BlackboardAttribute.Type artifactTimeStamp;
+            BlackboardAttribute.Type artifactSite;
+            BlackboardAttribute.Type artifactIP;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FBLOGINS_AND_LOGOUTS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FBLOGINS_AND_LOGOUTS", "Facebook Login and Logouts");
+                    artifactAction = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINS_AND_LOGOUTS_ACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Action");
+                    artifactTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINS_AND_LOGOUTS_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Time Stamp");
+                    artifactSite = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINS_AND_LOGOUTS_SITE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Site");
+                    artifactIP = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINS_AND_LOGOUTS_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FBLOGINS_AND_LOGOUTS");
+                    artifactAction = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINS_AND_LOGOUTS_ACTION");
+                    artifactTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINS_AND_LOGOUTS_TIME_STAMP");
+                    artifactSite = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINS_AND_LOGOUTS_SITE");
+                    artifactIP = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINS_AND_LOGOUTS_IP");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (LoginsAndLogoutsV2.loginAndLogout loginsdetails:loginsAndLogouts.account_accesses_v2){
+                
+                String action = loginsdetails.action;
+                String timeStamp = new TimestampToDate(loginsdetails.timestamp).getDate();
+                String site = loginsdetails.site;
+                String ip = loginsdetails.ip;
+                
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(artifactAction, FacebookIngestModuleFactory.getModuleName(), action));
+                attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
+                attributelist.add(new BlackboardAttribute(artifactSite, FacebookIngestModuleFactory.getModuleName(), site));
+                attributelist.add(new BlackboardAttribute(artifactIP, FacebookIngestModuleFactory.getModuleName(), ip));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+    }
     
     /**
     * Process login_protection_data.json file and add data as Data Artifact
@@ -283,7 +345,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     *
     * @param  af  JSON file
     */
-    private void processJSONlogin_protection_data_v2(AbstractFile af){
+    private void processJSONlogin_protection_data(AbstractFile af){
         String json = parseAFtoString(af);
         LoginProtectionDataV2 loginProtectionDataV2 = new Gson().fromJson(json,LoginProtectionDataV2.class);
         if (loginProtectionDataV2.login_protection_data_v2 != null){
@@ -339,7 +401,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
             }
         }
     }
-    
     
     /**
     * Process mobile_devices.json file and add data as Data Artifact
@@ -499,7 +560,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     
     /**
     * Process your_places_v2.json file and add data as Data Artifact
-    * Facebook IP address activity data.
+    * Facebook your_places_v2 data.
     * Uses POJO YourPlacesV2.json
     *
     * @param  af  JSON file
