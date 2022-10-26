@@ -14,7 +14,7 @@ public class GroupsJoinedV2 {
     public List<GroupsJoined_V2> groups_joined_v2;
     public class GroupsJoined_V2{
         public long timestamp;
-        public Data data;
+        public List<Data> data;
         public String title;
         public class Data {
             public String name;
