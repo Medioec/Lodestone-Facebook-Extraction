@@ -31,6 +31,19 @@ public class CommentsV2 {
                 public ExternalContext external_context;
                 public class Media{
                     public String uri;
+//                    public long creation_timestamp;
+//                    public long updated_timestamp;
+//                    public MediaMetaData media_metadata;
+//                    public class MediaMetaData {
+//                        public PhotoMetaData photo_metadata;
+//                        public class PhotoMetaData {
+//                            public List<ExifData> exif_data;
+//                            public class ExifData{
+//                                public String upload_ip;
+//                                public String taken_timestamp;
+//                            }
+//                        }
+//                    }
                 }
                 public class ExternalContext{
                     public String url;
