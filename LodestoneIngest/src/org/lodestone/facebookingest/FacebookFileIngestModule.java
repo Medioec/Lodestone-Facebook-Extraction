@@ -3219,6 +3219,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             BlackboardAttribute.Type message_Type;
             BlackboardAttribute.Type message_ContentImageURI;
             BlackboardAttribute.Type message_ContentImageDateCreated;
+            BlackboardAttribute.Type message_ContentStickerUri;
             BlackboardAttribute.Type message_ContentShare;
             BlackboardAttribute.Type message_IsUnsent;
             BlackboardAttribute.Type message_IsTakenDown;
@@ -3239,13 +3240,14 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     message_Type = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Type");
                     message_ContentImageURI = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Image URI");
                     message_ContentImageDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Image Date Created");
+                    message_ContentStickerUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_STICKER_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Sticker URI");
                     message_ContentShare = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_SHARE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Share");
                     message_IsUnsent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_UNSENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message is Unsent?");
                     message_IsTakenDown = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_TAKEN_DOWN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message is Taken Down?");
                     messageChat_ThreadPath = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_THREAD_PATH", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Chat Thread Path");
                     messageChat_IsStillParticipant = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_STILL_PARTICIPANT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User is still Participant?");
-                    messageChat_ImageUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Chat Image URI");
-                    messageChat_ImageDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Chat Image Date Created");
+                    messageChat_ImageUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group Chat Image URI");
+                    messageChat_ImageDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group Chat Image Date Created");
                 }
                 else{
                     artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_MESSENGER_CHAT");
@@ -3258,6 +3260,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     message_Type = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_TYPE");
                     message_ContentImageURI = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_URI");
                     message_ContentImageDateCreated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_DATE_CREATED");
+                    message_ContentStickerUri = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_STICKER_URI");
                     message_ContentShare = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_SHARE");
                     message_IsUnsent = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_UNSENT");
                     message_IsTakenDown = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_TAKEN_DOWN");
@@ -3286,6 +3289,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             String msgType = "";
             String msgContentImageUri = "";
             String msgContentImageDateCreated = "";
+            String msgContentStickerUri = "";
             String msgContentShare = "";
             String msgIsUnsent = "";
             String msgIsTakenDown = "";
@@ -3301,13 +3305,19 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 msgSender = message.sender_name;
                 msgDate = new TimestampToDate(message.timestamp_ms,true).getDate();
                 msgContent = message.content;
+                
+                
                 msgType = message.type;
                 msgContentImageUri = "";
                 msgContentImageDateCreated = "";
+                msgContentStickerUri = "";
                 msgContentShare = message.share;
                 msgIsUnsent = message.is_unsent;
                 msgIsTakenDown = message.is_taken_down;
                 
+                if (message.sticker != null) {
+                    msgContentStickerUri = message.sticker.uri;
+                }
                 
                 if (message.photos != null) {
                     for (Message1.Message.Image contentImage:message.photos) {
@@ -3325,6 +3335,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                         attributelist.add(new BlackboardAttribute(message_Type, FacebookIngestModuleFactory.getModuleName(), msgType));
                         attributelist.add(new BlackboardAttribute(message_ContentImageURI, FacebookIngestModuleFactory.getModuleName(), msgContentImageUri));
                         attributelist.add(new BlackboardAttribute(message_ContentImageDateCreated, FacebookIngestModuleFactory.getModuleName(), msgContentImageDateCreated));
+                        attributelist.add(new BlackboardAttribute(message_ContentStickerUri, FacebookIngestModuleFactory.getModuleName(), msgContentStickerUri));
                         attributelist.add(new BlackboardAttribute(message_ContentShare, FacebookIngestModuleFactory.getModuleName(), msgContentShare));
                         attributelist.add(new BlackboardAttribute(message_IsUnsent, FacebookIngestModuleFactory.getModuleName(), msgIsUnsent));
                         attributelist.add(new BlackboardAttribute(message_IsTakenDown, FacebookIngestModuleFactory.getModuleName(), msgIsTakenDown));
@@ -3354,6 +3365,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(message_Type, FacebookIngestModuleFactory.getModuleName(), msgType));
                     attributelist.add(new BlackboardAttribute(message_ContentImageURI, FacebookIngestModuleFactory.getModuleName(), msgContentImageUri));
                     attributelist.add(new BlackboardAttribute(message_ContentImageDateCreated, FacebookIngestModuleFactory.getModuleName(), msgContentImageDateCreated));
+                    attributelist.add(new BlackboardAttribute(message_ContentStickerUri, FacebookIngestModuleFactory.getModuleName(), msgContentStickerUri));
                     attributelist.add(new BlackboardAttribute(message_ContentShare, FacebookIngestModuleFactory.getModuleName(), msgContentShare));
                     attributelist.add(new BlackboardAttribute(message_IsUnsent, FacebookIngestModuleFactory.getModuleName(), msgIsUnsent));
                     attributelist.add(new BlackboardAttribute(message_IsTakenDown, FacebookIngestModuleFactory.getModuleName(), msgIsTakenDown));
