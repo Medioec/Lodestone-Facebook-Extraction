@@ -14,9 +14,36 @@ import java.text.SimpleDateFormat;
 public class TimestampToDate {
     private String date;
     private String pattern = "yyyy-MM-dd HH:mm:ss z";
+    
+    /**
+    * Add timestamp and convert to Date format
+    * Use timestamp as seconds form
+    *
+    * @param  timestamp  long
+    */
     public TimestampToDate(long timestamp){
         if (timestamp != 0){
             date = new SimpleDateFormat(pattern).format(new Date(timestamp*1000));
+        }
+        else{
+            date = "";
+        }
+    }
+    
+    /**
+    * Add timestamp and convert to Date format
+    *
+    * @param  timestamp  long
+    * @param  milliseconds  boolean value to use timestamp as milliseconds form
+    */
+    public TimestampToDate(long timestamp, boolean milliseconds){
+        if (timestamp != 0){
+            if (milliseconds) {
+            date = new SimpleDateFormat(pattern).format(new Date(timestamp));
+            }
+            else {
+            date = new SimpleDateFormat(pattern).format(new Date(timestamp*1000));
+            }
         }
         else{
             date = "";
