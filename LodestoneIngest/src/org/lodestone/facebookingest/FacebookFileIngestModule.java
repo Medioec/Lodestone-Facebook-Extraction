@@ -150,19 +150,19 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONmessage_1(af);
                     break;
                 case "notifications.json":
-                    //processJSON(af);
+                    processJSONnotifications(af);
                     break;
                 case "ads_interests.json":
-                    //processJSON(af);
+                    processJSONads_interests(af);
                     break;
-                case "friend_peer_group.json":
+                //case "friend_peer_group.json":
                     //processJSON(af);
-                    break;
+                    //break;
                 case "pages_and_profiles_you_follow.json":
-                    //processJSON(af);
+                    processJSONpages_and_profiles_you_follow(af);
                     break;
                 case "pages_you've_liked.json":
-                    //processJSON(af);
+                    processJSONpages_youve_liked(af);
                     break;
                 case "your_posts_1.json":
                     //processJSON(af);
@@ -3670,6 +3670,244 @@ public class FacebookFileIngestModule implements FileIngestModule{
         }
         catch (Exception e){
             e.printStackTrace();
+            return;
+        }
+    }
+    
+    /**
+    * Process notifications.json file and add data as Data Artifact
+    * Facebook notifications data
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONnotifications(AbstractFile af){
+        String json = parseAFtoString(af);
+        NotificationsV2 notifications = new Gson().fromJson(json, NotificationsV2.class);
+        if(notifications.notifications_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type notificationDate;
+            BlackboardAttribute.Type notificationText;
+            BlackboardAttribute.Type notificationReadStatus;
+            BlackboardAttribute.Type notificationHrefLink;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_NOTIFICATIONS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_NOTIFICATIONS", "Facebook Notifications");
+                    notificationDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_NOTIFICATION_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    notificationText = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_NOTIFICATION_TEXT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Text");
+                    notificationReadStatus = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_NOTIFICATION_READ_STATUS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Read Status (true:Unread / false:Read)");
+                    notificationHrefLink = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_NOTIFICATION_HREF", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Hyperlink");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_NOTIFICATIONS");
+                    notificationDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_NOTIFICATION_DATE");
+                    notificationReadStatus = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_NOTIFICATION_TEXT");
+                    notificationText = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_NOTIFICATION_READ_STATUS");
+                    notificationHrefLink = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_NOTIFICATION_HREF");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (NotificationsV2.Notifications_V2 notification:notifications.notifications_v2){
+                String date = new TimestampToDate(notification.timestamp).getDate();
+                String text = notification.text;
+                String readStatus = notification.unread;
+                String href = notification.href;
+                
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(notificationDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(notificationText, FacebookIngestModuleFactory.getModuleName(), text));
+                attributelist.add(new BlackboardAttribute(notificationReadStatus, FacebookIngestModuleFactory.getModuleName(), readStatus));
+                attributelist.add(new BlackboardAttribute(notificationHrefLink, FacebookIngestModuleFactory.getModuleName(), href));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No notifications_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process ads_interests.json file and add data as Data Artifact
+    * Facebook user's ads interests and topics data
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONads_interests(AbstractFile af){
+        String json = parseAFtoString(af);
+        TopicsV2 topics = new Gson().fromJson(json, TopicsV2.class);
+        if(topics.topics_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type topicData;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_TOPICS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_TOPICS", "Facebook Ad Interests");
+                    topicData = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_TOPIC", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Topics");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_TOPICS");
+                    topicData = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_TOPIC");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (String topic:topics.topics_v2) {
+                String text = topic;
+                
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(topicData, FacebookIngestModuleFactory.getModuleName(), text));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No topics_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process pages_and_profiles_you_follow.json file and add data as Data Artifact
+    * Facebook pages and profiles user follows
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONpages_and_profiles_you_follow(AbstractFile af){
+        String json = parseAFtoString(af);
+        PagesFollowedV2 pagesFollowed = new Gson().fromJson(json, PagesFollowedV2.class);
+        if(pagesFollowed.pages_followed_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type pageFollowedDate;
+            BlackboardAttribute.Type pageFollowedName;
+            BlackboardAttribute.Type pageFollowedTitle;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAGE_FOLLOWED") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PAGE_FOLLOWED", "Facebook Pages User Followed");
+                    pageFollowedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_FOLLOWED_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    pageFollowedName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_FOLLOWED_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Page Name");
+                    pageFollowedTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_FOLLOWED_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAGE_FOLLOWED");
+                    pageFollowedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_FOLLOWED_DATE");
+                    pageFollowedName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_FOLLOWED_TITLE");
+                    pageFollowedTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_FOLLOWED_NAME");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (PagesFollowedV2.PagesFollowed_V2 page:pagesFollowed.pages_followed_v2){
+                String date = new TimestampToDate(page.timestamp).getDate();
+                String name = page.data.get(0).name;
+                String title = page.title;
+                
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(pageFollowedDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(pageFollowedName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(pageFollowedTitle, FacebookIngestModuleFactory.getModuleName(), title));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No pages_followed_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process pages_you've_liked.json file and add data as Data Artifact
+    * Facebook pages user liked
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONpages_youve_liked(AbstractFile af){
+        String json = parseAFtoString(af);
+        PageLikesV2 pagesLiked = new Gson().fromJson(json, PageLikesV2.class);
+        if(pagesLiked.page_likes_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type pageFollowedDate;
+            BlackboardAttribute.Type pageFollowedName;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAGE_LIKED") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PAGE_LIKED", "Facebook Pages User Liked");
+                    pageFollowedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_LIKED_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    pageFollowedName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_LIKED_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Page Name");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAGE_LIKED");
+                    pageFollowedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_LIKED_DATE");
+                    pageFollowedName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_LIKED_NAME");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (PageLikesV2.PageLikes_V2 page:pagesLiked.page_likes_v2){
+                String date = new TimestampToDate(page.timestamp).getDate();
+                String name = page.name;
+                
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(pageFollowedDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(pageFollowedName, FacebookIngestModuleFactory.getModuleName(), name));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No pages_followed_v2 found");
             return;
         }
     }
