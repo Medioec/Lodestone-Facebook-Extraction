@@ -235,7 +235,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     //processJSON(af);
                     break;
                 case "where_you're_logged_in.json":
-                    //processJSON(af);
+                    processJSONwhere_youre_logged_in(af);
                     break;
                 case "your_facebook_activity_history.json":
                     //processJSON(af);
@@ -281,6 +281,92 @@ public class FacebookFileIngestModule implements FileIngestModule{
     @Override
     public void shutDown() {
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    }
+    
+    
+    /**
+    * Process account_accesses_v2.json file and add data as Data Artifact
+    * Facebook account_accesses_v2 data.
+    * Uses POJO account_accesses_v2.json
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONwhere_youre_logged_in(AbstractFile af){
+        String json = parseAFtoString(af);
+        ActiveSessionsV2 activeSessions = new Gson().fromJson(json, ActiveSessionsV2.class);
+        if (activeSessions.active_sessions_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type artifactCreatedTimeStamp;
+            BlackboardAttribute.Type artifactip_address;
+            BlackboardAttribute.Type artifactuser_agent;
+            BlackboardAttribute.Type artifactdatr_cookie;
+            BlackboardAttribute.Type artifactdevice;
+            BlackboardAttribute.Type artifactlocation;
+            BlackboardAttribute.Type artifactapp;
+            BlackboardAttribute.Type artifactsession_type;
+            
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FBACTIVESESSIONS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FBACTIVESESSIONS", "Facebook Active Session");
+                    artifactCreatedTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Time Stamp");
+                    artifactip_address = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                    artifactuser_agent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Agent");
+                    artifactdatr_cookie = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_COOKIE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Datr Cookie");
+                    artifactdevice = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_DEVICE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Device");
+                    artifactlocation = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_LOCATION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Location");
+                    artifactapp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_APP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "App");
+                    artifactsession_type = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_SESSION_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Session Type");
+                    
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FBLOGINS_AND_LOGOUTS");
+                    artifactCreatedTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_TIME_STAMP");
+                    artifactip_address = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_IP");
+                    artifactuser_agent = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_AGENT");
+                    artifactdatr_cookie = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_COOKIE");
+                    artifactdevice = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_DEVICE");
+                    artifactlocation = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_LOCATION");
+                    artifactapp = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_APP");
+                    artifactsession_type = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_SESSION_TYPE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (ActiveSessionsV2.activeSessions actSession:activeSessions.active_sessions_v2){
+                
+                String timeStamp = new TimestampToDate(actSession.createdTimeStamp).getDate();
+                String ip_address = actSession.ip_address;
+                String user_agent = actSession.user_agent;
+                String datr_cookie = actSession.datr_cookie;
+                String device = actSession.device;
+                String location = actSession.location;
+                String app = actSession.app;
+                String session_type = actSession.session_type;
+                
+                                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(artifactCreatedTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
+                attributelist.add(new BlackboardAttribute(artifactip_address, FacebookIngestModuleFactory.getModuleName(), ip_address));
+                attributelist.add(new BlackboardAttribute(artifactuser_agent, FacebookIngestModuleFactory.getModuleName(), user_agent));
+                attributelist.add(new BlackboardAttribute(artifactdatr_cookie, FacebookIngestModuleFactory.getModuleName(), datr_cookie));
+                attributelist.add(new BlackboardAttribute(artifactdevice, FacebookIngestModuleFactory.getModuleName(), device));
+                attributelist.add(new BlackboardAttribute(artifactlocation, FacebookIngestModuleFactory.getModuleName(), location));
+                attributelist.add(new BlackboardAttribute(artifactapp, FacebookIngestModuleFactory.getModuleName(), app));
+                attributelist.add(new BlackboardAttribute(artifactsession_type, FacebookIngestModuleFactory.getModuleName(), session_type));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
     }
     
     /**
