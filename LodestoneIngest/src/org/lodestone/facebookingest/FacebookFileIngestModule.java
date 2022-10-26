@@ -2394,7 +2394,10 @@ public class FacebookFileIngestModule implements FileIngestModule{
             for (GroupsJoinedV2.GroupsJoined_V2 group:groupsJoined.groups_joined_v2){
                 
                 String date = new TimestampToDate(group.timestamp).getDate();
-                String name = group.data.name;
+                String name = "";
+                for (GroupsJoinedV2.GroupsJoined_V2.Data titleData:group.data){
+                    name = titleData.name;
+                }
                 String title = group.title;
                 
                 // add variables to attributes
