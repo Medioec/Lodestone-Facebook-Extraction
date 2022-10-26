@@ -226,7 +226,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     //processJSON(af);
                     break;
                 case "login_protection_data.json":
-                    //processJSON(af);
+                    processJSONlogin_protection_data_v2(af);
                     break;
                 case "mobile_devices.json":
                     processJSONmobile_devices(af);
@@ -282,6 +282,71 @@ public class FacebookFileIngestModule implements FileIngestModule{
     public void shutDown() {
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
+    
+    
+    /**
+    * Process login_protection_data.json file and add data as Data Artifact
+    * Facebook login protection data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONlogin_protection_data_v2(AbstractFile af){
+        String json = parseAFtoString(af);
+        LoginProtectionDataV2 loginProtectionDataV2 = new Gson().fromJson(json,LoginProtectionDataV2.class);
+        if (loginProtectionDataV2.login_protection_data_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type artifactName;
+            BlackboardAttribute.Type artifactCreatedDate;
+            BlackboardAttribute.Type artifactUpdatedTimeStamp;
+            BlackboardAttribute.Type artifactIP;
+            try{ 
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_LOGIN_PROTECTION_V2") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_LOGIN_PROTECTION_V2", "Facebook Login Protection");
+                    artifactName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                    artifactCreatedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_CREATE_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Create Date");
+                    artifactUpdatedTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_UPDATED_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Updated Time Stamp");
+                    artifactIP = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_LOGIN_PROTECTION_V2");
+                    artifactName = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_NAME");
+                    artifactCreatedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_CREATE_DATE");
+                    artifactUpdatedTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_UPDATED_TIME_STAMP");
+                    artifactIP = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_UPDATED_IP");
+                }   
+                
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            
+            for (LoginProtectionDataV2.loginProtection loginProtect:loginProtectionDataV2.login_protection_data_v2){
+                String name = loginProtect.name;
+                String createdDate = new TimestampToDate(loginProtect.session.createdDate).getDate();
+                String updatedTimeStamp = new TimestampToDate(loginProtect.session.updatedTimeStamp).getDate();
+                String ip = loginProtect.session.ip;
+                                
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(artifactCreatedDate, FacebookIngestModuleFactory.getModuleName(), createdDate));
+                attributelist.add(new BlackboardAttribute(artifactUpdatedTimeStamp, FacebookIngestModuleFactory.getModuleName(), updatedTimeStamp));
+                attributelist.add(new BlackboardAttribute(artifactIP, FacebookIngestModuleFactory.getModuleName(), ip));
+                try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+            }
+        }
+    }
+    
     
     /**
     * Process mobile_devices.json file and add data as Data Artifact
@@ -561,7 +626,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     
     /**
     * Process email_address_verifications.json file and add data as Data Artifact
-    * Facebook reaction data.
+    * Facebook email_address_verifications data.
     *
     * @param  af  JSON file
     */
@@ -618,7 +683,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     
     /**
     * Process account_activity.json file and add data as Data Artifact
-    * Facebook reaction data.
+    * Facebook account_activity data.
     *
     * @param  af  JSON file
     */
