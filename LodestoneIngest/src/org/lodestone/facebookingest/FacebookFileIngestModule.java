@@ -147,7 +147,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONsupport_messages(af);
                     break;
                 case "message_1.json":
-                    //processJSON(af);
+                    processJSONmessage_1(af);
                     break;
                 case "notifications.json":
                     //processJSON(af);
@@ -2995,13 +2995,13 @@ public class FacebookFileIngestModule implements FileIngestModule{
             BlackboardAttribute.Type phoneNumberCountryCode;
             try{
                 // if artifact type does not exist
-                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PHONE_NUMBER_LOCATION") == null){
-                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PHONE_NUMBER_LOCATION", "Facebook Phone Number Location");
-                    phoneNumberSPN = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_DEVICE_SPN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Service Provider Name");
-                    phoneNumberCountryCode = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_DEVICE_COUNTRY_CODE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Country Code");
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_DEVICE_LOCATION") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_DEVICE_LOCATION", "Facebook Location Associated with User Device");
+                    phoneNumberSPN = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_DEVICE_SPN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Mobile Network Provider");
+                    phoneNumberCountryCode = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_DEVICE_COUNTRY_CODE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Mobile Country Code");
                 }
                 else{
-                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PHONE_NUMBER_LOCATION");
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_DEVICE_LOCATION");
                     phoneNumberSPN = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_DEVICE_SPN");
                     phoneNumberCountryCode = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_DEVICE_COUNTRY_CODE");
                 }
@@ -3471,6 +3471,193 @@ public class FacebookFileIngestModule implements FileIngestModule{
         }
         else{
             logger.log(Level.INFO, "No support_messages_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process message_1.json file and add data as Data Artifact
+    * Facebook user chat message data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONmessage_1(AbstractFile af){
+        try{
+        String json = parseAFtoString(af);
+        Message1 messageChat = new Gson().fromJson(json, Message1.class);
+        if(messageChat.messages != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type messageChat_Title;
+            BlackboardAttribute.Type messageChat_ThreadType;
+            BlackboardAttribute.Type messageChat_ListOfParticipant;
+            BlackboardAttribute.Type message_Sender;
+            BlackboardAttribute.Type message_Date;
+            BlackboardAttribute.Type message_Content;
+            BlackboardAttribute.Type message_Type;
+            BlackboardAttribute.Type message_ContentImageURI;
+            BlackboardAttribute.Type message_ContentImageDateCreated;
+            BlackboardAttribute.Type message_ContentShare;
+            BlackboardAttribute.Type message_IsUnsent;
+            BlackboardAttribute.Type message_IsTakenDown;
+            BlackboardAttribute.Type messageChat_ThreadPath;
+            BlackboardAttribute.Type messageChat_IsStillParticipant;
+            BlackboardAttribute.Type messageChat_ImageUri;
+            BlackboardAttribute.Type messageChat_ImageDateCreated;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_MESSENGER_CHAT") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_MESSENGER_CHAT", "Facebook Messenger Chat");
+                    messageChat_Title = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Chat Title");
+                    messageChat_ThreadType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_THREAD_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Thread Type");
+                    messageChat_ListOfParticipant = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_LIST_OF_PARTICIPANT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "List of Participants");
+                    message_Sender = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_SENDER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Sender");
+                    message_Date = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    message_Content = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Content");
+                    message_Type = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Type");
+                    message_ContentImageURI = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Image URI");
+                    message_ContentImageDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Image Date Created");
+                    message_ContentShare = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_SHARE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Share");
+                    message_IsUnsent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_UNSENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message is Unsent?");
+                    message_IsTakenDown = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_TAKEN_DOWN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message is Taken Down?");
+                    messageChat_ThreadPath = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_THREAD_PATH", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Chat Thread Path");
+                    messageChat_IsStillParticipant = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_STILL_PARTICIPANT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User is still Participant?");
+                    messageChat_ImageUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Chat Image URI");
+                    messageChat_ImageDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Chat Image Date Created");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_MESSENGER_CHAT");
+                    messageChat_Title = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_TITLE");
+                    messageChat_ThreadType = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_THREAD_TYPE");
+                    messageChat_ListOfParticipant = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_LIST_OF_PARTICIPANT");
+                    message_Sender = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_SENDER");
+                    message_Date = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_DATE");
+                    message_Content = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT");
+                    message_Type = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_TYPE");
+                    message_ContentImageURI = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_URI");
+                    message_ContentImageDateCreated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_DATE_CREATED");
+                    message_ContentShare = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_SHARE");
+                    message_IsUnsent = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_UNSENT");
+                    message_IsTakenDown = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_TAKEN_DOWN");
+                    messageChat_ThreadPath = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_THREAD_PATH");
+                    messageChat_IsStillParticipant = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_STILL_PARTICIPANT");
+                    messageChat_ImageUri = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_URI");
+                    messageChat_ImageDateCreated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_DATE_CREATED");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            String title = messageChat.title;
+            String threadType = messageChat.thread_type;
+            // Concatenate participant names
+            String names = "";
+            for (Message1.Participant participant:messageChat.participants){
+                names += participant.name;
+                names += ";\n";
+            }
+            String msgSender = "";
+            String msgDate = "";
+            String msgContent = "";
+            String msgType = "";
+            String msgContentImageUri = "";
+            String msgContentImageDateCreated = "";
+            String msgContentShare = "";
+            String msgIsUnsent = "";
+            String msgIsTakenDown = "";
+            String threadPath = messageChat.thread_path;
+            String chatIsStillParticipant = messageChat.is_still_participant;
+            String chatImageUri = "";
+            String chatImageDateCreated = "";
+            if (messageChat.image != null) {
+                chatImageUri = messageChat.image.uri;
+                chatImageDateCreated = new TimestampToDate(messageChat.image.creation_timestamp).getDate();
+            }
+            for (Message1.Message message:messageChat.messages){
+                msgSender = message.sender_name;
+                msgDate = new TimestampToDate(message.timestamp_ms,true).getDate();
+                msgContent = message.content;
+                msgType = message.type;
+                msgContentImageUri = "";
+                msgContentImageDateCreated = "";
+                msgContentShare = message.share;
+                msgIsUnsent = message.is_unsent;
+                msgIsTakenDown = message.is_taken_down;
+                
+                
+                if (message.photos != null) {
+                    for (Message1.Message.Image contentImage:message.photos) {
+                        msgContentImageUri = contentImage.uri;
+                        msgContentImageDateCreated = new TimestampToDate(contentImage.creation_timestamp).getDate();
+                        
+                        // add variables to attributes
+                        Collection<BlackboardAttribute> attributelist = new ArrayList();
+                        attributelist.add(new BlackboardAttribute(messageChat_Title, FacebookIngestModuleFactory.getModuleName(), title));
+                        attributelist.add(new BlackboardAttribute(messageChat_ThreadType, FacebookIngestModuleFactory.getModuleName(), threadType));
+                        attributelist.add(new BlackboardAttribute(messageChat_ListOfParticipant, FacebookIngestModuleFactory.getModuleName(), names));
+                        attributelist.add(new BlackboardAttribute(message_Sender, FacebookIngestModuleFactory.getModuleName(), msgSender));
+                        attributelist.add(new BlackboardAttribute(message_Date, FacebookIngestModuleFactory.getModuleName(), msgDate));
+                        attributelist.add(new BlackboardAttribute(message_Content, FacebookIngestModuleFactory.getModuleName(), msgContent));
+                        attributelist.add(new BlackboardAttribute(message_Type, FacebookIngestModuleFactory.getModuleName(), msgType));
+                        attributelist.add(new BlackboardAttribute(message_ContentImageURI, FacebookIngestModuleFactory.getModuleName(), msgContentImageUri));
+                        attributelist.add(new BlackboardAttribute(message_ContentImageDateCreated, FacebookIngestModuleFactory.getModuleName(), msgContentImageDateCreated));
+                        attributelist.add(new BlackboardAttribute(message_ContentShare, FacebookIngestModuleFactory.getModuleName(), msgContentShare));
+                        attributelist.add(new BlackboardAttribute(message_IsUnsent, FacebookIngestModuleFactory.getModuleName(), msgIsUnsent));
+                        attributelist.add(new BlackboardAttribute(message_IsTakenDown, FacebookIngestModuleFactory.getModuleName(), msgIsTakenDown));
+                        attributelist.add(new BlackboardAttribute(messageChat_ThreadPath, FacebookIngestModuleFactory.getModuleName(), threadPath));
+                        attributelist.add(new BlackboardAttribute(messageChat_IsStillParticipant, FacebookIngestModuleFactory.getModuleName(), chatIsStillParticipant));
+                        attributelist.add(new BlackboardAttribute(messageChat_ImageUri, FacebookIngestModuleFactory.getModuleName(), chatImageUri));
+                        attributelist.add(new BlackboardAttribute(messageChat_ImageDateCreated, FacebookIngestModuleFactory.getModuleName(), chatImageDateCreated));
+
+                        try{
+                            blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        }
+                        catch (TskCoreException | BlackboardException e){
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                }
+                else {
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(messageChat_Title, FacebookIngestModuleFactory.getModuleName(), title));
+                    attributelist.add(new BlackboardAttribute(messageChat_ThreadType, FacebookIngestModuleFactory.getModuleName(), threadType));
+                    attributelist.add(new BlackboardAttribute(messageChat_ListOfParticipant, FacebookIngestModuleFactory.getModuleName(), names));
+                    attributelist.add(new BlackboardAttribute(message_Sender, FacebookIngestModuleFactory.getModuleName(), msgSender));
+                    attributelist.add(new BlackboardAttribute(message_Date, FacebookIngestModuleFactory.getModuleName(), msgDate));
+                    attributelist.add(new BlackboardAttribute(message_Content, FacebookIngestModuleFactory.getModuleName(), msgContent));
+                    attributelist.add(new BlackboardAttribute(message_Type, FacebookIngestModuleFactory.getModuleName(), msgType));
+                    attributelist.add(new BlackboardAttribute(message_ContentImageURI, FacebookIngestModuleFactory.getModuleName(), msgContentImageUri));
+                    attributelist.add(new BlackboardAttribute(message_ContentImageDateCreated, FacebookIngestModuleFactory.getModuleName(), msgContentImageDateCreated));
+                    attributelist.add(new BlackboardAttribute(message_ContentShare, FacebookIngestModuleFactory.getModuleName(), msgContentShare));
+                    attributelist.add(new BlackboardAttribute(message_IsUnsent, FacebookIngestModuleFactory.getModuleName(), msgIsUnsent));
+                    attributelist.add(new BlackboardAttribute(message_IsTakenDown, FacebookIngestModuleFactory.getModuleName(), msgIsTakenDown));
+                    attributelist.add(new BlackboardAttribute(messageChat_ThreadPath, FacebookIngestModuleFactory.getModuleName(), threadPath));
+                    attributelist.add(new BlackboardAttribute(messageChat_IsStillParticipant, FacebookIngestModuleFactory.getModuleName(), chatIsStillParticipant));
+                    attributelist.add(new BlackboardAttribute(messageChat_ImageUri, FacebookIngestModuleFactory.getModuleName(), chatImageUri));
+                    attributelist.add(new BlackboardAttribute(messageChat_ImageDateCreated, FacebookIngestModuleFactory.getModuleName(), chatImageDateCreated));
+
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No messages found");
+            return;
+        }
+        }
+        catch (Exception e){
+            e.printStackTrace();
             return;
         }
     }
