@@ -232,12 +232,12 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 case "your_facebook_activity_history.json":
                     //processJSON(af);
                     break;
-                case "location.json":
+                //case "location.json":
                     //processJSON(af);
-                    break;
-                case "voting_reminders.json":
+                    //break;
+                //case "voting_reminders.json":
                     //processJSON(af);
-                    break;
+                    //break;
                 case "recently_viewed.json":
                     //processJSON(af);
                     break;
