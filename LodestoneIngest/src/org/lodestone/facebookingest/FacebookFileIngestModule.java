@@ -126,25 +126,25 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONyour_posts_in_groups(af);
                     break;
                 case "last_location.json":
-                    //processJSON(af);
-                    break;
-                case "primary_location.json":
-                    //processJSON(af);
+                    processJSONlast_location(af);
                     break;
                 case "primary_public_location.json":
-                    //processJSON(af);
+                    processJSONprimary_public_location(af);
+                    break;
+                case "device_location.json":
+                    processJSONdevice_location(af);
                     break;
                 case "timezone.json":
-                    //processJSON(af);
+                    processJSONtimezone(af);
                     break;
                 case "autofill_information.json":
-                    //processJSON(af);
+                    processJSONautofill_information(af);
                     break;
                 case "secret_conversations.json":
-                    //processJSON(af);
+                    processJSONsecret_conversations(af);
                     break;
                 case "support_messages.json":
-                    //processJSON(af);
+                    processJSONsupport_messages(af);
                     break;
                 case "message_1.json":
                     //processJSON(af);
@@ -2968,12 +2968,509 @@ public class FacebookFileIngestModule implements FileIngestModule{
             }
         }
         else{
-            logger.log(Level.INFO, "No groups_joined_v2 found");
+            logger.log(Level.INFO, "No group_posts_v2 found");
             return;
         }
         }
         catch (Exception e){
             e.printStackTrace();
+            return;
+        }
+    }
+    
+    /**
+    * Process device_location.json file and add data as Data Artifact
+    * Facebook user device location data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONdevice_location(AbstractFile af){
+        String json = parseAFtoString(af);
+        PhoneNumberLocationV2 phoneNumberLocations = new Gson().fromJson(json, PhoneNumberLocationV2.class);
+        if(phoneNumberLocations.phone_number_location_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type phoneNumberSPN;
+            BlackboardAttribute.Type phoneNumberCountryCode;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PHONE_NUMBER_LOCATION") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PHONE_NUMBER_LOCATION", "Facebook Phone Number Location");
+                    phoneNumberSPN = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_DEVICE_SPN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Service Provider Name");
+                    phoneNumberCountryCode = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_DEVICE_COUNTRY_CODE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Country Code");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PHONE_NUMBER_LOCATION");
+                    phoneNumberSPN = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_DEVICE_SPN");
+                    phoneNumberCountryCode = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_DEVICE_COUNTRY_CODE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (PhoneNumberLocationV2.PhoneNumberLocation_V2 phoneNumberLocation:phoneNumberLocations.phone_number_location_v2){
+                
+                String spn = phoneNumberLocation.spn;
+                String countryCode = phoneNumberLocation.country_code;
+                        
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(phoneNumberSPN, FacebookIngestModuleFactory.getModuleName(), spn));
+                attributelist.add(new BlackboardAttribute(phoneNumberCountryCode, FacebookIngestModuleFactory.getModuleName(), countryCode));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No phone_number_location_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process last_location.json file and add data as Data Artifact
+    * Facebook user device location data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONlast_location(AbstractFile af){
+        String json = parseAFtoString(af);
+        LastLocationV2 lastLocation = new Gson().fromJson(json, LastLocationV2.class);
+        if(lastLocation.last_location_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type lastLocationDate;
+            BlackboardAttribute.Type lastLocationName;
+            BlackboardAttribute.Type lastLocationLatitude;
+            BlackboardAttribute.Type lastLocationLongitude;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_LAST_LOCATION") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_LAST_LOCATION", "Facebook Last Location");
+                    lastLocationDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_LAST_LOCATION_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    lastLocationName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_LAST_LOCATION_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Location Name");
+                    lastLocationLatitude = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_LAST_LOCATION_LATITUDE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Latitude");
+                    lastLocationLongitude = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_LAST_LOCATION_LONGITUDE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Longitude");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_LAST_LOCATION");
+                    lastLocationDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_LAST_LOCATION_DATE");
+                    lastLocationName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_LAST_LOCATION_NAME");
+                    lastLocationLatitude = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_LAST_LOCATION_LATITUDE");
+                    lastLocationLongitude = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_LAST_LOCATION_LONGITUDE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            String date = new TimestampToDate(lastLocation.last_location_v2.time).getDate();
+            String locationName = lastLocation.last_location_v2.name;
+            String latitude = lastLocation.last_location_v2.coordinate.latitude;
+            String longitude = lastLocation.last_location_v2.coordinate.longitude;
+
+            // add variables to attributes
+            Collection<BlackboardAttribute> attributelist = new ArrayList();
+            attributelist.add(new BlackboardAttribute(lastLocationDate, FacebookIngestModuleFactory.getModuleName(), date));
+            attributelist.add(new BlackboardAttribute(lastLocationName, FacebookIngestModuleFactory.getModuleName(), locationName));
+            attributelist.add(new BlackboardAttribute(lastLocationLatitude, FacebookIngestModuleFactory.getModuleName(), latitude));
+            attributelist.add(new BlackboardAttribute(lastLocationLongitude, FacebookIngestModuleFactory.getModuleName(), longitude));
+
+            try{
+                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+            }
+            catch (TskCoreException | BlackboardException e){
+                e.printStackTrace();
+                return;
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No last_location_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process primary_public_location.json file and add data as Data Artifact
+    * Facebook user primary public location data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONprimary_public_location(AbstractFile af){
+        String json = parseAFtoString(af);
+        PrimaryPublicLocationV2 primaryPublicLocation = new Gson().fromJson(json, PrimaryPublicLocationV2.class);
+        if(primaryPublicLocation.primary_public_location_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type primaryPublicLocationCity;
+            BlackboardAttribute.Type primaryPublicLocationRegion;
+            BlackboardAttribute.Type primaryPublicLocationCountry;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION", "Facebook Primary Public Location");
+                    primaryPublicLocationCity = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION_CITY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "City");
+                    primaryPublicLocationRegion = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION_REGION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Region");
+                    primaryPublicLocationCountry = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION_COUNTRY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Country");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION");
+                    primaryPublicLocationCity = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION_CITY");
+                    primaryPublicLocationRegion = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION_REGION");
+                    primaryPublicLocationCountry = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PRIMARY_PUBLIC_LOCATION_COUNTRY");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            String city = primaryPublicLocation.primary_public_location_v2.city;
+            String region = primaryPublicLocation.primary_public_location_v2.region;
+            String country = primaryPublicLocation.primary_public_location_v2.country;
+
+            // add variables to attributes
+            Collection<BlackboardAttribute> attributelist = new ArrayList();
+            attributelist.add(new BlackboardAttribute(primaryPublicLocationCity, FacebookIngestModuleFactory.getModuleName(), city));
+            attributelist.add(new BlackboardAttribute(primaryPublicLocationRegion, FacebookIngestModuleFactory.getModuleName(), region));
+            attributelist.add(new BlackboardAttribute(primaryPublicLocationCountry, FacebookIngestModuleFactory.getModuleName(), country));
+
+            try{
+                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+            }
+            catch (TskCoreException | BlackboardException e){
+                e.printStackTrace();
+                return;
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No primary_public_location_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process timezone.json file and add data as Data Artifact
+    * Facebook user timezone data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONtimezone(AbstractFile af){
+        String json = parseAFtoString(af);
+        TimezoneV2 timezone = new Gson().fromJson(json, TimezoneV2.class);
+        if(timezone.timezone_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type timezoneAttribute;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_USER_TIMEZONE") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_USER_TIMEZONE", "Facebook Timezone Settings");
+                    timezoneAttribute = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_TIMEZONE_DATA", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Timezone");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_USER_TIMEZONE");
+                    timezoneAttribute = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_TIMEZONE_DATA");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            String timezone_v2 = timezone.timezone_v2;
+            // add variables to attributes
+            Collection<BlackboardAttribute> attributelist = new ArrayList();
+            attributelist.add(new BlackboardAttribute(timezoneAttribute, FacebookIngestModuleFactory.getModuleName(), timezone_v2));
+
+            try{
+                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+            }
+            catch (TskCoreException | BlackboardException e){
+                e.printStackTrace();
+                return;
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No timezone_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process autofill_information.json file and add data as Data Artifact
+    * Facebook user autofill information data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONautofill_information(AbstractFile af){
+        String json = parseAFtoString(af);
+        Autofill_InformationV2 autofill_Information = new Gson().fromJson(json, Autofill_InformationV2.class);
+        if(autofill_Information.autofill_information_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type autofillEmail;
+            BlackboardAttribute.Type autofillGender;
+            BlackboardAttribute.Type autofillFirstName;
+            BlackboardAttribute.Type autofillLastName;
+            BlackboardAttribute.Type autofillFullName;
+            BlackboardAttribute.Type autofillWorkEmail;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_AUTOFILL") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_AUTOFILL", "Facebook Autofill Information");
+                    autofillEmail = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_AUTOFILL_EMAIL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Email");
+                    autofillGender = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_AUTOFILL_GENDER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Gender");
+                    autofillFirstName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_AUTOFILL_FIRST_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "First Name");
+                    autofillLastName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_AUTOFILL_LAST_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Last Name");
+                    autofillFullName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_AUTOFILL_FULL_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Full Name");
+                    autofillWorkEmail = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_AUTOFILL_WORK_EMAIL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Work Email");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_AUTOFILL");
+                    autofillEmail = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_AUTOFILL_EMAIL");
+                    autofillGender = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_AUTOFILL_GENDER");
+                    autofillFirstName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_AUTOFILL_FIRST_NAME");
+                    autofillLastName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_AUTOFILL_LAST_NAME");
+                    autofillFullName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_AUTOFILL_FULL_NAME");
+                    autofillWorkEmail = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_AUTOFILL_WORK_EMAIL");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            String email = "";
+            String gender = "";
+            String first_name = "";
+            String last_name = "";
+            String full_name = "";
+            String work_email = "";
+            
+            if (!autofill_Information.autofill_information_v2.EMAIL.isEmpty()) {
+                email = autofill_Information.autofill_information_v2.EMAIL.get(0);
+            }
+            
+            if (!autofill_Information.autofill_information_v2.GENDER.isEmpty()) {
+                gender = autofill_Information.autofill_information_v2.GENDER.get(0);
+            }
+            
+            if (!autofill_Information.autofill_information_v2.FIRST_NAME.isEmpty()) {
+                first_name = autofill_Information.autofill_information_v2.FIRST_NAME.get(0);
+            }
+            
+            if (!autofill_Information.autofill_information_v2.LAST_NAME.isEmpty()) {
+                last_name = autofill_Information.autofill_information_v2.LAST_NAME.get(0);
+            }
+            
+            if (!autofill_Information.autofill_information_v2.FULL_NAME.isEmpty()) {
+                full_name = autofill_Information.autofill_information_v2.FULL_NAME.get(0);
+            }
+            
+            if (!autofill_Information.autofill_information_v2.WORK_EMAIL.isEmpty()) {
+                work_email = autofill_Information.autofill_information_v2.WORK_EMAIL.get(0);
+            }
+            
+            // add variables to attributes
+            Collection<BlackboardAttribute> attributelist = new ArrayList();
+            attributelist.add(new BlackboardAttribute(autofillEmail, FacebookIngestModuleFactory.getModuleName(), email));
+            attributelist.add(new BlackboardAttribute(autofillGender, FacebookIngestModuleFactory.getModuleName(), gender));
+            attributelist.add(new BlackboardAttribute(autofillFirstName, FacebookIngestModuleFactory.getModuleName(), first_name));
+            attributelist.add(new BlackboardAttribute(autofillLastName, FacebookIngestModuleFactory.getModuleName(), last_name));
+            attributelist.add(new BlackboardAttribute(autofillFullName, FacebookIngestModuleFactory.getModuleName(), full_name));
+            attributelist.add(new BlackboardAttribute(autofillWorkEmail, FacebookIngestModuleFactory.getModuleName(), work_email));
+
+            try{
+                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+            }
+            catch (TskCoreException | BlackboardException e){
+                e.printStackTrace();
+                return;
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No autofill_information_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process secret_conversations.json file and add data as Data Artifact
+    * Facebook user device information for secret conversations on armadillo devices .
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONsecret_conversations(AbstractFile af){
+        String json = parseAFtoString(af);
+        SecretConversationsV2 autofill_Information = new Gson().fromJson(json, SecretConversationsV2.class);
+        if(autofill_Information.secret_conversations_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type secretConversationType;
+            BlackboardAttribute.Type deviceType;
+            BlackboardAttribute.Type deviceManufacturer;
+            BlackboardAttribute.Type deviceModel;
+            BlackboardAttribute.Type deviceOS;
+            BlackboardAttribute.Type lastConnnectedIpAttribute;
+            BlackboardAttribute.Type lastActiveDateAttribute;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_SECRET_CONVERSATION_INFO") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_SECRET_CONVERSATION_INFO", "Facebook Devices that used Secret Conversations feature");
+                    secretConversationType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Secret Conversation Type");
+                    deviceType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_DEVICE_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Device Type");
+                    deviceManufacturer = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_DEVICE_MANUFACTURER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Manufacturer");
+                    deviceModel = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_DEVICE_MODEL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Model");
+                    deviceOS = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_DEVICE_OS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "OS Version");
+                    lastConnnectedIpAttribute = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_LAST_CONNECTED_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Last Connected IP");
+                    lastActiveDateAttribute = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_LAST_ACTIVE_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Last Active Time");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_SECRET_CONVERSATION_INFO");
+                    secretConversationType = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_TYPE");
+                    deviceType = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_DEVICE_TYPE");
+                    deviceManufacturer = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_DEVICE_MANUFACTURER");
+                    deviceModel = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_DEVICE_MODEL");
+                    deviceOS = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_DEVICE_OS");
+                    lastConnnectedIpAttribute = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_LAST_CONNECTED_IP");
+                    lastActiveDateAttribute = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SECRET_CONVERSATION_LAST_ACTIVE_DATE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (SecretConversationsV2.SecretConversations_V2.Armadillo armadillo:autofill_Information.secret_conversations_v2.armadillo_devices){
+                String type = "Armadillo";
+                String devType = armadillo.device_type;
+                String devManu = armadillo.device_manufacturer;
+                String devModel = armadillo.device_model;
+                String devOS = armadillo.device_os_version;
+                String lastConnectedIP = armadillo.last_connected_ip;
+                String lastActiveDate = new TimestampToDate(armadillo.last_active_time).getDate();
+
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(secretConversationType, FacebookIngestModuleFactory.getModuleName(), type));
+                attributelist.add(new BlackboardAttribute(deviceType, FacebookIngestModuleFactory.getModuleName(), devType));
+                attributelist.add(new BlackboardAttribute(deviceManufacturer, FacebookIngestModuleFactory.getModuleName(), devManu));
+                attributelist.add(new BlackboardAttribute(deviceModel, FacebookIngestModuleFactory.getModuleName(), devModel));
+                attributelist.add(new BlackboardAttribute(deviceOS, FacebookIngestModuleFactory.getModuleName(), devOS));
+                attributelist.add(new BlackboardAttribute(lastConnnectedIpAttribute, FacebookIngestModuleFactory.getModuleName(), lastConnectedIP));
+                attributelist.add(new BlackboardAttribute(lastActiveDateAttribute, FacebookIngestModuleFactory.getModuleName(), lastActiveDate));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No secret_conversations_v2 found");
+            return;
+        }
+    }
+    
+    /**
+    * Process support_messages.json file and add data as Data Artifact
+    * Facebook user Facebook support message data.
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONsupport_messages(AbstractFile af){
+        String json = parseAFtoString(af);
+        SupportMessagesV2 supportMessageThreads = new Gson().fromJson(json, SupportMessagesV2.class);
+        if(supportMessageThreads.support_messages_v2 != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type supportMsgThreadDate;
+            BlackboardAttribute.Type supportMsgThreadSubject;
+            BlackboardAttribute.Type supportMsgFrom;
+            BlackboardAttribute.Type supportMsgTo;
+            BlackboardAttribute.Type supportMsgSubject;
+            BlackboardAttribute.Type supportMsgMessage;
+            BlackboardAttribute.Type supportMsgDate;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_SUPPORT_MESSAGE") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_SUPPORT_MESSAGE", "Facebook Support Messages");
+                    supportMsgThreadDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_THREAD_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Thread Date");
+                    supportMsgThreadSubject = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_THREAD_SUBJECT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Thread Subject");
+                    supportMsgFrom = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_FROM", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "From");
+                    supportMsgTo = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_TO", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "To");
+                    supportMsgSubject = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_SUBJECT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Subject");
+                    supportMsgMessage = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_MESSAGE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message");
+                    supportMsgDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_SUPPORT_MESSAGE");
+                    supportMsgThreadDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_THREAD_DATE");
+                    supportMsgThreadSubject = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_THREAD_SUBJECT");
+                    supportMsgFrom = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_FROM");
+                    supportMsgTo = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_TO");
+                    supportMsgSubject = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_SUBJECT");
+                    supportMsgMessage = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_MESSAGE");
+                    supportMsgDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_SUPPORT_MESSAGE_DATE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (SupportMessagesV2.SupportMessages_V2 thread:supportMessageThreads.support_messages_v2){
+                String threadDate = new TimestampToDate(thread.timestamp).getDate();
+                String threadSubject = thread.subject;
+                for (SupportMessagesV2.SupportMessages_V2.Messages message:thread.messages){
+                    String from = message.from;
+                    String to = message.to;
+                    String subject = message.subject;
+                    String messageData = message.message;
+                    String date = new TimestampToDate(message.timestamp).getDate();
+
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(supportMsgThreadDate, FacebookIngestModuleFactory.getModuleName(), threadDate));
+                    attributelist.add(new BlackboardAttribute(supportMsgThreadSubject, FacebookIngestModuleFactory.getModuleName(), threadSubject));
+                    attributelist.add(new BlackboardAttribute(supportMsgFrom, FacebookIngestModuleFactory.getModuleName(), from));
+                    attributelist.add(new BlackboardAttribute(supportMsgTo, FacebookIngestModuleFactory.getModuleName(), to));
+                    attributelist.add(new BlackboardAttribute(supportMsgSubject, FacebookIngestModuleFactory.getModuleName(), subject));
+                    attributelist.add(new BlackboardAttribute(supportMsgMessage, FacebookIngestModuleFactory.getModuleName(), messageData));
+                    attributelist.add(new BlackboardAttribute(supportMsgDate, FacebookIngestModuleFactory.getModuleName(), date));
+
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No support_messages_v2 found");
             return;
         }
     }
