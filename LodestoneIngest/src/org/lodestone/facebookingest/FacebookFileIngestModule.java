@@ -2542,19 +2542,14 @@ public class FacebookFileIngestModule implements FileIngestModule{
                         post = postData.post;
                     }
                 }
-                System.out.println("1: "+title);
                 if (groupPost.attachments != null){
-                    System.out.println("2");
                     boolean marketplaceInPost = false;
                     boolean attachmentInPost = false;
                     boolean externalContextInPost = false;
                     // Marketplace and External Context data
                     for (GroupPostsV2.GroupPosts_V2.Attachments attachment:groupPost.attachments) {
                         for (GroupPostsV2.GroupPosts_V2.Attachments.AttachmentData attachmentData:attachment.data) {
-                            System.out.println("3a: "+attachmentData.for_sale_item);
-                            System.out.println("3b: "+attachmentData.media);
                             if (attachmentData.for_sale_item != null){
-                                System.out.println("has sale");
                                 saleTitle = attachmentData.for_sale_item.title;
                                 salePrice = attachmentData.for_sale_item.price;
                                 saleSeller = attachmentData.for_sale_item.seller;
@@ -2569,29 +2564,21 @@ public class FacebookFileIngestModule implements FileIngestModule{
                                 marketplaceInPost = true;
                             }
                             if (attachmentData.external_context != null){
-                                System.out.println("has EC");
                                 url = attachmentData.external_context.url;
                                 externalContextInPost = true;
                             }
                             if (attachmentData.media != null){
-                                System.out.println("has media");
                                 attachmentInPost = true;
                             }
                         }
                     }
-                    System.out.println(marketplaceInPost);
-                    System.out.println(attachmentInPost);
-                    System.out.println(externalContextInPost);
                     
                     // Attachment data
                     if (attachmentInPost) {
-                        System.out.println("4");
                         // Attachment data
                         for (GroupPostsV2.GroupPosts_V2.Attachments attachment:groupPost.attachments) {
                             for (GroupPostsV2.GroupPosts_V2.Attachments.AttachmentData attachmentData:attachment.data) {
-                                System.out.println("4a");
                                 if (attachmentData.media != null){
-                                    System.out.println("4b");
                                     uri = attachmentData.media.uri;
                                     attachmentCreatedDate = new TimestampToDate(attachmentData.media.creation_timestamp).getDate();
                                     description = attachmentData.media.description;
@@ -2634,7 +2621,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
                         }
                     }
                     else if (marketplaceInPost || externalContextInPost) {
-                        System.out.println("5");
                         // add variables to attributes
                         Collection<BlackboardAttribute> attributelist = new ArrayList();
                         attributelist.add(new BlackboardAttribute(groupPost_date, FacebookIngestModuleFactory.getModuleName(), date));
@@ -2668,7 +2654,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     }
                 }
                 else {
-                    System.out.println("6");
                     // add variables to attributes
                     Collection<BlackboardAttribute> attributelist = new ArrayList();
                     attributelist.add(new BlackboardAttribute(groupPost_date, FacebookIngestModuleFactory.getModuleName(), date));
