@@ -5,6 +5,8 @@
  */
 package org.lodestone.facebooksource;
 
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -48,18 +50,26 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import java.util.zip.ZipFile;
 import org.openide.util.Exceptions;
 import org.openqa.selenium.io.Zip;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+
+import static org.awaitility.Awaitility.*;
+import static org.awaitility.Durations.*;
+import static java.util.concurrent.TimeUnit.*;
+import org.junit.Assert;
 
 
 
 
 /**
  *
- * @author Alford
+ * @author Alford, Jun Jie
  */
 
 public class addOnlineDataTask implements Runnable {
@@ -100,6 +110,8 @@ public class addOnlineDataTask implements Runnable {
     
     @Override    
     public void run() {
+        
+       
         errorList.clear();
         
         FileManager fileManager = Case.getCurrentCase().getServices().getFileManager();
@@ -151,6 +163,12 @@ public class addOnlineDataTask implements Runnable {
         catch(InterruptedException e){
                System.out.println(e);
             }
+        //Number of files read from FB description
+        NumberOfFiles numF = new NumberOfFiles();
+        
+        NumberOfFiles numCurrentZ = new NumberOfFiles();
+        //set current number of zip files in dl directory using setNumFiles
+        numCurrentZ.setNumFiles(CurrentNumOfZipFiles());
         if(LatestExport)
         {
             try{
@@ -163,25 +181,36 @@ public class addOnlineDataTask implements Runnable {
                 catch(Exception e){
                    System.out.println("No Pending files available for download"); 
                 }
-                //calls Datadownload method
-                DataDownload(driver);
+                
+                //calls Datadownload method and set return as number of files
+                numF.setNumFiles(DataDownload(driver));
+                
         }
         else{
-            //calls Datadownload method
-            DataDownload(driver);
+            //calls Datadownload method and set return as number of files
+                numF.setNumFiles(DataDownload(driver));
         }
-        //placeholder until methods to detect file download is finished so file extraction from zip can be done and added to data source.
+ 
+        
+
+        // number of zip files expected = before download count + facebook number of files to download
+        int numberOfFilesToWait = numCurrentZ.getNumFiles()+numF.getNumFiles();
+        //check if files are downloaded
         try{
-            progressMonitor.setProgressText("6mins Wait time for download");
-            Thread.sleep(360000);
+        await().during(1000, MILLISECONDS).atMost(300, MINUTES).untilAsserted(() -> Assert.assertEquals(numberOfFilesToWait, CurrentNumOfZipFiles()));
+        }
+        catch (Exception e){
+             System.out.println("Download took too long\n"+e);
+        }
+        
+        try{
+            Thread.sleep(1000);
         }
          catch(InterruptedException e){
                System.out.println(e);
             }
-        //currently not used. meant for expectedconditions for downloads and consistentl checking of files is present.
-       WebDriverWait waitdl = new WebDriverWait(driver,Duration.ofMinutes(120));
-        //        waitdl.until(.filepresent());
         
+ 
         errorList = new ArrayList<>();
         newDataSources = new ArrayList<>();
         localFilePaths = new ArrayList<>();
@@ -189,8 +218,7 @@ public class addOnlineDataTask implements Runnable {
         // Adding downloaded files as a Data Source
         File downloadFolder = new File(modDir);
         File[] listOfFiles = downloadFolder.listFiles();
-
-      
+        
         for (File file : listOfFiles) {
             //unzipping files from downloadfolder dir after all downloads are completed.
             UnZipFile uzfile = new UnZipFile();  
@@ -200,6 +228,7 @@ public class addOnlineDataTask implements Runnable {
                 catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }
+      
                   //newDir without ext name
                 String newFileDir = file.getAbsolutePath().replaceAll("\\.\\w+","");
                 //add unzipped files to localfilepaths list
@@ -220,20 +249,37 @@ public class addOnlineDataTask implements Runnable {
         
         doCallBack();
     }
-        
-        public ExpectedCondition<Boolean> filepresent() {
-         return new ExpectedCondition<Boolean>() {
-        @Override
-        public Boolean apply(WebDriver driver) {
-            File f = new File("D:\\program.txt"); 
-            return f.exists();
+    //method to check current number of zipfiles in modDir
+    private int CurrentNumOfZipFiles(){
+           // Adding downloaded files as a Data Source
+        File downloadFolder = new File(modDir);
+        File[] listOfFiles = downloadFolder.listFiles();
+        int fileCounter = 0;
+        for (File file : listOfFiles) {
+            //check if file is a zip file, if true, run condition
+            if(isZipFile(file.getAbsolutePath()))
+            {
+                fileCounter++;
+            }
         }
-        @Override
-        public String toString() {
-          return String.format("file to be present within the time specified");
-        }
-    };
-}   
+        return fileCounter;
+    }
+    
+    // getter and setter for numfiles
+    public class NumberOfFiles {
+       private int numfiles;
+
+       // Getter
+       public int getNumFiles() {
+         return numfiles;
+       }
+
+       // Setter
+       public void setNumFiles(int i) {
+         this.numfiles = i;
+       }
+     }
+    
     private boolean isZipFile(String path){
          if (path == null)
             return false;
@@ -246,8 +292,8 @@ public class addOnlineDataTask implements Runnable {
         }   
     }
     
-     private void DataDownload(WebDriver driver){
-        
+     private int DataDownload(WebDriver driver){
+        int noOfFiles = 0;
          try{       
                     progressMonitor.setProgressText("Initiating download of files");
                     WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(120));
@@ -256,6 +302,7 @@ public class addOnlineDataTask implements Runnable {
                     System.out.println(numFiles);
                     String numFilesArray[] = numFiles.split(" ", 2);
                     int numFile = Integer.parseInt(numFilesArray[0]);
+                    noOfFiles = numFile;
                     String fileDate = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][1]")).getText();
                     String fileFormat = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][2]")).getText();
                     String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
@@ -278,10 +325,12 @@ public class addOnlineDataTask implements Runnable {
                             }
                             Thread.sleep(600);
                         }
+                
                 }
             catch(InterruptedException e){
                System.out.println(e);
             }  
+         return noOfFiles;
     }
      
     private void DataRequest(WebDriver driver, Boolean formatType, Boolean dataExport){
@@ -338,4 +387,6 @@ public class addOnlineDataTask implements Runnable {
             }
         }
     }
+    
+   
 }
