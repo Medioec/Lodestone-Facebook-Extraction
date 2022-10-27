@@ -8,7 +8,6 @@ package org.lodestone.facebooksource;
 import java.io.File;
 import java.io.IOException;
 import org.lodestone.facebooksource.Bundle;
-import sun.net.ProgressMonitor;
 
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;

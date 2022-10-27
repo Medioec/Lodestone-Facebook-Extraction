@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import org.lodestone.facebookingest.pojo.*;
 import org.lodestone.facebookingest.utility.TimestampToDate;
@@ -171,7 +172,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONpages_youve_liked(af);
                     break;
                 case "your_posts_1.json":
-                    //processJSON(af);
+                    //processJSONyour_posts_1(af);
                     break;
                 case "your_uncategorized_photos.json":
                     //processJSON(af);
@@ -3777,6 +3778,63 @@ public class FacebookFileIngestModule implements FileIngestModule{
             return;
         }
     }
+    
+    /**
+    * Process your_posts_1.json file and add data as Data Artifact
+    * Facebook user post data
+    *
+    * @param  af  JSON file
+    */
+//    private void processJSONyour_posts_1(AbstractFile af){
+//        String json = parseAFtoString(af);
+//        List<PageLikesV2> pagesLiked = new Gson().fromJson(json, List.class);
+//        if(pagesLiked != null){
+//            
+//            // prepare variables for artifact
+//            BlackboardArtifact.Type artifactType;
+//            BlackboardAttribute.Type pageFollowedDate;
+//            BlackboardAttribute.Type pageFollowedName;
+//            try{
+//                // if artifact type does not exist
+//                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAGE_LIKED") == null){
+//                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PAGE_LIKED", "Facebook Pages User Liked");
+//                    pageFollowedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_LIKED_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+//                    pageFollowedName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_LIKED_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Page Name");
+//                }
+//                else{
+//                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAGE_LIKED");
+//                    pageFollowedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_LIKED_DATE");
+//                    pageFollowedName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_LIKED_NAME");
+//                }
+//            }
+//            catch (TskCoreException | TskDataException e){
+//                e.printStackTrace();
+//                return;
+//            }
+//            
+//            for (PageLikesV2.PageLikes_V2 page:pagesLiked.page_likes_v2){
+//                String date = new TimestampToDate(page.timestamp).getDate();
+//                String name = page.name;
+//                
+//                // add variables to attributes
+//                Collection<BlackboardAttribute> attributelist = new ArrayList();
+//                attributelist.add(new BlackboardAttribute(pageFollowedDate, FacebookIngestModuleFactory.getModuleName(), date));
+//                attributelist.add(new BlackboardAttribute(pageFollowedName, FacebookIngestModuleFactory.getModuleName(), name));
+//
+//                try{
+//                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+//                }
+//                catch (TskCoreException | BlackboardException e){
+//                    e.printStackTrace();
+//                    return;
+//                }
+//            }
+//        }
+//        else{
+//            logger.log(Level.INFO, "No pages_followed_v2 found");
+//            return;
+//        }
+//    }
     
     /**
     * Read file and parse JSON as JsonObject
