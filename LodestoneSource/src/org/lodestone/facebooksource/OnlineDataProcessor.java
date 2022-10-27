@@ -13,12 +13,15 @@ public class OnlineDataProcessor implements DataSourceProcessor {
 
     private final String modulename = "Extraction data from online cloud sources";
     private final OnlineDataProcessorPanel processorPanel;
-    private final String projectDir;
+    private final String projectDir; // For IDE release
 
     public OnlineDataProcessor() {
         processorPanel = new OnlineDataProcessorPanel();
+        // For IDE release
         this.projectDir = new File("").getAbsolutePath();
         System.setProperty("webdriver.chrome.driver",projectDir+"\\chromedriver.exe");
+        // For NBM release, put chromedriver.exe in Autopsy Program Files [E.g. C:\Program Files\Autopsy-4.19.3\chromedriver.exe]
+        //System.setProperty("webdriver.chrome.driver","chromedriver.exe");
     }
 
     @Override
