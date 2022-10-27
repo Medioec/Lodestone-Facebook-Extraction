@@ -5,7 +5,19 @@
  */
 package org.lodestone.facebooksource;
 
+import java.io.File;
+import java.io.IOException;
+import org.lodestone.facebooksource.Bundle;
+import sun.net.ProgressMonitor;
 
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.util.Base64;
+import java.util.concurrent.TimeUnit;
+import static org.awaitility.Durations.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +42,6 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.sleuthkit.datamodel.AbstractFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -41,26 +51,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.lodestone.facebooksource.Bundle;
-import sun.net.ProgressMonitor;
-
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Base64;
-import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import java.util.zip.ZipFile;
 import org.openide.util.Exceptions;
-import org.openqa.selenium.io.Zip;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import static org.awaitility.Awaitility.*;
-import static org.awaitility.Durations.*;
 import static java.util.concurrent.TimeUnit.*;
 import org.junit.Assert;
 
@@ -169,19 +166,19 @@ public class addOnlineDataTask implements Runnable {
         NumberOfFiles numCurrentZ = new NumberOfFiles();
         //set current number of zip files in dl directory using setNumFiles
         numCurrentZ.setNumFiles(CurrentNumOfZipFiles());
+        
+        //if latest export, wait for pending status to finish and download the latest file instead of available ones(if any)
         if(LatestExport)
         {
             try{
                 //Wait until pending disappears
-                String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")).getText();
                 progressMonitor.setProgressText("Files pending for download, please wait");
                 wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")));
                 Thread.sleep(600);
                 }
                 catch(Exception e){
                    System.out.println("No Pending files available for download"); 
-                }
-                
+                }  
                 //calls Datadownload method and set return as number of files
                 numF.setNumFiles(DataDownload(driver));
                 
@@ -192,19 +189,18 @@ public class addOnlineDataTask implements Runnable {
         }
  
         
-
         // number of zip files expected = before download count + facebook number of files to download
         int numberOfFilesToWait = numCurrentZ.getNumFiles()+numF.getNumFiles();
-        //check if files are downloaded
+        //check if files are downloaded by comparing before and after number of zips
         try{
         await().during(1000, MILLISECONDS).atMost(300, MINUTES).untilAsserted(() -> Assert.assertEquals(numberOfFilesToWait, CurrentNumOfZipFiles()));
         }
         catch (Exception e){
-             System.out.println("Download took too long\n"+e);
+             System.out.println("Download took too long, timeout error\n"+e);
         }
         
         try{
-            Thread.sleep(1000);
+            Thread.sleep(500);
         }
          catch(InterruptedException e){
                System.out.println(e);
@@ -291,7 +287,7 @@ public class addOnlineDataTask implements Runnable {
             return false;
         }   
     }
-    
+    //method for datadownload, support multiple and single downloads
      private int DataDownload(WebDriver driver){
         int noOfFiles = 0;
          try{       
@@ -332,7 +328,7 @@ public class addOnlineDataTask implements Runnable {
             }  
          return noOfFiles;
     }
-     
+     //method for data request
     private void DataRequest(WebDriver driver, Boolean formatType, Boolean dataExport){
         
          // explicit wait - to wait for the download button to be click-able
