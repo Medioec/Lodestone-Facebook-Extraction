@@ -201,7 +201,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     //processJSON(af);
                     break;
                 case "your_search_history.json":
-                    //processJSON(af);
+                    processJSONyour_search_history(af);
                     break;
                 case "account_activity.json":
                     processJSONaccount_activity(af);
@@ -275,7 +275,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
     public void shutDown() {
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
-    
     
     /**
     * Process visited_things_v2.json file and add data as Data Artifact
@@ -356,6 +355,66 @@ public class FacebookFileIngestModule implements FileIngestModule{
                             return;
                         }
                     }
+                }
+            }
+        }
+    }
+    
+    /**
+    * Process your_search_history.json file and add data as Data Artifact
+    * Facebook search history data.
+    * Uses POJO SearchHistoryV2.java
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONyour_search_history(AbstractFile af){
+        String json = parseAFtoString(af);
+        SearchHistoryV2 history = new Gson().fromJson(json, SearchHistoryV2.class);
+        if (history.searches_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type histDate;
+            BlackboardAttribute.Type histTitle;
+            BlackboardAttribute.Type histText;
+            
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_SEARCHHISTORY") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_SEARCHHISTORY", "Facebook Search History");
+                    histDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_SEARCHHISTORY_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    histTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_SEARCHHISTORY_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                    histText = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_SEARCHHISTORY_TEXT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Text");
+                    
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_SEARCHHISTORY");
+                    histDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_SEARCHHISTORY_DATE");
+                    histTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FB_SEARCHHISTORY_TITLE");
+                    histText = currentCase.getSleuthkitCase().getAttributeType("LS_FB_SEARCHHISTORY_TEXT");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (SearchHistoryV2.Searches_V2 search:history.searches_v2){
+                
+                String date = new TimestampToDate(search.timestamp).getDate();
+                String title = search.title;
+                String text = search.data.get(0).text;
+
+                 // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(histDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(histTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                attributelist.add(new BlackboardAttribute(histText, FacebookIngestModuleFactory.getModuleName(), text));
+                
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
                 }
             }
         }
