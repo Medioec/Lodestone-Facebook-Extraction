@@ -242,6 +242,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     //processJSON(af);
                     break;
                 case "recently_visited.json":
+                    processJSONrecently_visited(af);
                     //processJSON(af);
                     break;
                 case "your_topics.json":
@@ -277,9 +278,94 @@ public class FacebookFileIngestModule implements FileIngestModule{
     
     
     /**
-    * Process account_accesses_v2.json file and add data as Data Artifact
-    * Facebook account_accesses_v2 data.
-    * Uses POJO account_accesses_v2.json
+    * Process visited_things_v2.json file and add data as Data Artifact
+    * Facebook visited_things_v2 data.
+    * Uses POJO visited_things_v2.json
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONrecently_visited(AbstractFile af){
+        String json = parseAFtoString(af);
+        RecentlyVisitedV2 recentlyVisitedV2 = new Gson().fromJson(json, RecentlyVisitedV2.class);
+        if (recentlyVisitedV2.visited_things_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type artifactName;
+            BlackboardAttribute.Type artifactDescription;
+            BlackboardAttribute.Type artifactTimeStamp;
+            BlackboardAttribute.Type artifactDataName;
+            BlackboardAttribute.Type artifactURI;
+            BlackboardAttribute.Type artifactValue;
+            
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FBRECENTLY_VISITED") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FBRECENTLY_VISITED", "Facebook Recently Visited");
+                    artifactName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                    artifactDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description");
+                    artifactTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Time Stamp");
+                    artifactDataName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_DATA_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Data Name");
+                    artifactURI = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_DATA_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
+                    artifactValue = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_VALUE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "VALUE");
+                    
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FBRECENTLY_VISITED");
+                    artifactName = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_NAME");
+                    artifactDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_DESCRIPTION");
+                    artifactTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_TIME_STAMP");
+                    artifactDataName = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_DATA_NAME");
+                    artifactURI = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_DATA_URI");
+                    artifactValue = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_VALUE");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (RecentlyVisitedV2.recentLogins recentLog:recentlyVisitedV2.visited_things_v2){
+                
+                             
+                String timeStamp = "";
+                String dataName = "";
+                String uri = "";
+                String value = "";
+                
+                String name = recentLog.name;
+                String description = recentLog.description;
+
+                 // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(artifactDescription, FacebookIngestModuleFactory.getModuleName(), description));
+                if (recentLog.entries != null){
+                    for (RecentlyVisitedV2.recentLogins.Entry entry:recentLog.entries){
+                        timeStamp = new TimestampToDate(entry.timestamp).getDate();
+                        dataName = entry.data.dataName;
+                        uri = entry.data.uri;
+                        value = entry.data.value;
+                        attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
+                        attributelist.add(new BlackboardAttribute(artifactDataName, FacebookIngestModuleFactory.getModuleName(), dataName));
+                        attributelist.add(new BlackboardAttribute(artifactURI, FacebookIngestModuleFactory.getModuleName(), uri));
+                        attributelist.add(new BlackboardAttribute(artifactValue, FacebookIngestModuleFactory.getModuleName(), value));
+                        try{
+                            blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        }
+                        catch (TskCoreException | BlackboardException e){
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    /**
+    * Process active_sessions_v2.json file and add data as Data Artifact
+    * Facebook active_sessions_v2 data.
+    * Uses POJO active_sessions_v2.json
     *
     * @param  af  JSON file
     */
