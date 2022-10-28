@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -166,7 +167,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONpages_youve_liked(af);
                     break;
                 case "your_posts_1.json":
-                    //processJSONyour_posts_1(af);
+                    processJSONyour_posts_1(af);
                     break;
                 case "your_uncategorized_photos.json":
                     //processJSON(af);
@@ -812,7 +813,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_YOURPLACES", "Facebook Your Places");
                     placeName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
                     placeAddress = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_ADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Address");
-                    placeUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                    placeUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "External Context URL");
                     placeTimestamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_TIMESTAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
                 }
                 else{
@@ -1796,7 +1797,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     commentCommentString = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_COMMENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Comment");
                     commentAuthor = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_AUTHOR", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Author");
                     commentUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
-                    commentUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                    commentUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBCOMMENT_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "External Context URL");
                 }
                 else{
                     artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_COMMENT");
@@ -2707,7 +2708,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     groupCommentAuthor = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_AUTHOR", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Author");
                     groupCommentGroup = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_GROUP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group");
                     groupCommentUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
-                    groupCommentUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                    groupCommentUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPCOMMENT_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "External Context URL");
                 }
                 else{
                     artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_GROUP_COMMENT");
@@ -2901,7 +2902,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     groupPost_description = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_AT_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Attachment Description");
                     groupPost_attachmentUploadIp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_AT_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Attachment Uploaded from IP");
                     groupPost_attachmentTakenDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_AT_DATE_TAKEN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Attachment Date Taken");
-                    groupPost_url = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                    groupPost_url = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBGROUPPOST_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "External Context URL");
                 }
                 else{
                     artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_GROUP_POST");
@@ -3643,15 +3644,15 @@ public class FacebookFileIngestModule implements FileIngestModule{
             BlackboardAttribute.Type message_Content;
             BlackboardAttribute.Type message_Type;
             BlackboardAttribute.Type message_ContentImageURI;
-            BlackboardAttribute.Type message_ContentImageDateCreated;
+            BlackboardAttribute.Type message_ContentMediaDateCreated;
             BlackboardAttribute.Type message_ContentStickerUri;
             BlackboardAttribute.Type message_ContentShare;
             BlackboardAttribute.Type message_IsUnsent;
             BlackboardAttribute.Type message_IsTakenDown;
             BlackboardAttribute.Type messageChat_ThreadPath;
             BlackboardAttribute.Type messageChat_IsStillParticipant;
-            BlackboardAttribute.Type messageChat_ImageUri;
-            BlackboardAttribute.Type messageChat_ImageDateCreated;
+            BlackboardAttribute.Type messageChat_MediaUri;
+            BlackboardAttribute.Type messageChat_MediaDateCreated;
             try{
                 // if artifact type does not exist
                 if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_MESSENGER_CHAT") == null){
@@ -3664,15 +3665,15 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     message_Content = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Content");
                     message_Type = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Type");
                     message_ContentImageURI = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Image URI");
-                    message_ContentImageDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Image Date Created");
+                    message_ContentMediaDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Image Date Created");
                     message_ContentStickerUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_STICKER_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message Sticker URI");
                     message_ContentShare = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_SHARE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Share");
                     message_IsUnsent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_UNSENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message is Unsent?");
                     message_IsTakenDown = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_MSG_TAKEN_DOWN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Message is Taken Down?");
                     messageChat_ThreadPath = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_THREAD_PATH", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Chat Thread Path");
                     messageChat_IsStillParticipant = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_STILL_PARTICIPANT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User is still Participant?");
-                    messageChat_ImageUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group Chat Image URI");
-                    messageChat_ImageDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group Chat Image Date Created");
+                    messageChat_MediaUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group Chat Image URI");
+                    messageChat_MediaDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Group Chat Image Date Created");
                 }
                 else{
                     artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_MESSENGER_CHAT");
@@ -3684,15 +3685,15 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     message_Content = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT");
                     message_Type = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_TYPE");
                     message_ContentImageURI = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_URI");
-                    message_ContentImageDateCreated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_DATE_CREATED");
+                    message_ContentMediaDateCreated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_IMAGE_DATE_CREATED");
                     message_ContentStickerUri = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_STICKER_URI");
                     message_ContentShare = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_CONTENT_SHARE");
                     message_IsUnsent = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_UNSENT");
                     message_IsTakenDown = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_MSG_TAKEN_DOWN");
                     messageChat_ThreadPath = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_THREAD_PATH");
                     messageChat_IsStillParticipant = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_STILL_PARTICIPANT");
-                    messageChat_ImageUri = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_URI");
-                    messageChat_ImageDateCreated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_DATE_CREATED");
+                    messageChat_MediaUri = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_URI");
+                    messageChat_MediaDateCreated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_MESSENGER_CHAT_IMAGE_DATE_CREATED");
                 }
             }
             catch (TskCoreException | TskDataException e){
@@ -3712,19 +3713,19 @@ public class FacebookFileIngestModule implements FileIngestModule{
             String msgDate = "";
             String msgContent = "";
             String msgType = "";
-            String msgContentImageUri = "";
-            String msgContentImageDateCreated = "";
+            String msgContentMediaUri = "";
+            String msgContentMediaDateCreated = "";
             String msgContentStickerUri = "";
             String msgContentShare = "";
             String msgIsUnsent = "";
             String msgIsTakenDown = "";
             String threadPath = messageChat.thread_path;
             String chatIsStillParticipant = messageChat.is_still_participant;
-            String chatImageUri = "";
-            String chatImageDateCreated = "";
+            String chatMediaUri = "";
+            String chatMediaDateCreated = "";
             if (messageChat.image != null) {
-                chatImageUri = messageChat.image.uri;
-                chatImageDateCreated = new TimestampToDate(messageChat.image.creation_timestamp).getDate();
+                chatMediaUri = messageChat.image.uri;
+                chatMediaDateCreated = new TimestampToDate(messageChat.image.creation_timestamp).getDate();
             }
             for (Message1.Message message:messageChat.messages){
                 msgSender = message.sender_name;
@@ -3733,8 +3734,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 
                 
                 msgType = message.type;
-                msgContentImageUri = "";
-                msgContentImageDateCreated = "";
+                msgContentMediaUri = "";
+                msgContentMediaDateCreated = "";
                 msgContentStickerUri = "";
                 msgContentShare = message.share;
                 msgIsUnsent = message.is_unsent;
@@ -3746,8 +3747,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 
                 if (message.photos != null) {
                     for (Message1.Message.Image contentImage:message.photos) {
-                        msgContentImageUri = contentImage.uri;
-                        msgContentImageDateCreated = new TimestampToDate(contentImage.creation_timestamp).getDate();
+                        msgContentMediaUri = contentImage.uri;
+                        msgContentMediaDateCreated = new TimestampToDate(contentImage.creation_timestamp).getDate();
                         
                         // add variables to attributes
                         Collection<BlackboardAttribute> attributelist = new ArrayList();
@@ -3758,16 +3759,16 @@ public class FacebookFileIngestModule implements FileIngestModule{
                         attributelist.add(new BlackboardAttribute(message_Date, FacebookIngestModuleFactory.getModuleName(), msgDate));
                         attributelist.add(new BlackboardAttribute(message_Content, FacebookIngestModuleFactory.getModuleName(), msgContent));
                         attributelist.add(new BlackboardAttribute(message_Type, FacebookIngestModuleFactory.getModuleName(), msgType));
-                        attributelist.add(new BlackboardAttribute(message_ContentImageURI, FacebookIngestModuleFactory.getModuleName(), msgContentImageUri));
-                        attributelist.add(new BlackboardAttribute(message_ContentImageDateCreated, FacebookIngestModuleFactory.getModuleName(), msgContentImageDateCreated));
+                        attributelist.add(new BlackboardAttribute(message_ContentImageURI, FacebookIngestModuleFactory.getModuleName(), msgContentMediaUri));
+                        attributelist.add(new BlackboardAttribute(message_ContentMediaDateCreated, FacebookIngestModuleFactory.getModuleName(), msgContentMediaDateCreated));
                         attributelist.add(new BlackboardAttribute(message_ContentStickerUri, FacebookIngestModuleFactory.getModuleName(), msgContentStickerUri));
                         attributelist.add(new BlackboardAttribute(message_ContentShare, FacebookIngestModuleFactory.getModuleName(), msgContentShare));
                         attributelist.add(new BlackboardAttribute(message_IsUnsent, FacebookIngestModuleFactory.getModuleName(), msgIsUnsent));
                         attributelist.add(new BlackboardAttribute(message_IsTakenDown, FacebookIngestModuleFactory.getModuleName(), msgIsTakenDown));
                         attributelist.add(new BlackboardAttribute(messageChat_ThreadPath, FacebookIngestModuleFactory.getModuleName(), threadPath));
                         attributelist.add(new BlackboardAttribute(messageChat_IsStillParticipant, FacebookIngestModuleFactory.getModuleName(), chatIsStillParticipant));
-                        attributelist.add(new BlackboardAttribute(messageChat_ImageUri, FacebookIngestModuleFactory.getModuleName(), chatImageUri));
-                        attributelist.add(new BlackboardAttribute(messageChat_ImageDateCreated, FacebookIngestModuleFactory.getModuleName(), chatImageDateCreated));
+                        attributelist.add(new BlackboardAttribute(messageChat_MediaUri, FacebookIngestModuleFactory.getModuleName(), chatMediaUri));
+                        attributelist.add(new BlackboardAttribute(messageChat_MediaDateCreated, FacebookIngestModuleFactory.getModuleName(), chatMediaDateCreated));
 
                         try{
                             blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
@@ -3788,16 +3789,16 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     attributelist.add(new BlackboardAttribute(message_Date, FacebookIngestModuleFactory.getModuleName(), msgDate));
                     attributelist.add(new BlackboardAttribute(message_Content, FacebookIngestModuleFactory.getModuleName(), msgContent));
                     attributelist.add(new BlackboardAttribute(message_Type, FacebookIngestModuleFactory.getModuleName(), msgType));
-                    attributelist.add(new BlackboardAttribute(message_ContentImageURI, FacebookIngestModuleFactory.getModuleName(), msgContentImageUri));
-                    attributelist.add(new BlackboardAttribute(message_ContentImageDateCreated, FacebookIngestModuleFactory.getModuleName(), msgContentImageDateCreated));
+                    attributelist.add(new BlackboardAttribute(message_ContentImageURI, FacebookIngestModuleFactory.getModuleName(), msgContentMediaUri));
+                    attributelist.add(new BlackboardAttribute(message_ContentMediaDateCreated, FacebookIngestModuleFactory.getModuleName(), msgContentMediaDateCreated));
                     attributelist.add(new BlackboardAttribute(message_ContentStickerUri, FacebookIngestModuleFactory.getModuleName(), msgContentStickerUri));
                     attributelist.add(new BlackboardAttribute(message_ContentShare, FacebookIngestModuleFactory.getModuleName(), msgContentShare));
                     attributelist.add(new BlackboardAttribute(message_IsUnsent, FacebookIngestModuleFactory.getModuleName(), msgIsUnsent));
                     attributelist.add(new BlackboardAttribute(message_IsTakenDown, FacebookIngestModuleFactory.getModuleName(), msgIsTakenDown));
                     attributelist.add(new BlackboardAttribute(messageChat_ThreadPath, FacebookIngestModuleFactory.getModuleName(), threadPath));
                     attributelist.add(new BlackboardAttribute(messageChat_IsStillParticipant, FacebookIngestModuleFactory.getModuleName(), chatIsStillParticipant));
-                    attributelist.add(new BlackboardAttribute(messageChat_ImageUri, FacebookIngestModuleFactory.getModuleName(), chatImageUri));
-                    attributelist.add(new BlackboardAttribute(messageChat_ImageDateCreated, FacebookIngestModuleFactory.getModuleName(), chatImageDateCreated));
+                    attributelist.add(new BlackboardAttribute(messageChat_MediaUri, FacebookIngestModuleFactory.getModuleName(), chatMediaUri));
+                    attributelist.add(new BlackboardAttribute(messageChat_MediaDateCreated, FacebookIngestModuleFactory.getModuleName(), chatMediaDateCreated));
 
                     try{
                         blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
@@ -4064,56 +4065,225 @@ public class FacebookFileIngestModule implements FileIngestModule{
     *
     * @param  af  JSON file
     */
-//    private void processJSONyour_posts_1(AbstractFile af){
-//        String json = parseAFtoString(af);
-//        List<PageLikesV2> pagesLiked = new Gson().fromJson(json, List.class);
-//        if(pagesLiked != null){
-//            
-//            // prepare variables for artifact
-//            BlackboardArtifact.Type artifactType;
-//            BlackboardAttribute.Type pageFollowedDate;
-//            BlackboardAttribute.Type pageFollowedName;
-//            try{
-//                // if artifact type does not exist
-//                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAGE_LIKED") == null){
-//                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PAGE_LIKED", "Facebook Pages User Liked");
-//                    pageFollowedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_LIKED_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
-//                    pageFollowedName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PAGE_LIKED_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Page Name");
-//                }
-//                else{
-//                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PAGE_LIKED");
-//                    pageFollowedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_LIKED_DATE");
-//                    pageFollowedName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PAGE_LIKED_NAME");
-//                }
-//            }
-//            catch (TskCoreException | TskDataException e){
-//                e.printStackTrace();
-//                return;
-//            }
-//            
-//            for (PageLikesV2.PageLikes_V2 page:pagesLiked.page_likes_v2){
-//                String date = new TimestampToDate(page.timestamp).getDate();
-//                String name = page.name;
-//                
-//                // add variables to attributes
-//                Collection<BlackboardAttribute> attributelist = new ArrayList();
-//                attributelist.add(new BlackboardAttribute(pageFollowedDate, FacebookIngestModuleFactory.getModuleName(), date));
-//                attributelist.add(new BlackboardAttribute(pageFollowedName, FacebookIngestModuleFactory.getModuleName(), name));
-//
-//                try{
-//                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
-//                }
-//                catch (TskCoreException | BlackboardException e){
-//                    e.printStackTrace();
-//                    return;
-//                }
-//            }
-//        }
-//        else{
-//            logger.log(Level.INFO, "No pages_followed_v2 found");
-//            return;
-//        }
-//    }
+    private void processJSONyour_posts_1(AbstractFile af){
+        try{
+        String json = parseAFtoString(af);
+        YourPosts1[] yourPostsArray = new Gson().fromJson(json, YourPosts1[].class);
+        List<YourPosts1> yourPosts = Arrays.asList(yourPostsArray);
+        if(yourPosts != null){
+            
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type yourPost_Date;
+            BlackboardAttribute.Type yourPost_Text;
+            BlackboardAttribute.Type yourPost_DateUpdated;
+            BlackboardAttribute.Type yourPost_Tags;
+            BlackboardAttribute.Type yourPost_MediaTitle;
+            BlackboardAttribute.Type yourPost_MediaDescription;
+            BlackboardAttribute.Type yourPost_MediaUri;
+            BlackboardAttribute.Type yourPost_MediaDateCreated;
+            BlackboardAttribute.Type yourPost_MediaUploadedIp;
+            BlackboardAttribute.Type yourPost_MediaDateTaken;
+            BlackboardAttribute.Type yourPost_MediaDateModified;
+            BlackboardAttribute.Type yourPost_MediaIso;
+            BlackboardAttribute.Type yourPost_MediaFocalLength;
+            BlackboardAttribute.Type yourPost_MediaCameraMake;
+            BlackboardAttribute.Type yourPost_MediaCameraModel;
+            BlackboardAttribute.Type yourPost_MediaCameraExposure;
+            BlackboardAttribute.Type yourPost_MediaFstop;
+            BlackboardAttribute.Type yourPost_MediaOrientation;
+            BlackboardAttribute.Type yourPost_EC_Url;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_USER_POSTS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_USER_POSTS", "Facebook User Posts");
+                    yourPost_Date = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    yourPost_Text = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_TEXT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Text");
+                    yourPost_DateUpdated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_DATE_UPDATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Post Date Updated");
+                    yourPost_Tags = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_TAGS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Tagged Accounts");
+                    yourPost_MediaTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Media Title");
+                    yourPost_MediaDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Media Description");
+                    yourPost_MediaUri = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
+                    yourPost_MediaDateCreated = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_DATE_CREATED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Media Date Created");
+                    yourPost_MediaUploadedIp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_UPLOADED_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Media Uploaded IP");
+                    yourPost_MediaDateTaken = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_DATE_TAKEN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Media Date Taken");
+                    yourPost_MediaDateModified = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_DATE_MODIFIED", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Media Date Modified");
+                    yourPost_MediaIso = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_ISO", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "ISO");
+                    yourPost_MediaFocalLength = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_FOCAL_LENGTH", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Focal Length");
+                    yourPost_MediaCameraMake = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_CAMERA_MAKE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Camera Make");
+                    yourPost_MediaCameraModel = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_CAMERA_MODEL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Camera Model");
+                    yourPost_MediaCameraExposure = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_CAMERA_EXPOSURE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Camera Exposure");
+                    yourPost_MediaFstop = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_F_STOP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "F-stop");
+                    yourPost_MediaOrientation = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_ORIENTATION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Media Orientation");
+                    yourPost_EC_Url = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_USER_POSTS_EC_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "External Context URL");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_USER_POSTS");
+                    yourPost_Date = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_DATE");
+                    yourPost_Text = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_TEXT");
+                    yourPost_DateUpdated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_DATE_UPDATED");
+                    yourPost_Tags = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_TAGS");
+                    yourPost_MediaTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_TITLE");
+                    yourPost_MediaDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_DESCRIPTION");
+                    yourPost_MediaUri = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_URI");
+                    yourPost_MediaDateCreated = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_DATE_CREATED");
+                    yourPost_MediaUploadedIp = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_UPLOADED_IP");
+                    yourPost_MediaDateTaken = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_DATE_TAKEN");
+                    yourPost_MediaDateModified = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_DATE_MODIFIED");
+                    yourPost_MediaIso = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_ISO");
+                    yourPost_MediaFocalLength = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_FOCAL_LENGTH");
+                    yourPost_MediaCameraMake = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_CAMERA_MAKE");
+                    yourPost_MediaCameraModel = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_CAMERA_MODEL");
+                    yourPost_MediaCameraExposure = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_CAMERA_EXPOSURE");
+                    yourPost_MediaFstop = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_F_STOP");
+                    yourPost_MediaOrientation = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_MEDIA_ORIENTATION");
+                    yourPost_EC_Url = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_USER_POSTS_EC_URL");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            for (YourPosts1 post:yourPosts){
+                String date = new TimestampToDate(post.timestamp).getDate();
+                
+                String postText = "";
+                String postDateUpdated = "";
+                String postTags = "";
+                if (post.data != null) {
+                    for (YourPosts1.Data data:post.data) {
+                        if (data.post != null) {
+                            postText = data.post;
+                        }
+                        else if (data.update_timestamp != 0) {
+                            postDateUpdated = new TimestampToDate(data.update_timestamp).getDate();
+                        }
+                    }
+                }
+                if (post.tags != null) {
+                    for (YourPosts1.Tag tag:post.tags) {
+                        if (tag.name != null) {
+                            postTags += tag.name;
+                            postTags += ";\n";
+                        }
+                    }
+                }
+                // External Context
+                String url = "";
+                // Media
+                String title = "";
+                String description = "";
+                String uri = "";
+                String mediaDateCreated = "";
+                String mediaUploadedIp = "";
+                String mediaDateTaken = "";
+                String mediaDateModified = "";
+                String mediaIso = "";
+                String mediaFocalLength = "";
+                String mediaCameraMake = "";
+                String mediaCameraModel = "";
+                String mediaCameraExposure = "";
+                String mediaFstop = "";
+                String mediaOrientation = "";
+                
+                if (post.attachments != null) {
+                    for (YourPosts1.Attachment attachment:post.attachments) {
+                        for (YourPosts1.Attachment.Data attachmentData:attachment.data) {
+                            if(attachmentData.external_context != null) {
+                                url = attachmentData.external_context.url;
+                            }
+                            if(attachmentData.media != null) {
+                                title = attachmentData.media.title;
+                                description = attachmentData.media.description;
+                                uri = attachmentData.media.uri;
+                                mediaDateCreated = new TimestampToDate(attachmentData.media.creation_timestamp).getDate();
+                                mediaUploadedIp = attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).upload_ip;
+                                mediaDateTaken = new TimestampToDate(attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).taken_timestamp).getDate();
+                                mediaDateModified = new TimestampToDate(attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).modified_timestamp).getDate();
+                                mediaIso = attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).iso;
+                                mediaFocalLength = attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).focal_length;
+                                mediaCameraMake = attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).camera_make;
+                                mediaCameraModel = attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).camera_model;
+                                mediaCameraExposure = attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).exposure;
+                                mediaFstop = attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).f_stop;
+                                mediaOrientation = attachmentData.media.media_metadata.photo_metadata.exif_data.get(0).orientation;
+                            }
+                            // add variables to attributes
+                            Collection<BlackboardAttribute> attributelist = new ArrayList();
+                            attributelist.add(new BlackboardAttribute(yourPost_Date, FacebookIngestModuleFactory.getModuleName(), date));
+                            attributelist.add(new BlackboardAttribute(yourPost_Text, FacebookIngestModuleFactory.getModuleName(), postText));
+                            attributelist.add(new BlackboardAttribute(yourPost_DateUpdated, FacebookIngestModuleFactory.getModuleName(), postDateUpdated));
+                            attributelist.add(new BlackboardAttribute(yourPost_Tags, FacebookIngestModuleFactory.getModuleName(), postTags));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaDescription, FacebookIngestModuleFactory.getModuleName(), description));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaUri, FacebookIngestModuleFactory.getModuleName(), uri));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaDateCreated, FacebookIngestModuleFactory.getModuleName(), mediaDateCreated));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaUploadedIp, FacebookIngestModuleFactory.getModuleName(), mediaUploadedIp));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaDateTaken, FacebookIngestModuleFactory.getModuleName(), mediaDateTaken));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaDateModified, FacebookIngestModuleFactory.getModuleName(), mediaDateModified));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaIso, FacebookIngestModuleFactory.getModuleName(), mediaIso));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaFocalLength, FacebookIngestModuleFactory.getModuleName(), mediaFocalLength));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaCameraMake, FacebookIngestModuleFactory.getModuleName(), mediaCameraMake));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaCameraModel, FacebookIngestModuleFactory.getModuleName(), mediaCameraModel));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaCameraExposure, FacebookIngestModuleFactory.getModuleName(), mediaCameraExposure));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaFstop, FacebookIngestModuleFactory.getModuleName(), mediaFstop));
+                            attributelist.add(new BlackboardAttribute(yourPost_MediaOrientation, FacebookIngestModuleFactory.getModuleName(), mediaOrientation));
+                            attributelist.add(new BlackboardAttribute(yourPost_EC_Url, FacebookIngestModuleFactory.getModuleName(), url));
+
+                            try{
+                                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                            }
+                            catch (TskCoreException | BlackboardException e){
+                                e.printStackTrace();
+                                return;
+                            }
+                        }
+                    }
+                }
+                else {
+                    // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(yourPost_Date, FacebookIngestModuleFactory.getModuleName(), date));
+                    attributelist.add(new BlackboardAttribute(yourPost_Text, FacebookIngestModuleFactory.getModuleName(), postText));
+                    attributelist.add(new BlackboardAttribute(yourPost_DateUpdated, FacebookIngestModuleFactory.getModuleName(), postDateUpdated));
+                    attributelist.add(new BlackboardAttribute(yourPost_Tags, FacebookIngestModuleFactory.getModuleName(), postTags));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaDescription, FacebookIngestModuleFactory.getModuleName(), description));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaUri, FacebookIngestModuleFactory.getModuleName(), uri));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaDateCreated, FacebookIngestModuleFactory.getModuleName(), mediaDateCreated));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaUploadedIp, FacebookIngestModuleFactory.getModuleName(), mediaUploadedIp));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaDateTaken, FacebookIngestModuleFactory.getModuleName(), mediaDateTaken));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaDateModified, FacebookIngestModuleFactory.getModuleName(), mediaDateModified));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaIso, FacebookIngestModuleFactory.getModuleName(), mediaIso));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaFocalLength, FacebookIngestModuleFactory.getModuleName(), mediaFocalLength));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaCameraMake, FacebookIngestModuleFactory.getModuleName(), mediaCameraMake));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaCameraModel, FacebookIngestModuleFactory.getModuleName(), mediaCameraModel));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaCameraExposure, FacebookIngestModuleFactory.getModuleName(), mediaCameraExposure));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaFstop, FacebookIngestModuleFactory.getModuleName(), mediaFstop));
+                    attributelist.add(new BlackboardAttribute(yourPost_MediaOrientation, FacebookIngestModuleFactory.getModuleName(), mediaOrientation));
+                    attributelist.add(new BlackboardAttribute(yourPost_EC_Url, FacebookIngestModuleFactory.getModuleName(), url));
+
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+        else{
+            logger.log(Level.INFO, "No pages_followed_v2 found");
+            return;
+        }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
+    }
     
     /**
     * Read file and parse JSON as JsonObject
