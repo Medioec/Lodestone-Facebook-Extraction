@@ -21,13 +21,12 @@ public class YourPosts1 {
         public class Data {
             public Media media;
             public ExternalContext external_context;
-            public int backdated_timestamp;
-            public LifeEvent life_event;
+            //public LifeEvent life_event;
             public class Media {
                 public String uri;
                 public long creation_timestamp;
                 public MediaMetadata media_metadata;
-                public Thumbnail thumbnail;
+                public String title;
                 public String description;
                 public class MediaMetadata {
                     public PhotoMetadata photo_metadata;
@@ -47,19 +46,16 @@ public class YourPosts1 {
                         }
                     }
                 }
-                public class Thumbnail {
-                    public String uri;
-                }
             }
-            public class LifeEvent {
-                public String title;
-                public StartDate start_date;
-                public class StartDate {
-                    public String year;
-                    public String month;
-                    public String day;
-                }
-            }
+//            public class LifeEvent {
+//                public String title;
+//                public StartDate start_date;
+//                public class StartDate {
+//                    public String year;
+//                    public String month;
+//                    public String day;
+//                }
+//            }
             public class ExternalContext {
                 public String url;
             }
@@ -68,6 +64,7 @@ public class YourPosts1 {
     public class Data {
         public String post;
         public long update_timestamp;
+//      public int backdated_timestamp;
     }
     public class Tag {
         public String name;
