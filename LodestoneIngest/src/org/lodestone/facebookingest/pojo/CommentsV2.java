@@ -31,19 +31,36 @@ public class CommentsV2 {
                 public ExternalContext external_context;
                 public class Media{
                     public String uri;
-//                    public long creation_timestamp;
-//                    public long updated_timestamp;
-//                    public MediaMetaData media_metadata;
-//                    public class MediaMetaData {
-//                        public PhotoMetaData photo_metadata;
-//                        public class PhotoMetaData {
-//                            public List<ExifData> exif_data;
-//                            public class ExifData{
-//                                public String upload_ip;
-//                                public String taken_timestamp;
-//                            }
-//                        }
-//                    }
+                    public long creation_timestamp;
+                    public long updated_timestamp;
+                    public MediaMetaData media_metadata;
+                    public String description;
+                    public class MediaMetaData {
+                        public PhotoMetaData photo_metadata;
+                        public VideoMetaData video_metadata;
+                        public class PhotoMetaData {
+                            public List<ExifData> exif_data;
+                            public class ExifData{
+                                public String upload_ip;
+                                public long taken_timestamp;
+                                public long modified_timestamp;
+                                public String iso;
+                                public String focal_length;
+                                public String camera_make;
+                                public String camera_model;
+                                public String exposure;
+                                public String f_stop;
+                                public String orientation;
+                            }
+                        }
+                        public class VideoMetaData {
+                            public List<ExifData> exif_data;
+                            public class ExifData{
+                                public String upload_ip;
+                                public long upload_timestamp;
+                            }
+                        }
+                    }
                 }
                 public class ExternalContext{
                     public String url;
