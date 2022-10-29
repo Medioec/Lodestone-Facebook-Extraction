@@ -590,7 +590,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     
                 }
                 else{
-                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FBLOGINS_AND_LOGOUTS");
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FBACTIVESESSIONS");
                     artifactCreatedTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_TIME_STAMP");
                     artifactip_address = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_IP");
                     artifactuser_agent = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_AGENT");
@@ -947,7 +947,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     placeTimestamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_YOURPLACES_TIMESTAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
                 }
                 else{
-                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_FRIENDS");
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_YOURPLACES");
                     placeName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_YOURPLACES_NAME");
                     placeAddress = currentCase.getSleuthkitCase().getAttributeType("LS_FB_YOURPLACES_ADDRESS");
                     placeUrl = currentCase.getSleuthkitCase().getAttributeType("LS_FB_YOURPLACES_URL");
