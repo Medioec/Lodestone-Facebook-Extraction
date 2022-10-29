@@ -30,6 +30,7 @@ public class YourPosts1 {
                 public String description;
                 public class MediaMetadata {
                     public PhotoMetadata photo_metadata;
+                    public VideoMetaData video_metadata;
                     public class PhotoMetadata {
                         public List<Exifdata> exif_data;
                         public class Exifdata {
@@ -43,6 +44,13 @@ public class YourPosts1 {
                             public String exposure;
                             public String f_stop;
                             public String orientation;
+                        }
+                    }
+                    public class VideoMetaData {
+                        public List<ExifData> exif_data;
+                        public class ExifData{
+                            public String upload_ip;
+                            public long upload_timestamp;
                         }
                     }
                 }
