@@ -16,12 +16,14 @@ public class GroupPostsV2 {
         public long timestamp;
         public List<Attachments> attachments;
         public List<Data> data;
+        public List<Tag> tags;
         public String title;
         public class Attachments {
             public List<AttachmentData> data;
             public class AttachmentData {
                 public Media media;
                 public ForSaleItem for_sale_item;
+                public Place place;
                 public ExternalContext external_context;
                 public class ForSaleItem {
                     public String title;
@@ -74,6 +76,16 @@ public class GroupPostsV2 {
                         }
                     }
                 }
+                public class Place {
+                    public String name;
+                    public String address;
+                    public String url;
+                    public Coordinate coordinate;
+                    public class Coordinate {
+                        public String latitude;
+                        public String longitude;
+                    }
+                }
                 public class ExternalContext{
                     public String url;
                 }
@@ -81,6 +93,10 @@ public class GroupPostsV2 {
         }
         public class Data {
             public String post;
+            public long update_timestamp;
+        }
+        public class Tag {
+            public String name;
         }
     }
 }

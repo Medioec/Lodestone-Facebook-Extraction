@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class YourPosts1 {
     public long timestamp;
+    public String title;
     public List<Attachment> attachments;
     public List<Data> data;
     public List<Tag> tags;
@@ -20,6 +21,7 @@ public class YourPosts1 {
         public List<Data> data;
         public class Data {
             public Media media;
+            public Place place;
             public ExternalContext external_context;
             //public LifeEvent life_event;
             public class Media {
@@ -55,15 +57,16 @@ public class YourPosts1 {
                     }
                 }
             }
-//            public class LifeEvent {
-//                public String title;
-//                public StartDate start_date;
-//                public class StartDate {
-//                    public String year;
-//                    public String month;
-//                    public String day;
-//                }
-//            }
+            public class Place {
+                public String name;
+                public String address;
+                public String url;
+                public Coordinate coordinate;
+                public class Coordinate {
+                    public String latitude;
+                    public String longitude;
+                }
+            }
             public class ExternalContext {
                 public String url;
             }
@@ -72,7 +75,6 @@ public class YourPosts1 {
     public class Data {
         public String post;
         public long update_timestamp;
-//      public int backdated_timestamp;
     }
     public class Tag {
         public String name;
