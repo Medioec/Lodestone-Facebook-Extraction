@@ -1281,7 +1281,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             try{
                 // if artifact type does not exist
                 if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_ACCOUNT_ACTIVITY") == null){
-                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_ACCOUNT_ACTIVITY", "Account Activity");
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_ACCOUNT_ACTIVITY", "Facebook Account Activity");
                     artifactAction = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_ACTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Action");
                     artifactTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Time Stamp");
                     artifactIP_Address = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACCOUNTACTIVITY_IP_ADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
@@ -2002,7 +2002,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             try{
                 // if artifact type does not exist
                 if (currentCase.getSleuthkitCase().getArtifactType("LS_OFF_FB_ACTIVITY") == null){
-                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_OFF_FB_ACTIVITY", "Organisation Activities User visited off-Facebook");
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_OFF_FB_ACTIVITY", "Facebook Organisation Activities User visited off-Facebook");
                     organisationName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_OFF_FB_ORG_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Organisation Name");
                     organisationId = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_OFF_FB_ORG_ID", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Activity ID");
                     activityType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_OFF_FB_ACTIVITY_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Activity Type");
