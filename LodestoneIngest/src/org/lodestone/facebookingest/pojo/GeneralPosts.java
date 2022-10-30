@@ -10,21 +10,25 @@ import java.util.List;
  *
  * @author Alford
  */
-public class GroupPostsV2 {
-    public List<GroupPosts_V2> group_posts_v2;
-    public class GroupPosts_V2{
+public class GeneralPosts {
+    public List<General_Posts> group_posts_v2;
+    public List<General_Posts> profile_updates_v2;
+    public List<General_Posts> collections_v2;
+    public List<General_Posts> saves_v2;
+    public class General_Posts {
         public long timestamp;
-        public List<Attachments> attachments;
+        public String title;
+        public List<Attachment> attachments;
         public List<Data> data;
         public List<Tag> tags;
-        public String title;
-        public class Attachments {
-            public List<AttachmentData> data;
-            public class AttachmentData {
+        public class Attachment {
+            public List<Data> data;
+            public class Data {
                 public Media media;
                 public ForSaleItem for_sale_item;
                 public Place place;
                 public ExternalContext external_context;
+                public LifeEvent life_event;
                 public class ForSaleItem {
                     public String title;
                     public String price;
@@ -44,17 +48,18 @@ public class GroupPostsV2 {
                         }
                     }
                 }
-                public class Media{
+                public class Media {
                     public String uri;
                     public long creation_timestamp;
-                    public MediaMetaData media_metadata;
+                    public MediaMetadata media_metadata;
+                    public String title;
                     public String description;
-                    public class MediaMetaData {
-                        public PhotoMetaData photo_metadata;
+                    public class MediaMetadata {
+                        public PhotoMetadata photo_metadata;
                         public VideoMetaData video_metadata;
-                        public class PhotoMetaData {
-                            public List<ExifData> exif_data;
-                            public class ExifData{
+                        public class PhotoMetadata {
+                            public List<Exifdata> exif_data;
+                            public class Exifdata {
                                 public String upload_ip;
                                 public long taken_timestamp;
                                 public long modified_timestamp;
@@ -86,7 +91,16 @@ public class GroupPostsV2 {
                         public String longitude;
                     }
                 }
-                public class ExternalContext{
+                public class LifeEvent {
+                    public String title;
+                    public StartDate start_date;
+                    public class StartDate {
+                        public String year;
+                        public String month;
+                        public String day;
+                    }
+                }
+                public class ExternalContext {
                     public String url;
                 }
             }
