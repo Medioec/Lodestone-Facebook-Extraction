@@ -258,6 +258,11 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 case "places_you've_created.json":
                     processJSONplaces_youve_created(af);
                     break;
+                case "posts_from_apps_and_websites.json":
+                    processJSONposts_from_apps_and_websites(af);
+                    break;
+                case "your_address_books.json":
+                    processJSONyour_address_books(af);
             }
         }
         
@@ -283,7 +288,165 @@ public class FacebookFileIngestModule implements FileIngestModule{
         FileIngestModule.super.shutDown(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
     
-      /**
+    /**
+    * Process your_address_books.json file and add data as Data Artifact
+    * Facebook your_address_books data.
+    * Uses POJO YourAddressBooksV2
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONyour_address_books(AbstractFile af){
+        String json = parseAFtoString(af);
+        YourAddressBooksV2 addressBooks = new Gson().fromJson(json, YourAddressBooksV2.class);
+        if (addressBooks.address_book_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type bbName;
+            BlackboardAttribute.Type bbCreateDate;
+            BlackboardAttribute.Type bbUpdateDate;
+            BlackboardAttribute.Type bbContactPoint;
+            
+            try{
+                
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_ADDRESSBOOK") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_ADDRESSBOOK", "Facebook Address Book");
+                    bbName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_ADDRESSBOOK_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                    bbCreateDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_ADDRESSBOOK_CREATEDDATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Created Date");
+                    bbUpdateDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_ADDRESSBOOK_UPDATEDDATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Updated Date");
+                    bbContactPoint = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_ADDRESSBOOK_CONTACTPOINT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Contact Point");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_ADDRESSBOOK");
+                    bbName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_ADDRESSBOOK_NAME");
+                    bbCreateDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_ADDRESSBOOK_CREATEDDATE");
+                    bbUpdateDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_ADDRESSBOOK_UPDATEDDATE");
+                    bbContactPoint = currentCase.getSleuthkitCase().getAttributeType("LS_FB_ADDRESSBOOK_CONTACTPOINT");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (YourAddressBooksV2.Address_Book_V2.Address_Book contact:addressBooks.address_book_v2.address_book){
+                String name = "";
+                String createDate = "";
+                String updateDate = "";
+                String contactPoint = "";
+                Collection<BlackboardAttribute> attributelist = new ArrayList<>();
+                
+                name = contact.name;
+                createDate = new TimestampToDate(contact.created_timestamp).getDate();
+                updateDate = new TimestampToDate(contact.updated_timestamp).getDate();
+                
+                if(contact.details != null){
+                    for(YourAddressBooksV2.Address_Book_V2.Address_Book.Details detail:contact.details){
+                        contactPoint = detail.contact_point;
+                        attributelist.add(new BlackboardAttribute(bbName, FacebookIngestModuleFactory.getModuleName(), name));
+                        attributelist.add(new BlackboardAttribute(bbCreateDate, FacebookIngestModuleFactory.getModuleName(), createDate));
+                        attributelist.add(new BlackboardAttribute(bbUpdateDate, FacebookIngestModuleFactory.getModuleName(), updateDate));
+                        attributelist.add(new BlackboardAttribute(bbContactPoint, FacebookIngestModuleFactory.getModuleName(), contactPoint));
+                        try{
+                            blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        }
+                        catch (TskCoreException | BlackboardException e){
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                }
+                else{
+                    attributelist.add(new BlackboardAttribute(bbName, FacebookIngestModuleFactory.getModuleName(), name));
+                    attributelist.add(new BlackboardAttribute(bbCreateDate, FacebookIngestModuleFactory.getModuleName(), createDate));
+                    attributelist.add(new BlackboardAttribute(bbUpdateDate, FacebookIngestModuleFactory.getModuleName(), updateDate));
+                    attributelist.add(new BlackboardAttribute(bbContactPoint, FacebookIngestModuleFactory.getModuleName(), contactPoint));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+    * Process posts_from_apps_and_websites.json file and add data as Data Artifact
+    * Facebook posts_from_apps_and_websites data.
+    * Uses POJO AppAndWebPostsV2
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONposts_from_apps_and_websites(AbstractFile af){
+        String json = parseAFtoString(af);
+        AppAndWebPostsV2 appPosts = new Gson().fromJson(json, AppAndWebPostsV2.class);
+        if (appPosts.app_posts_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type bbDate;
+            BlackboardAttribute.Type bbTitle;
+            BlackboardAttribute.Type bbName;
+            BlackboardAttribute.Type bbUrl;
+            
+            try{
+                
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_APPPOSTS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_APPPOSTS", "Facebook Posts From Apps and Websites");
+                    bbDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_APPPOSTS_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    bbTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_APPPOSTS_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Title");
+                    bbName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_APPPOSTS_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                    bbUrl = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_APPPOSTS_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URL");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_APPPOSTS");
+                    bbDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_APPPOSTS_DATE");
+                    bbTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FB_APPPOSTS_TITLE");
+                    bbName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_APPPOSTS_NAME");
+                    bbUrl = currentCase.getSleuthkitCase().getAttributeType("LS_FB_APPPOSTS_URL");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (AppAndWebPostsV2.App_Posts_V2 post:appPosts.app_posts_v2){
+                String date = "";
+                String title = "";
+                String name = "";
+                String url = "";
+                
+                date = new TimestampToDate(post.timestamp).getDate();
+                title = post.title;
+                
+                if(post.attachments != null){
+                    AppAndWebPostsV2.App_Posts_V2.Attachments.Data data = post.attachments.get(0).data.get(0);
+                    if(data.external_context != null){
+                        name = data.external_context.name;
+                        url = data.external_context.url;
+                    }
+                }
+                 // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList<>();
+                attributelist.add(new BlackboardAttribute(bbDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(bbTitle, FacebookIngestModuleFactory.getModuleName(), title));
+                attributelist.add(new BlackboardAttribute(bbName, FacebookIngestModuleFactory.getModuleName(), name));
+                attributelist.add(new BlackboardAttribute(bbUrl, FacebookIngestModuleFactory.getModuleName(), url));
+                
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+    }
+    
+    /**
     * Process recently_viewed.json file and add data as Data Artifact
     * Facebook recently_viewed data.
     * Uses POJO recently_viewed.json
