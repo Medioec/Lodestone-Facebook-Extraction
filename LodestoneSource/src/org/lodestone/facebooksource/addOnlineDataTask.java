@@ -154,8 +154,10 @@ public class addOnlineDataTask implements Runnable {
         DataRequest(driver,formatType,DataExport);
         //download files, if true wait if there is a pending request, if no pending request = download latest available file.
         try{     
-                Thread.sleep(600);
-                driver.get("https://www.facebook.com/dyi/?tab=all_archives");}
+                Thread.sleep(800);
+                driver.get("https://www.facebook.com/dyi/?tab=all_archives");
+                Thread.sleep(800);}
+                
         catch(InterruptedException e){
                System.out.println(e);
             }
