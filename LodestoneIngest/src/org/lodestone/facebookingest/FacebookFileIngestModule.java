@@ -4521,6 +4521,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     * @param  af  JSON file
     */
     private void processJSONprofile_information(AbstractFile af){
+        try{
         String json = parseAFtoString(af);
         ProfileV2 profileInformation = new Gson().fromJson(json, ProfileV2.class);
         if(profileInformation.profile_v2 != null){
@@ -4528,11 +4529,14 @@ public class FacebookFileIngestModule implements FileIngestModule{
             // prepare variables for artifact
             BlackboardArtifact.Type artifactTypeMain;
             BlackboardArtifact.Type artifactTypeEmail;
+            BlackboardArtifact.Type artifactTypePreviousRelationship;
             BlackboardArtifact.Type artifactTypeOtherName;
             BlackboardArtifact.Type artifactTypeFamily;
             BlackboardArtifact.Type artifactTypeEducation;
             BlackboardArtifact.Type artifactTypeWork;
             BlackboardArtifact.Type artifactTypeLanguage;
+            BlackboardArtifact.Type artifactTypeWebsite;
+            BlackboardArtifact.Type artifactTypeScreenName;
             BlackboardArtifact.Type artifactTypePhone;
             
             BlackboardAttribute.Type profileInfo_FullName;
@@ -4543,6 +4547,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
             BlackboardAttribute.Type profileInfo_EmailOwner;
             BlackboardAttribute.Type profileInfo_EmailType;
             BlackboardAttribute.Type profileInfo_Email;
+            
+            BlackboardAttribute.Type profileInfo_Birthday;
             
             BlackboardAttribute.Type profileInfo_Gender;
             BlackboardAttribute.Type profileInfo_Pronouns;
@@ -4559,7 +4565,12 @@ public class FacebookFileIngestModule implements FileIngestModule{
             BlackboardAttribute.Type profileInfo_HometownDate;
             
             BlackboardAttribute.Type profileInfo_Relationship;
+            BlackboardAttribute.Type profileInfo_RelationshipPartner;
             BlackboardAttribute.Type profileInfo_RelationshipDate;
+            
+            BlackboardAttribute.Type profileInfo_PreviousRelationshipOwner;
+            BlackboardAttribute.Type profileInfo_PreviousRelationshipName;
+            BlackboardAttribute.Type profileInfo_PreviousRelationshipDate;
             
             BlackboardAttribute.Type profileInfo_FamilyMemberOwner;
             BlackboardAttribute.Type profileInfo_FamilyMemberName;
@@ -4568,13 +4579,20 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             BlackboardAttribute.Type profileInfo_EducationOwner;
             BlackboardAttribute.Type profileInfo_EducationName;
-            BlackboardAttribute.Type profileInfo_EducationGraduatedStatus;
+            BlackboardAttribute.Type profileInfo_EducationDescription;
             BlackboardAttribute.Type profileInfo_EducationType;
+            BlackboardAttribute.Type profileInfo_EducationGraduatedStatus;
+            BlackboardAttribute.Type profileInfo_EducationDateStart;
+            BlackboardAttribute.Type profileInfo_EducationDateEnd;
             BlackboardAttribute.Type profileInfo_EducationDate;
+            BlackboardAttribute.Type profileInfo_EducationConcentrations;
+            BlackboardAttribute.Type profileInfo_EducationModules;
             
             BlackboardAttribute.Type profileInfo_WorkOwner;
             BlackboardAttribute.Type profileInfo_WorkEmployer;
+            BlackboardAttribute.Type profileInfo_WorkLocation;
             BlackboardAttribute.Type profileInfo_WorkTitle;
+            BlackboardAttribute.Type profileInfo_WorkDescription;
             BlackboardAttribute.Type profileInfo_WorkDateStart;
             BlackboardAttribute.Type profileInfo_WorkDateEnd;
             BlackboardAttribute.Type profileInfo_WorkDate;
@@ -4586,6 +4604,20 @@ public class FacebookFileIngestModule implements FileIngestModule{
             BlackboardAttribute.Type profileInfo_ReligiousView;
             
             BlackboardAttribute.Type profileInfo_BloodDonorStatus;
+            
+            BlackboardAttribute.Type profileInfo_WebsiteOwner;
+            BlackboardAttribute.Type profileInfo_Website;
+            
+            BlackboardAttribute.Type profileInfo_ScreenNameOwner;
+            BlackboardAttribute.Type profileInfo_ScreenNameService;
+            BlackboardAttribute.Type profileInfo_ScreenName;
+            BlackboardAttribute.Type profileInfo_ScreenNameDate;
+            
+            BlackboardAttribute.Type profileInfo_AddressStreet;
+            BlackboardAttribute.Type profileInfo_AddressCity;
+            BlackboardAttribute.Type profileInfo_AddressCountry;
+            BlackboardAttribute.Type profileInfo_AddressCountryCode;
+            BlackboardAttribute.Type profileInfo_AddressRegion;
             
             BlackboardAttribute.Type profileInfo_PhoneNumberOwner;
             BlackboardAttribute.Type profileInfo_PhoneNumberType;
@@ -4606,6 +4638,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     profileInfo_FirstName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_FIRSTNAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "First Name");
                     profileInfo_MiddleName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_MIDDLENAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Middle Name");
                     profileInfo_LastName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_LASTNAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Last Name");
+                    profileInfo_Birthday = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_BIRTHDAY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Birthday");
                     profileInfo_Gender = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_GENDER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Gender");
                     profileInfo_Pronouns = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PRONOUN", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Pronouns");
                     profileInfo_CurrentCity = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_CURRENTCITY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Current City");
@@ -4615,11 +4648,17 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     profileInfo_ReligiousView = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_RELIGIOUS_VIEW", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Religious View");
                     profileInfo_BloodDonorStatus = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_BLOOD_DONOR_STATUS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Blood Donor Status");
                     profileInfo_Relationship = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_RELATIONSHIP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Relationship");
+                    profileInfo_RelationshipPartner = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_RELATIONSHIP_PARTNER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Relationship Partner");
                     profileInfo_RelationshipDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_RELATIONSHIP_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Relationship Date Modified");
                     profileInfo_AboutMe = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_ABOUT_ME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "\"About Me\" Text");
                     profileInfo_FavouriteQuote = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_FAVOURITE_QUOTE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Favourite Quote");
                     profileInfo_RegistrationDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_REGISTRATION_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Registration Date");
                     profileInfo_ProfileURL = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE_URL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Profile URL");
+                    profileInfo_AddressStreet = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE_ADDRESS_STREET", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Address Street");
+                    profileInfo_AddressCity = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE__ADDRESS_CITY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Address City");
+                    profileInfo_AddressCountry = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE__ADDRESS_COUNTRY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Address Country");
+                    profileInfo_AddressCountryCode = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE__ADDRESS_COUNTRY_CODE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Address Country Code");
+                    profileInfo_AddressRegion = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE__ADDRESS_REGION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Address Region");
                 }
                 else{
                     artifactTypeMain = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_MAIN");
@@ -4628,6 +4667,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     profileInfo_FirstName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_FIRSTNAME");
                     profileInfo_MiddleName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_MIDDLENAME");
                     profileInfo_LastName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_LASTNAME");
+                    profileInfo_Birthday = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_BIRTHDAY");
                     profileInfo_Gender = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_GENDER");
                     profileInfo_Pronouns = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PRONOUN");
                     profileInfo_CurrentCity = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_CURRENTCITY");
@@ -4637,11 +4677,17 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     profileInfo_ReligiousView = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_RELIGIOUS_VIEW");
                     profileInfo_BloodDonorStatus = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_BLOOD_DONOR_STATUS");
                     profileInfo_Relationship = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_RELATIONSHIP");
+                    profileInfo_RelationshipPartner = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_RELATIONSHIP_PARTNER");
                     profileInfo_RelationshipDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_RELATIONSHIP_DATE");
                     profileInfo_AboutMe = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_ABOUT_ME");
                     profileInfo_FavouriteQuote = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_FAVOURITE_QUOTE");
                     profileInfo_RegistrationDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_REGISTRATION_DATE");
                     profileInfo_ProfileURL = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE_URL");
+                    profileInfo_AddressStreet = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE_ADDRESS_STREET");
+                    profileInfo_AddressCity = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE__ADDRESS_CITY");
+                    profileInfo_AddressCountry = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE__ADDRESS_COUNTRY");
+                    profileInfo_AddressCountryCode = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE__ADDRESS_COUNTRY_CODE");
+                    profileInfo_AddressRegion = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PROFILE__ADDRESS_REGION");
                 }
                 
                 // Emails
@@ -4656,6 +4702,20 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     profileInfo_EmailOwner = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EMAIL_OWNER");
                     profileInfo_EmailType = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EMAIL_TYPE");
                     profileInfo_Email = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EMAIL_ADDRESS");
+                }
+                
+                // Previous Relationship
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP") == null){
+                    artifactTypePreviousRelationship = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP", "Facebook User Profile Information - Previous Relationships");
+                    profileInfo_PreviousRelationshipOwner = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP_OWNER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User");
+                    profileInfo_PreviousRelationshipName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name/Partner");
+                    profileInfo_PreviousRelationshipDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Modified");
+                }
+                else{
+                    artifactTypePreviousRelationship = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP");
+                    profileInfo_PreviousRelationshipOwner = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP_OWNER");
+                    profileInfo_PreviousRelationshipName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP_NAME");
+                    profileInfo_PreviousRelationshipDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_PREVIOUS_RELATIONSHIP_DATE");
                 }
                 
                 // Previous/Other Names
@@ -4695,17 +4755,27 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     artifactTypeEducation = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PROFILE_INFO_EDUCATION", "Facebook User Profile Information - Education Experience");
                     profileInfo_EducationOwner = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_OWNER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User");
                     profileInfo_EducationName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Institution Name");
-                    profileInfo_EducationGraduatedStatus = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_GRADUATED_STATUS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Graduated?");
+                    profileInfo_EducationDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description");
                     profileInfo_EducationType = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_TYPE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Institution Type");
-                    profileInfo_EducationDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Dated Modified");
+                    profileInfo_EducationGraduatedStatus = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_GRADUATED_STATUS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Graduated?");
+                    profileInfo_EducationDateStart = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE_START", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Start");
+                    profileInfo_EducationDateEnd = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE_END", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date End");
+                    profileInfo_EducationDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Modified");
+                    profileInfo_EducationConcentrations = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_CONCENTRATIONS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Concentrations");
+                    profileInfo_EducationModules = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE_MODULES", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Modules");
                 }
                 else{
                     artifactTypeEducation = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_EDUCATION");
                     profileInfo_EducationOwner = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_OWNER");
                     profileInfo_EducationName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_NAME");
-                    profileInfo_EducationGraduatedStatus = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_GRADUATED_STATUS");
+                    profileInfo_EducationDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DESCRIPTION");
                     profileInfo_EducationType = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_TYPE");
+                    profileInfo_EducationGraduatedStatus = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_GRADUATED_STATUS");
+                    profileInfo_EducationDateStart = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE_START");
+                    profileInfo_EducationDateEnd = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE_END");
                     profileInfo_EducationDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE");
+                    profileInfo_EducationConcentrations = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_CONCENTRATIONS");
+                    profileInfo_EducationModules = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_EDUCATION_DATE_MODULES");
                 }
                 
                 // Work
@@ -4713,7 +4783,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     artifactTypeWork = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PROFILE_INFO_WORK", "Facebook User Profile Information - Work Experience");
                     profileInfo_WorkOwner = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_OWNER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User");
                     profileInfo_WorkEmployer = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_EMPLOYER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Employer");
+                    profileInfo_WorkLocation = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_LOCATION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Location");
                     profileInfo_WorkTitle = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_TITLE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Job Title");
+                    profileInfo_WorkDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description");
                     profileInfo_WorkDateStart = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_DATE_START", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Started");
                     profileInfo_WorkDateEnd = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_DATE_END", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Ended");
                     profileInfo_WorkDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Added");
@@ -4722,7 +4794,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     artifactTypeWork = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_WORK");
                     profileInfo_WorkOwner = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_OWNER");
                     profileInfo_WorkEmployer = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_EMPLOYER");
+                    profileInfo_WorkLocation = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_LOCATION");
                     profileInfo_WorkTitle = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_TITLE");
+                    profileInfo_WorkDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_DESCRIPTION");
                     profileInfo_WorkDateStart = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_DATE_START");
                     profileInfo_WorkDateEnd = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_DATE_END");
                     profileInfo_WorkDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WORK_DATE");
@@ -4740,6 +4814,34 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     profileInfo_LanguageOwner = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_LANGUAGE_OWNER");
                     profileInfo_Language = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_LANGUAGE");
                     profileInfo_LanguageDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_LANGUAGE_DATE");
+                }
+                
+                // Websites linked
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_WEBSITE") == null){
+                    artifactTypeWebsite = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PROFILE_INFO_WEBSITE", "Facebook User Profile Information - Websites");
+                    profileInfo_WebsiteOwner = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WEBSITE_OWNER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User");
+                    profileInfo_Website = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_WEBSITE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Website URL");
+                }
+                else{
+                    artifactTypeWebsite = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_WEBSITE");
+                    profileInfo_WebsiteOwner = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WEBSITE_OWNER");
+                    profileInfo_Website = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_WEBSITE");
+                }
+                
+                // Screen Name
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME") == null){
+                    artifactTypeScreenName = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME", "Facebook User Profile Information - Screen Names");
+                    profileInfo_ScreenNameOwner = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME_OWNER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User");
+                    profileInfo_ScreenNameService = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME_SERVICE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Service Name");
+                    profileInfo_ScreenName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Screen Name");
+                    profileInfo_ScreenNameDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Modified");
+                }
+                else{
+                    artifactTypeScreenName = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME");
+                    profileInfo_ScreenNameOwner = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME_OWNER");
+                    profileInfo_ScreenNameService = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME_SERVICE");
+                    profileInfo_ScreenName = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME");
+                    profileInfo_ScreenNameDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_PROFILE_INFO_SCREEN_NAME_DATE");
                 }
                 
                 // Phone Numbers
@@ -4769,6 +4871,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             String firstName = "";
             String middleName = "";
             String lastName = "";
+            String birthday = "";
             String gender = "";
             String pronoun = "";
             String currentCity = "";
@@ -4776,22 +4879,39 @@ public class FacebookFileIngestModule implements FileIngestModule{
             String hometown = "";
             String hometownDate = "";
             String relationship = "";
+            String relationshipPartner = "";
             String relationshipDate = "";
             String religiousView = "";
             String bloodDonorStatus = "";
+            String addressStreet = "";
+            String addressCity = "";
+            String addressCountry = "";
+            String addressCountryCode = "";
+            String addressRegion = "";
             String username = "";
             String aboutMe = "";
             String favQuote = "";
             String registrationDate = "";
             String profileUrl = "";
             
-            fullName = profile.name.full_name;
-            firstName = profile.name.first_name;
-            middleName = profile.name.middle_name;
-            lastName = profile.name.last_name;
-            gender = profile.gender.gender_option;
-            pronoun = profile.gender.pronoun;
-            bloodDonorStatus = profile.blood_info.blood_donor_status;
+            if (profile.name != null) {
+                fullName = profile.name.full_name;
+                firstName = profile.name.first_name;
+                middleName = profile.name.middle_name;
+                lastName = profile.name.last_name;
+            }
+            
+            if (profile.birthday != null) {
+                birthday = profile.birthday.year + "-" + profile.birthday.month + "-" + profile.birthday.day + "-";
+            }
+            
+            if (profile.gender != null) {
+                gender = profile.gender.gender_option;
+                pronoun = profile.gender.pronoun;
+            }
+            if (profile.blood_info != null) {
+                bloodDonorStatus = profile.blood_info.blood_donor_status;
+            }
             
             if (profile.current_city != null) {
                 currentCity = profile.current_city.name;
@@ -4803,12 +4923,20 @@ public class FacebookFileIngestModule implements FileIngestModule{
             }
             if (profile.relationship != null) {
                 relationship = profile.relationship.status;
+                relationshipPartner = profile.relationship.partner;
                 relationshipDate = new TimestampToDate(profile.relationship.timestamp).getDate();
             }
             if (profile.religious_view != null) {
                 religiousView = profile.religious_view.name;
             }
             
+            if (profile.address != null) {
+                addressStreet = profile.address.street;
+                addressCity = profile.address.city;
+                addressCountry = profile.address.country;
+                addressCountryCode = profile.address.country_code;
+                addressRegion = profile.address.region;
+            }
             if (profile.username != null) {
                 username = profile.username;
             }
@@ -4823,26 +4951,431 @@ public class FacebookFileIngestModule implements FileIngestModule{
             profileUrl = profile.profile_uri;
             
             /////////// Add the Main, Email, OtherName ... atttributes, loop them if necessary
-//            // add variables to attributes
-//            Collection<BlackboardAttribute> attributelist = new ArrayList();
-//            attributelist.add(new BlackboardAttribute(profileInfo_MediaTitle, FacebookIngestModuleFactory.getModuleName(), title));
-//            attributelist.add(new BlackboardAttribute(profileInfo_MediaDescription, FacebookIngestModuleFactory.getModuleName(), description));
-//            attributelist.add(new BlackboardAttribute(profileInfo_MediaUri, FacebookIngestModuleFactory.getModuleName(), uri));
-//            attributelist.add(new BlackboardAttribute(profileInfo_MediaDateCreated, FacebookIngestModuleFactory.getModuleName(), mediaDateCreated));
-//            attributelist.add(new BlackboardAttribute(profileInfo_MediaUploadedIp, FacebookIngestModuleFactory.getModuleName(), mediaUploadIp));
-//            attributelist.add(new BlackboardAttribute(profileInfo_MediaDateUploaded, FacebookIngestModuleFactory.getModuleName(), mediaDateUploaded));
-//            attributelist.add(new BlackboardAttribute(profileInfo_ThumbnailUri, FacebookIngestModuleFactory.getModuleName(), mediaThumbnailUri));
-//
-//            try{
-//                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
-//            }
-//            catch (TskCoreException | BlackboardException e){
-//                e.printStackTrace();
-//                return;
-//            }
+            // add variables to attributes for main artifact
+            Collection<BlackboardAttribute> attributelist = new ArrayList();
+            attributelist.add(new BlackboardAttribute(profileInfo_FullName, FacebookIngestModuleFactory.getModuleName(), fullName));
+            attributelist.add(new BlackboardAttribute(profileInfo_FirstName, FacebookIngestModuleFactory.getModuleName(), firstName));
+            attributelist.add(new BlackboardAttribute(profileInfo_MiddleName, FacebookIngestModuleFactory.getModuleName(), middleName));
+            attributelist.add(new BlackboardAttribute(profileInfo_LastName, FacebookIngestModuleFactory.getModuleName(), lastName));
+            attributelist.add(new BlackboardAttribute(profileInfo_Birthday, FacebookIngestModuleFactory.getModuleName(), birthday));
+            attributelist.add(new BlackboardAttribute(profileInfo_Gender, FacebookIngestModuleFactory.getModuleName(), gender));
+            attributelist.add(new BlackboardAttribute(profileInfo_Pronouns, FacebookIngestModuleFactory.getModuleName(), pronoun));
+            attributelist.add(new BlackboardAttribute(profileInfo_CurrentCity, FacebookIngestModuleFactory.getModuleName(), currentCity));
+            attributelist.add(new BlackboardAttribute(profileInfo_CurrentCityDate, FacebookIngestModuleFactory.getModuleName(), currentCityDate));
+            attributelist.add(new BlackboardAttribute(profileInfo_Hometown, FacebookIngestModuleFactory.getModuleName(), hometown));
+            attributelist.add(new BlackboardAttribute(profileInfo_HometownDate, FacebookIngestModuleFactory.getModuleName(), hometownDate));
+            attributelist.add(new BlackboardAttribute(profileInfo_Relationship, FacebookIngestModuleFactory.getModuleName(), relationship));
+            attributelist.add(new BlackboardAttribute(profileInfo_RelationshipPartner, FacebookIngestModuleFactory.getModuleName(), relationshipPartner));
+            attributelist.add(new BlackboardAttribute(profileInfo_RelationshipDate, FacebookIngestModuleFactory.getModuleName(), relationshipDate));
+            attributelist.add(new BlackboardAttribute(profileInfo_ReligiousView, FacebookIngestModuleFactory.getModuleName(), religiousView));
+            attributelist.add(new BlackboardAttribute(profileInfo_BloodDonorStatus, FacebookIngestModuleFactory.getModuleName(), bloodDonorStatus));
+            attributelist.add(new BlackboardAttribute(profileInfo_AddressStreet, FacebookIngestModuleFactory.getModuleName(), addressStreet));
+            attributelist.add(new BlackboardAttribute(profileInfo_AddressCity, FacebookIngestModuleFactory.getModuleName(), addressCity));
+            attributelist.add(new BlackboardAttribute(profileInfo_AddressCountry, FacebookIngestModuleFactory.getModuleName(), addressCountry));
+            attributelist.add(new BlackboardAttribute(profileInfo_AddressCountryCode, FacebookIngestModuleFactory.getModuleName(), addressCountryCode));
+            attributelist.add(new BlackboardAttribute(profileInfo_AddressRegion, FacebookIngestModuleFactory.getModuleName(), addressRegion));
+            attributelist.add(new BlackboardAttribute(profileInfo_Username, FacebookIngestModuleFactory.getModuleName(), username));
+            attributelist.add(new BlackboardAttribute(profileInfo_AboutMe, FacebookIngestModuleFactory.getModuleName(), aboutMe));
+            attributelist.add(new BlackboardAttribute(profileInfo_FavouriteQuote, FacebookIngestModuleFactory.getModuleName(), favQuote));
+            attributelist.add(new BlackboardAttribute(profileInfo_RegistrationDate, FacebookIngestModuleFactory.getModuleName(), registrationDate));
+            attributelist.add(new BlackboardAttribute(profileInfo_ProfileURL, FacebookIngestModuleFactory.getModuleName(), profileUrl));
+            try{
+                blackboard.postArtifact(af.newDataArtifact(artifactTypeMain, attributelist), FacebookIngestModuleFactory.getModuleName());
+            }
+            catch (TskCoreException | BlackboardException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            String owner = fullName;
+            // Emails
+            if (profile.emails != null) {
+                ProfileV2.Profile_V2.Emails emailList = profile.emails;
+                String emailAddress = "";
+                String emailType = "Linked";
+                for (String email:emailList.emails) {
+                    emailAddress = email;
+
+                    // add variables to attributes for email artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_EmailOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EmailType, FacebookIngestModuleFactory.getModuleName(), emailType));
+                    attributelist.add(new BlackboardAttribute(profileInfo_Email, FacebookIngestModuleFactory.getModuleName(), emailAddress));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeEmail, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+
+                emailType = "Previous";
+                for (String email:emailList.previous_emails) {
+                    emailAddress = email;
+
+                    // add variables to attributes for email artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_EmailOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EmailType, FacebookIngestModuleFactory.getModuleName(), emailType));
+                    attributelist.add(new BlackboardAttribute(profileInfo_Email, FacebookIngestModuleFactory.getModuleName(), emailAddress));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeEmail, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+
+                emailType = "Pending";
+                for (String email:emailList.pending_emails) {
+                    emailAddress = email;
+
+                    // add variables to attributes for email artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_EmailOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EmailType, FacebookIngestModuleFactory.getModuleName(), emailType));
+                    attributelist.add(new BlackboardAttribute(profileInfo_Email, FacebookIngestModuleFactory.getModuleName(), emailAddress));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeEmail, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+
+                emailType = "Advertising Account";
+                for (String email:emailList.ad_account_emails) {
+                    emailAddress = email;
+
+                    // add variables to attributes for email artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_EmailOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EmailType, FacebookIngestModuleFactory.getModuleName(), emailType));
+                    attributelist.add(new BlackboardAttribute(profileInfo_Email, FacebookIngestModuleFactory.getModuleName(), emailAddress));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeEmail, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+            
+            // Previous relationship
+            if (profile.previous_relationships != null) {
+                List<ProfileV2.Profile_V2.PreviousRelationship> prevRelList = profile.previous_relationships;
+                String prevRelName = "";
+                String prevRelDate = "";
+                for (ProfileV2.Profile_V2.PreviousRelationship relation:prevRelList) {
+                    prevRelName = relation.name;
+                    prevRelDate = new TimestampToDate(relation.timestamp).getDate();
+
+                    // add variables to attributes for previous relationship artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_PreviousRelationshipOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_PreviousRelationshipName, FacebookIngestModuleFactory.getModuleName(), prevRelName));
+                    attributelist.add(new BlackboardAttribute(profileInfo_PreviousRelationshipDate, FacebookIngestModuleFactory.getModuleName(), prevRelDate));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypePreviousRelationship, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+            
+            // Previous/Other Names
+            if (profile.previous_names != null) {
+                List<ProfileV2.Profile_V2.PreviousNames> prevNameList = profile.previous_names;
+                List<ProfileV2.Profile_V2.OtherNames> otherNameList = profile.other_names;
+                String otherName = "";
+                String otherNameDate = "";
+                String otherNameType = "Previous";
+                for (ProfileV2.Profile_V2.PreviousNames name:prevNameList) {
+                    otherName = name.name;
+                    otherNameDate = new TimestampToDate(name.timestamp).getDate();
+
+                    // add variables to attributes for previous name artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_OtherNameOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_OtherName, FacebookIngestModuleFactory.getModuleName(), otherName));
+                    attributelist.add(new BlackboardAttribute(profileInfo_OtherNameType, FacebookIngestModuleFactory.getModuleName(), otherNameDate));
+                    attributelist.add(new BlackboardAttribute(profileInfo_OtherNameDate, FacebookIngestModuleFactory.getModuleName(), otherNameType));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeOtherName, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+
+                otherNameType = "";
+                for (ProfileV2.Profile_V2.OtherNames name:otherNameList) {
+                    otherName = name.name;
+                    otherNameType = name.type;
+                    otherNameDate = new TimestampToDate(name.timestamp).getDate();
+
+                    // add variables to attributes for other name artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_OtherNameOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_OtherName, FacebookIngestModuleFactory.getModuleName(), otherName));
+                    attributelist.add(new BlackboardAttribute(profileInfo_OtherNameType, FacebookIngestModuleFactory.getModuleName(), otherNameDate));
+                    attributelist.add(new BlackboardAttribute(profileInfo_OtherNameDate, FacebookIngestModuleFactory.getModuleName(), otherNameType));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeOtherName, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+            
+            // Family Member
+            if (profile.family_members != null) {
+                List<ProfileV2.Profile_V2.FamilyMembers> familyMemberList = profile.family_members;
+                String familyMemberName = "";
+                String familyMemberRelation = "";
+                String familyMemberDate = "";
+                for (ProfileV2.Profile_V2.FamilyMembers relation:familyMemberList) {
+                    familyMemberName = relation.name;
+                    familyMemberRelation = relation.relation;
+                    familyMemberDate = new TimestampToDate(relation.timestamp).getDate();
+
+                    // add variables to attributes for family member artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_FamilyMemberOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_FamilyMemberName, FacebookIngestModuleFactory.getModuleName(), familyMemberName));
+                    attributelist.add(new BlackboardAttribute(profileInfo_FamilyMemberRelation, FacebookIngestModuleFactory.getModuleName(), familyMemberRelation));
+                    attributelist.add(new BlackboardAttribute(profileInfo_FamilyMemberDate, FacebookIngestModuleFactory.getModuleName(), familyMemberDate));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeFamily, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+            
+            // Education
+            if (profile.education_experiences != null) {
+                List<ProfileV2.Profile_V2.EducationExperience> educationList = profile.education_experiences;
+                String educationName = "";
+                String educationDescription = "";
+                String educationGraduated = "";
+                String educationType = "";
+                String educationDateStart = "";
+                String educationDateEnd = "";
+                String educationDate = "";
+                String educationConcentrations = "";
+                String educationModules = "";
+                for (ProfileV2.Profile_V2.EducationExperience education:educationList) {
+                    educationName = education.name;
+                    educationDescription = education.description;
+                    educationType = education.school_type;
+                    educationGraduated = education.graduated;
+                    educationDateStart = new TimestampToDate(education.start_timestamp).getDate();
+                    educationDateEnd = new TimestampToDate(education.end_timestamp).getDate();
+                    educationDate = new TimestampToDate(education.timestamp).getDate();
+                    educationConcentrations = "";
+                    educationModules = "";
+                    if (education.concentrations != null) {
+                        for (String concentrate: education.concentrations) {
+                            educationConcentrations += concentrate;
+                            educationConcentrations += ";\n";
+                        }
+                    }
+                    if (education.modules != null) {
+                        for (ProfileV2.Profile_V2.EducationExperience.Module mod: education.modules) {
+                            educationModules += "Module:";
+                            educationModules += mod.name;
+                            educationModules += "\n";
+                            if (mod.tags != null) {
+                                educationModules += "Tagged People: \n";
+                                for (ProfileV2.Profile_V2.EducationExperience.Module.Tag tag: mod.tags) { 
+                                    educationModules += tag.name;
+                                    educationModules += ";\n";
+                                }
+                            }
+                            educationModules += "\n";
+                        }
+                    }
+                    // add variables to attributes for education artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationName, FacebookIngestModuleFactory.getModuleName(), educationName));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationDescription, FacebookIngestModuleFactory.getModuleName(), educationDescription));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationGraduatedStatus, FacebookIngestModuleFactory.getModuleName(), educationGraduated));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationType, FacebookIngestModuleFactory.getModuleName(), educationType));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationDateStart, FacebookIngestModuleFactory.getModuleName(), educationDateStart));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationDateEnd, FacebookIngestModuleFactory.getModuleName(), educationDateEnd));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationDate, FacebookIngestModuleFactory.getModuleName(), educationDate));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationConcentrations, FacebookIngestModuleFactory.getModuleName(), educationConcentrations));
+                    attributelist.add(new BlackboardAttribute(profileInfo_EducationModules, FacebookIngestModuleFactory.getModuleName(), educationModules));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeEducation, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+            
+            // Work
+            if (profile.work_experiences != null) {
+                List<ProfileV2.Profile_V2.WorkExperience> workList = profile.work_experiences;
+                String workEmployer = "";
+                String workTitle = "";
+                String workLocation = "";
+                String workDescription = "";
+                String workDateStart = "";
+                String workDateEnd = "";
+                String workDate = "";
+                for (ProfileV2.Profile_V2.WorkExperience work:workList) {
+                    workEmployer = work.employer;
+                    workLocation = work.location;
+                    workTitle = work.title;
+                    workDescription = work.description;
+                    workDateStart = new TimestampToDate(work.start_timestamp).getDate();
+                    workDateEnd = new TimestampToDate(work.end_timestamp).getDate();
+                    workDate = new TimestampToDate(work.timestamp).getDate();
+
+                    // add variables to attributes for work artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_WorkOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_WorkEmployer, FacebookIngestModuleFactory.getModuleName(), workEmployer));
+                    attributelist.add(new BlackboardAttribute(profileInfo_WorkTitle, FacebookIngestModuleFactory.getModuleName(), workTitle));
+                    attributelist.add(new BlackboardAttribute(profileInfo_WorkLocation, FacebookIngestModuleFactory.getModuleName(), workLocation));
+                    attributelist.add(new BlackboardAttribute(profileInfo_WorkDescription, FacebookIngestModuleFactory.getModuleName(), workDescription));
+                    attributelist.add(new BlackboardAttribute(profileInfo_WorkDateStart, FacebookIngestModuleFactory.getModuleName(), workDateStart));
+                    attributelist.add(new BlackboardAttribute(profileInfo_WorkDateEnd, FacebookIngestModuleFactory.getModuleName(), workDateEnd));
+                    attributelist.add(new BlackboardAttribute(profileInfo_WorkDate, FacebookIngestModuleFactory.getModuleName(), workDate));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeWork, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+            // Languages
+            if (profile.languages != null) {
+                List<ProfileV2.Profile_V2.Language> languageList = profile.languages;
+                String languageName = "";
+                String languageDate = "";
+                for (ProfileV2.Profile_V2.Language language:languageList) {
+                    languageName = language.name;
+                    languageDate = new TimestampToDate(language.timestamp).getDate();
+
+                    // add variables to attributes for language artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_LanguageOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_Language, FacebookIngestModuleFactory.getModuleName(), languageName));
+                    attributelist.add(new BlackboardAttribute(profileInfo_LanguageDate, FacebookIngestModuleFactory.getModuleName(), languageDate));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeLanguage, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+            
+            // Website
+            if (profile.websites != null) {
+                List<ProfileV2.Profile_V2.Website> websiteList = profile.websites;
+                String websiteAddress = "";
+                for (ProfileV2.Profile_V2.Website website:websiteList) {
+                    websiteAddress = website.address;
+
+                    // add variables to attributes for website artifact
+                    attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(profileInfo_WebsiteOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                    attributelist.add(new BlackboardAttribute(profileInfo_Website, FacebookIngestModuleFactory.getModuleName(), websiteAddress));
+                    try{
+                        blackboard.postArtifact(af.newDataArtifact(artifactTypeWebsite, attributelist), FacebookIngestModuleFactory.getModuleName());
+                    }
+                    catch (TskCoreException | BlackboardException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+            }
+            
+            // Screen Name
+            if (profile.screen_names != null) {
+                List<ProfileV2.Profile_V2.ScreenName> screenNameList = profile.screen_names;
+                String screenNameService = "";
+                String screenNameName = "";
+                String screenNameDate = "";
+                for (ProfileV2.Profile_V2.ScreenName screenName:screenNameList) {
+                    screenNameService = screenName.service_name;
+                    
+                    for (ProfileV2.Profile_V2.ScreenName.Screen_Name name:screenName.names) {
+                        screenNameName = name.name;
+                        screenNameDate = new TimestampToDate(name.timestamp).getDate();
+                        
+                         // add variables to attributes for screen name artifact
+                        attributelist = new ArrayList();
+                        attributelist.add(new BlackboardAttribute(profileInfo_ScreenNameOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                        attributelist.add(new BlackboardAttribute(profileInfo_ScreenNameService, FacebookIngestModuleFactory.getModuleName(), screenNameService));
+                        attributelist.add(new BlackboardAttribute(profileInfo_ScreenName, FacebookIngestModuleFactory.getModuleName(), screenNameName));
+                        attributelist.add(new BlackboardAttribute(profileInfo_ScreenNameDate, FacebookIngestModuleFactory.getModuleName(), screenNameDate));
+                        try{
+                            blackboard.postArtifact(af.newDataArtifact(artifactTypeScreenName, attributelist), FacebookIngestModuleFactory.getModuleName());
+                        }
+                        catch (TskCoreException | BlackboardException e){
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            // Phone Number
+            if (profile.phone_numbers != null) {
+                List<ProfileV2.Profile_V2.PhoneNumber> phoneNumberList = profile.phone_numbers;
+                String phoneNumberType = "";
+                String phoneNumber = "";
+                String phoneNumberVerfied = "";
+                for (ProfileV2.Profile_V2.PhoneNumber phoneNo:phoneNumberList) {
+                    phoneNumberType = phoneNo.phone_type;
+                    phoneNumber = phoneNo.phone_number;
+                    phoneNumberVerfied = phoneNo.verified;
+                    
+                    // add variables to attributes for screen name artifact
+                   attributelist = new ArrayList();
+                   attributelist.add(new BlackboardAttribute(profileInfo_PhoneNumberOwner, FacebookIngestModuleFactory.getModuleName(), owner));
+                   attributelist.add(new BlackboardAttribute(profileInfo_PhoneNumberType, FacebookIngestModuleFactory.getModuleName(), phoneNumberType));
+                   attributelist.add(new BlackboardAttribute(profileInfo_PhoneNumber, FacebookIngestModuleFactory.getModuleName(), phoneNumber));
+                   attributelist.add(new BlackboardAttribute(profileInfo_PhoneNumberVerified, FacebookIngestModuleFactory.getModuleName(), phoneNumberVerfied));
+                   try{
+                       blackboard.postArtifact(af.newDataArtifact(artifactTypePhone, attributelist), FacebookIngestModuleFactory.getModuleName());
+                   }
+                   catch (TskCoreException | BlackboardException e){
+                       e.printStackTrace();
+                       return;
+                   }
+                }
+            }
         }
         else{
             logger.log(Level.INFO, "No profile_v2 found");
+            return;
+        }
+        }
+        catch (Exception e){
+            e.printStackTrace();
             return;
         }
     }
