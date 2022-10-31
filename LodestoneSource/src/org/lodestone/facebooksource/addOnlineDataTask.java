@@ -154,9 +154,9 @@ public class addOnlineDataTask implements Runnable {
         DataRequest(driver,formatType,DataExport);
         //download files, if true wait if there is a pending request, if no pending request = download latest available file.
         try{     
-                Thread.sleep(800);
+                Thread.sleep(300);
                 driver.get("https://www.facebook.com/dyi/?tab=all_archives");
-                Thread.sleep(800);}
+                Thread.sleep(500);}
                 
         catch(InterruptedException e){
                System.out.println(e);
@@ -173,16 +173,20 @@ public class addOnlineDataTask implements Runnable {
         {
             try{
                 //Wait until pending disappears
+                String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl'][1]")).getText();
+                
                 progressMonitor.setProgressText("Files pending for download, please wait");
-                wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl']")));
-                Thread.sleep(600);
+                if("Pending".equals(status))
+                    {
+                    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl'][1]")));
+                    Thread.sleep(600);
+                    }
                 }
                 catch(Exception e){
                    System.out.println("No Pending files available for download"); 
                 }  
                 //calls Datadownload method and set return as number of files
-                numF.setNumFiles(DataDownload(driver));
-                
+                numF.setNumFiles(DataDownload(driver));   
         }
         else{
             //calls Datadownload method and set return as number of files
