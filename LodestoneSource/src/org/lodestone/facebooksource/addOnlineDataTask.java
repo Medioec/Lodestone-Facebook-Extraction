@@ -5,6 +5,7 @@
  */
 package org.lodestone.facebooksource;
 
+<<<<<<< Updated upstream
 import java.io.File;
 import java.io.IOException;
 import org.lodestone.facebooksource.Bundle;
@@ -17,6 +18,21 @@ import java.nio.file.Path;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 import static org.awaitility.Durations.*;
+=======
+//import java.io.File;
+//import java.io.IOException;
+//import org.lodestone.facebooksource.Bundle;
+//import sun.net.ProgressMonitor;
+//
+//import java.io.BufferedOutputStream;
+//import java.io.FileInputStream;
+//import java.io.FileNotFoundException;
+//import java.io.FileOutputStream;
+//import java.nio.file.Path;
+//import java.util.Base64;
+//import java.util.concurrent.TimeUnit;
+//import static org.awaitility.Durations.*;
+>>>>>>> Stashed changes
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,10 +170,17 @@ public class addOnlineDataTask implements Runnable {
         DataRequest(driver,formatType,DataExport);
         //download files, if true wait if there is a pending request, if no pending request = download latest available file.
         try{     
+<<<<<<< Updated upstream
                 Thread.sleep(300);
                 driver.get("https://www.facebook.com/dyi/?tab=all_archives");
                 Thread.sleep(500);}
                 
+=======
+                Thread.sleep(600);
+                driver.get("https://www.facebook.com/dyi/?tab=all_archives");
+              
+        }
+>>>>>>> Stashed changes
         catch(InterruptedException e){
                System.out.println(e);
             }
@@ -204,6 +227,8 @@ public class addOnlineDataTask implements Runnable {
              System.out.println("Download took too long, timeout error\n"+e);
         }
         
+        progressMonitor.setProgressText("Downloads complete");
+        
         try{
             Thread.sleep(500);
         }
@@ -225,6 +250,7 @@ public class addOnlineDataTask implements Runnable {
             UnZipFile uzfile = new UnZipFile();  
             if(isZipFile(file.getAbsolutePath()))
             {
+                progressMonitor.setProgressText("Unzipping downloaded files");
                 try {uzfile.UnZipFile(file.getAbsolutePath());} 
                 catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
@@ -250,6 +276,7 @@ public class addOnlineDataTask implements Runnable {
         
         doCallBack();
     }
+    
     //method to check current number of zipfiles in modDir
     private int CurrentNumOfZipFiles(){
            // Adding downloaded files as a Data Source
@@ -388,6 +415,4 @@ public class addOnlineDataTask implements Runnable {
             }
         }
     }
-    
-   
 }
