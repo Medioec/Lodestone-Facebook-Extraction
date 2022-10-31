@@ -203,7 +203,7 @@ public class addOnlineDataTask implements Runnable {
         catch (Exception e){
              System.out.println("Download took too long, timeout error\n"+e);
         }
-        
+        progressMonitor.setProgressText("Downloads complete");
         try{
             Thread.sleep(500);
         }
@@ -225,6 +225,7 @@ public class addOnlineDataTask implements Runnable {
             UnZipFile uzfile = new UnZipFile();  
             if(isZipFile(file.getAbsolutePath()))
             {
+                progressMonitor.setProgressText("Unzipping downloaded files");
                 try {uzfile.UnZipFile(file.getAbsolutePath());} 
                 catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
