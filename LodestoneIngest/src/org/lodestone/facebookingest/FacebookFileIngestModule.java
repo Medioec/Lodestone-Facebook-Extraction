@@ -190,7 +190,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     break;
                 case "your_saved_items.json":
                     processJSONgeneralPosts(af, "saves_v2");
-                    //break;
+                    break;
                 case "your_search_history.json":
                     processJSONyour_search_history(af);
                     break;
@@ -216,7 +216,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONmobile_devices(af);
                     break;
                 case "record_details.json":
-                    //processJSON(af);
+                    processJSONrecord_details(af);
                     break;
                 case "where_you're_logged_in.json":
                     processJSONwhere_youre_logged_in(af);
@@ -275,7 +275,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process your_address_books.json file and add data as Data Artifact
     * Facebook your_address_books data.
-    * Uses POJO YourAddressBooksV2
+    * Uses POJO YourAddressBooksV2.java
     *
     * @param  af  JSON file
     */
@@ -359,7 +359,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process posts_from_apps_and_websites.json file and add data as Data Artifact
     * Facebook posts_from_apps_and_websites data.
-    * Uses POJO AppAndWebPostsV2
+    * Uses POJO AppAndWebPostsV2.java
     *
     * @param  af  JSON file
     */
@@ -433,7 +433,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process recently_viewed.json file and add data as Data Artifact
     * Facebook recently_viewed data.
-    * Uses POJO recently_viewed.json
+    * Uses POJO RecentlyViewedV2.java
     *
     * @param  af  JSON file
     */
@@ -556,7 +556,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process visited_things_v2.json file and add data as Data Artifact
     * Facebook visited_things_v2 data.
-    * Uses POJO visited_things_v2.json
+    * Uses POJO RecentlyVisitedV2.java
     *
     * @param  af  JSON file
     */
@@ -700,7 +700,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process active_sessions_v2.json file and add data as Data Artifact
     * Facebook active_sessions_v2 data.
-    * Uses POJO active_sessions_v2.json
+    * Uses POJO ActiveSessionsV2.java
     *
     * @param  af  JSON file
     */
@@ -785,7 +785,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process account_accesses_v2.json file and add data as Data Artifact
     * Facebook account_accesses_v2 data.
-    * Uses POJO account_accesses_v2.json
+    * Uses POJO LoginsAndLogoutsV2.java
     *
     * @param  af  JSON file
     */
@@ -848,6 +848,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process login_protection_data.json file and add data as Data Artifact
     * Facebook login protection data.
+    * Uses POJO LoginProtectionDataV2.java
     *
     * @param  af  JSON file
     */
@@ -911,7 +912,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process mobile_devices.json file and add data as Data Artifact
     * Facebook IP address activity data.
-    * Uses POJO DevicesV2.json
+    * Uses POJO MobileDevicesV2.java
     *
     * @param  af  JSON file
     */
@@ -1065,9 +1066,128 @@ public class FacebookFileIngestModule implements FileIngestModule{
     }
     
     /**
+    * Process record_details.json file and add data as Data Artifact
+    * Facebook administrative events data.
+    * Uses POJO AdminRecordsV2.java
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONrecord_details(AbstractFile af){
+        String json = parseAFtoString(af);
+        AdminRecordsV2 adminRecords = new Gson().fromJson(json, AdminRecordsV2.class);
+        if (adminRecords.admin_records_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type adminRecordEvent;
+            BlackboardAttribute.Type adminRecordDate;
+            BlackboardAttribute.Type adminRecordIpAddress;
+            BlackboardAttribute.Type adminRecordUserAgent;
+            BlackboardAttribute.Type adminRecordCookie;
+            BlackboardAttribute.Type adminRecordExtraInfoOldName;
+            BlackboardAttribute.Type adminRecordExtraInfoNewName;
+            BlackboardAttribute.Type adminRecordExtraInfoOldNumber;
+            BlackboardAttribute.Type adminRecordExtraInfoNewNumber;
+            BlackboardAttribute.Type adminRecordExtraInfoOldVanity;
+            BlackboardAttribute.Type adminRecordExtraInfoNewVanity;
+            BlackboardAttribute.Type adminRecordExtraInfoOldEmail;
+            BlackboardAttribute.Type adminRecordExtraInfoNewEmail;
+            
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_RECORD_DETAILS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_RECORD_DETAILS", "Facebook Administrative Records");
+                    adminRecordEvent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_EVENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Event");
+                    adminRecordDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
+                    adminRecordIpAddress = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_IP_ADDRESS", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
+                    adminRecordUserAgent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_USER_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "User Agent");
+                    adminRecordCookie = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_COOKIE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Cookie");
+                    adminRecordExtraInfoOldName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_OLD_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Old Name");
+                    adminRecordExtraInfoNewName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_NEW_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "New Name");
+                    adminRecordExtraInfoOldNumber = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_OLD_NUMBER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Old Number");
+                    adminRecordExtraInfoNewNumber = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_NEW_NUMBER", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "New Number");
+                    adminRecordExtraInfoOldVanity = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_OLD_VANITY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Old Vanity");
+                    adminRecordExtraInfoNewVanity = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_NEW_VANITY", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "New Vanity");
+                    adminRecordExtraInfoOldEmail = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_OLD_EMAIL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Old Email");
+                    adminRecordExtraInfoNewEmail = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_RECORD_DETAILS_NEW_EMAIL", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "New Email");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_RECORD_DETAILS");
+                    adminRecordEvent = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_EVENT");
+                    adminRecordDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_DATE");
+                    adminRecordIpAddress = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_IP_ADDRESS");
+                    adminRecordUserAgent = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_USER_AGENT");
+                    adminRecordCookie = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_COOKIE");
+                    adminRecordExtraInfoOldName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_OLD_NAME");
+                    adminRecordExtraInfoNewName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_NEW_NAME");
+                    adminRecordExtraInfoOldNumber = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_OLD_NUMBER");
+                    adminRecordExtraInfoNewNumber = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_NEW_NUMBER");
+                    adminRecordExtraInfoOldVanity = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_OLD_VANITY");
+                    adminRecordExtraInfoNewVanity = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_NEW_VANITY");
+                    adminRecordExtraInfoOldEmail = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_OLD_EMAIL");
+                    adminRecordExtraInfoNewEmail = currentCase.getSleuthkitCase().getAttributeType("LS_FB_RECORD_DETAILS_NEW_EMAIL");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            
+            String event = "";
+            String date = "";
+            String ipAddress = "";
+            String userAgent = "";
+            String cookie = "";
+            String extraInfoOldName = "";
+            String extraInfoNewName = "";
+            String extraInfoOldNumber = "";
+            String extraInfoNewNumber = "";
+            String extraInfoOldVanity = "";
+            String extraInfoNewVanity = "";
+            String extraInfoOldEmail = "";
+            String extraInfoNewEmail = "";
+            for (AdminRecordsV2.AdminRecords_V2 adminEvent:adminRecords.admin_records_v2){
+                
+                event = adminEvent.event;
+                if (adminEvent.session != null) {
+                    date = new TimestampToDate(adminEvent.session.created_timestamp).getDate();
+                    ipAddress = adminEvent.session.ip_address;
+                    userAgent = adminEvent.session.user_agent;
+                    cookie = adminEvent.session.datr_cookie;
+                }
+                if (adminEvent.extra_info != null) {
+                    extraInfoOldName = adminEvent.extra_info.old_name;
+                    extraInfoNewName = adminEvent.extra_info.new_name;
+                    extraInfoOldNumber = adminEvent.extra_info.old_number;
+                    extraInfoNewNumber = adminEvent.extra_info.new_number;
+                    extraInfoOldVanity = adminEvent.extra_info.old_vanity;
+                    extraInfoNewVanity = adminEvent.extra_info.new_vanity;
+                    extraInfoOldEmail = adminEvent.extra_info.old_email;
+                    extraInfoNewEmail = adminEvent.extra_info.new_email;
+                }
+                
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(adminRecordEvent, FacebookIngestModuleFactory.getModuleName(), event));
+                attributelist.add(new BlackboardAttribute(adminRecordDate, FacebookIngestModuleFactory.getModuleName(), date));
+                attributelist.add(new BlackboardAttribute(adminRecordIpAddress, FacebookIngestModuleFactory.getModuleName(), ipAddress));
+                attributelist.add(new BlackboardAttribute(adminRecordUserAgent, FacebookIngestModuleFactory.getModuleName(), userAgent));
+                attributelist.add(new BlackboardAttribute(adminRecordCookie, FacebookIngestModuleFactory.getModuleName(), cookie));
+                attributelist.add(new BlackboardAttribute(adminRecordExtraInfoOldName, FacebookIngestModuleFactory.getModuleName(), extraInfoOldName));
+                attributelist.add(new BlackboardAttribute(adminRecordExtraInfoNewName, FacebookIngestModuleFactory.getModuleName(), extraInfoNewName));
+                attributelist.add(new BlackboardAttribute(adminRecordExtraInfoOldNumber, FacebookIngestModuleFactory.getModuleName(), extraInfoOldNumber));
+                attributelist.add(new BlackboardAttribute(adminRecordExtraInfoNewNumber, FacebookIngestModuleFactory.getModuleName(), extraInfoNewNumber));
+                attributelist.add(new BlackboardAttribute(adminRecordExtraInfoOldVanity, FacebookIngestModuleFactory.getModuleName(), extraInfoOldVanity));
+                attributelist.add(new BlackboardAttribute(adminRecordExtraInfoNewVanity, FacebookIngestModuleFactory.getModuleName(), extraInfoNewVanity));
+                attributelist.add(new BlackboardAttribute(adminRecordExtraInfoOldEmail, FacebookIngestModuleFactory.getModuleName(), extraInfoOldEmail));
+                attributelist.add(new BlackboardAttribute(adminRecordExtraInfoNewEmail, FacebookIngestModuleFactory.getModuleName(), extraInfoNewEmail));
+            }
+        }
+    }
+    
+    /**
     * Process your_places_v2.json file and add data as Data Artifact
     * Facebook your_places_v2 data.
-    * Uses POJO YourPlacesV2.json
+    * Uses POJO YourPlacesV2.java
     *
     * @param  af  JSON file
     */
@@ -1125,6 +1245,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process ip_address_activity.json file and add data as Data Artifact
     * Facebook IP address activity data.
+    * Uses POJO UsedIpAddressV2.java
     *
     * @param  af  JSON file
     */
@@ -1187,6 +1308,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process email_address_verifications.json file and add data as Data Artifact
     * Facebook email_address_verifications data.
+    * Uses POJO ContactVerficationV2.java
     *
     * @param  af  JSON file
     */
@@ -1244,6 +1366,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process account_activity.json file and add data as Data Artifact
     * Facebook account_activity data.
+    * Uses POJO AccountActivityV2.java
     *
     * @param  af  JSON file
     */
@@ -1769,6 +1892,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process advertisers_using_your_activity_or_information.json file and add data as Data Artifact
     * Facebook data about advertisers using your activity and information.
+    * Uses POJO CustomAudienceAllTypesV2.java
     *
     * @param  af  JSON file
     */
@@ -1836,6 +1960,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process processJSONadvertisers_you've_interacted_with.json file and add data as Data Artifact
     * Facebook data about advertisers the user have interacted with.
+    * Uses POJO HistoryV2.java
     *
     * @param  af  JSON file
     */
@@ -1898,6 +2023,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process apps_and_websites.json file and add data as Data Artifact
     * Facebook data about apps and websites that user connected with their Facebook account
+    * Uses POJO InstalledAppsV2.java
     *
     * @param  af  JSON file
     */
@@ -1970,6 +2096,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process your_off-facebook_activity.json file and add data as Data Artifact
     * Facebook data about activities from the businesses and organisations that user visit off Facebook
+    * Uses POJO OffFacebookActivityV2.java
     *
     * @param  af  JSON file
     */
@@ -2240,6 +2367,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process posts_and_comments.json file and add data as Data Artifact
     * Facebook reaction data.
+    * Uses POJO ReactionsV2.java
     *
     * @param  af  JSON file
     */
@@ -2599,6 +2727,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process accounts_center.json file and add data as Data Artifact
     * Facebook account center data.
+    * Uses POJO AccountsCenterV2.java
     *
     * @param  af  JSON file
     */
@@ -2677,6 +2806,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process event_invitations.json file and add data as Data Artifact
     * Facebook events user is invited to data.
+    * Uses POJO EventsInvitedV2.java
     *
     * @param  af  JSON file
     */
@@ -2740,6 +2870,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process your_event_responses.json file and add data as Data Artifact
     * Facebook event response data.
+    * Uses POJO EventResponseV2.java
     *
     * @param  af  JSON file
     */
@@ -2857,6 +2988,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process items_sold.json file and add data as Data Artifact
     * Facebook marketplace items sold data.
+    * Uses POJO ItemsSellingV2.java
     *
     * @param  af  JSON file
     */
@@ -2955,6 +3087,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process payment_history.json file and add data as Data Artifact
     * Facebook payment history data.
+    * Uses POJO PaymentsV2.java
     *
     * @param  af  JSON file
     */
@@ -3054,6 +3187,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process your_comments_in_groups.json file and add data as Data Artifact
     * Facebook user comments in groups data.
+    * Uses POJO GroupCommentsV2.java
     *
     * @param  af  JSON file
     */
@@ -3256,6 +3390,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process your_group_membership_activity.json file and add data as Data Artifact
     * Facebook user group membership data.
+    * Uses POJO GroupsJoinedV2.java
     *
     * @param  af  JSON file
     */
@@ -3322,6 +3457,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process device_location.json file and add data as Data Artifact
     * Facebook user device location data.
+    * Uses POJO PhoneNumberLocationV2.java
     *
     * @param  af  JSON file
     */
@@ -3380,6 +3516,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process last_location.json file and add data as Data Artifact
     * Facebook user device location data.
+    * Uses POJO LastLocationV2.java
     *
     * @param  af  JSON file
     */
@@ -3445,6 +3582,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process primary_public_location.json file and add data as Data Artifact
     * Facebook user primary public location data.
+    * Uses POJO PrimaryPublicLocationV2.java
     *
     * @param  af  JSON file
     */
@@ -3505,6 +3643,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process timezone.json file and add data as Data Artifact
     * Facebook user timezone data.
+    * Uses POJO TimezoneV2.java
     *
     * @param  af  JSON file
     */
@@ -3554,6 +3693,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process autofill_information.json file and add data as Data Artifact
     * Facebook user autofill information data.
+    * Uses POJO Autofill_InformationV2.java
     *
     * @param  af  JSON file
     */
@@ -3653,6 +3793,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process secret_conversations.json file and add data as Data Artifact
     * Facebook user device information for secret conversations on armadillo devices .
+    * Uses POJO SecretConversationsV2.java
     *
     * @param  af  JSON file
     */
@@ -3735,6 +3876,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process support_messages.json file and add data as Data Artifact
     * Facebook user Facebook support message data.
+    * Uses POJO SupportMessagesV2.java
     *
     * @param  af  JSON file
     */
@@ -3819,6 +3961,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process message_1.json file and add data as Data Artifact
     * Facebook user chat message data.
+    * Uses POJO Message1.java
     *
     * @param  af  JSON file
     */
@@ -4012,6 +4155,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process notifications.json file and add data as Data Artifact
     * Facebook notifications data
+    * Uses POJO NotificationsV2.java
     *
     * @param  af  JSON file
     */
@@ -4079,6 +4223,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process ads_interests.json file and add data as Data Artifact
     * Facebook user's ads interests and topics data
+    * Uses POJO TopicsV2.java
     *
     * @param  af  JSON file
     */
@@ -4131,6 +4276,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process pages_and_profiles_you_follow.json file and add data as Data Artifact
     * Facebook pages and profiles user follows
+    * Uses POJO PagesFollowedV2.java
     *
     * @param  af  JSON file
     */
@@ -4193,6 +4339,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process pages_you've_liked.json file and add data as Data Artifact
     * Facebook pages user liked
+    * Uses POJO PageLikesV2.java
     *
     * @param  af  JSON file
     */
@@ -4250,6 +4397,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process your_uncategorized_photos.json file and add data as Data Artifact
     * Facebook user uncategorized photos data
+    * Uses POJO OtherPhotosV2.java
     *
     * @param  af  JSON file
     */
@@ -4415,6 +4563,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process your_videos.json file and add data as Data Artifact
     * Facebook user videos data
+    * Uses POJO VideosV2.java
     *
     * @param  af  JSON file
     */
@@ -4517,6 +4666,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process profile_information.json file and add data as Data Artifact
     * Facebook user profile information data
+    * Uses POJO ProfileV2.java
     *
     * @param  af  JSON file
     */
@@ -5383,6 +5533,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
     /**
     * Process collections.json file and add data as Data Artifact
     * Facebook user collections data
+    * Uses POJO CollectionsV2.java
     *
     * @param  af  JSON file
     */
@@ -5455,7 +5606,9 @@ public class FacebookFileIngestModule implements FileIngestModule{
     * Group posts (your_posts_in_groups.json)
     * Profile update history (profile_update_history.json)
     * Saved posts (your_saved_items.json)
-    *
+    * 
+    * Uses POJO General_Posts.java
+    * 
     * @param  af  JSON file
     */
     private void processJSONgeneralPosts(AbstractFile af, String type){
