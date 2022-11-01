@@ -5,6 +5,8 @@
 package org.lodestone.facebookingest;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import org.lodestone.facebookingest.pojo.*;
 import org.lodestone.facebookingest.pojo.GeneralPosts.General_Posts;
 import org.lodestone.facebookingest.utility.TimestampToDate;
@@ -228,7 +231,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONwhere_youre_logged_in(af);
                     break;
                 case "your_facebook_activity_history.json":
-                    //processJSON(af);
+                    processJSONyour_facebook_activity_history(af);
                     break;
                 //case "location.json":
                     //processJSON(af);
@@ -243,7 +246,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     processJSONrecently_visited(af);
                     break;
                 case "your_topics.json":
-                    //processJSON(af);
+                    processJSONyour_topics(af);
                     break;
                 case "places_you've_created.json":
                     processJSONplaces_youve_created(af);
@@ -789,6 +792,97 @@ public class FacebookFileIngestModule implements FileIngestModule{
     }
     
     /**
+    * Process your_facebook_activity_history.json file and add data as Data Artifact
+    * Facebook user activity history data.
+    * Uses JsonObject, JsonArray, JsonElement
+    *
+    * @param  af  JSON file
+    */
+    private void processJSONyour_facebook_activity_history(AbstractFile af){
+        try{
+            JsonObject json = parseAFtoJson(af);
+            System.out.println(json.toString());
+            if(json.has("last_activity_v2")){
+                BlackboardArtifact.Type artifactType;
+                BlackboardAttribute.Type activityHistoryApplication;
+                BlackboardAttribute.Type activityHistoryDate;
+                try{
+                    // if artifact type does not exist
+                    if (currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_LAST_ACITIVITY_TIME") == null){
+                        artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FACEBOOK_LAST_ACITIVITY_TIME", "Facebook User Last Activity Date");
+                        activityHistoryApplication = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_LAST_ACITIVITY_TIME_APP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Application");
+                        activityHistoryDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FACEBOOK_LAST_ACITIVITY_TIME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date Last Active");
+                    }
+                    else{
+                        artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FACEBOOK_LAST_ACITIVITY_TIME");
+                        activityHistoryApplication = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_LAST_ACITIVITY_TIME_APP");
+                        activityHistoryDate = currentCase.getSleuthkitCase().getAttributeType("LS_FACEBOOK_LAST_ACITIVITY_TIME");
+                    }
+                }
+                catch (TskCoreException | TskDataException e){
+                    e.printStackTrace();
+                    return;
+                }
+                JsonObject lastActivity = json.getAsJsonObject("last_activity_v2");
+                System.out.println(lastActivity.toString());
+                if(lastActivity.has("last_activity_time")){
+                    JsonObject lastActivityTime = lastActivity.getAsJsonObject("last_activity_time");
+                    List<String> keys = lastActivityTime.entrySet()
+                        .stream()
+                        .map(i -> i.getKey())
+                        .collect(Collectors.toCollection(ArrayList::new));
+                    System.out.println(keys.toString());
+                    JsonArray activityByDay;
+                    Collection<BlackboardAttribute> attributelist;
+
+                    String date = "";
+                    String app = "";
+                    for (String key:keys) {
+                        // prepare variables for artifact
+                        app = key;
+                        System.out.println(key);
+                        if (lastActivityTime.has(key)) {
+                            activityByDay = lastActivityTime.getAsJsonObject(key).getAsJsonArray("activity_by_day");
+                            System.out.println(activityByDay.toString());
+                            for (JsonElement timestamp:activityByDay) {
+                                date = new TimestampToDate(timestamp.getAsLong()).getDate();
+
+                                // add variables to attributes
+                                attributelist = new ArrayList();
+                                attributelist.add(new BlackboardAttribute(activityHistoryApplication, FacebookIngestModuleFactory.getModuleName(), app));
+                                attributelist.add(new BlackboardAttribute(activityHistoryDate, FacebookIngestModuleFactory.getModuleName(), date));
+
+                                try{
+                                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                                }
+                                catch (TskCoreException | BlackboardException e){
+                                    e.printStackTrace();
+                                    return;
+                                }
+                            }
+                        }
+                        else{
+                            logger.log(Level.INFO, "Key not found");
+                        }
+                    }
+                }
+                else{
+                    logger.log(Level.INFO, "No last_activity_time found");
+                    return;
+                }
+            }
+            else{
+                logger.log(Level.INFO, "No last_activity_v2 found");
+                return;
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return;
+        }
+    }
+    
+    /**
     * Process account_accesses_v2.json file and add data as Data Artifact
     * Facebook account_accesses_v2 data.
     * Uses POJO LoginsAndLogoutsV2.java
@@ -1186,6 +1280,14 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 attributelist.add(new BlackboardAttribute(adminRecordExtraInfoNewVanity, FacebookIngestModuleFactory.getModuleName(), extraInfoNewVanity));
                 attributelist.add(new BlackboardAttribute(adminRecordExtraInfoOldEmail, FacebookIngestModuleFactory.getModuleName(), extraInfoOldEmail));
                 attributelist.add(new BlackboardAttribute(adminRecordExtraInfoNewEmail, FacebookIngestModuleFactory.getModuleName(), extraInfoNewEmail));
+                
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
             }
         }
     }
@@ -5320,6 +5422,51 @@ public class FacebookFileIngestModule implements FileIngestModule{
         }
     }
     
+    /**
+     * Process your_topics.json file and add data as Data Artifact
+     * Facebook topics inferred from user data
+     * Uses POJO InferredTopicsV2.java
+     * 
+     * @param af JSON file
+     */
+    private void processJSONyour_topics(AbstractFile af){
+        String json = parseAFtoString(af);
+        InferredTopicsV2 topics = new Gson().fromJson(json, InferredTopicsV2.class);
+        if (topics.inferred_topics_v2 != null){
+            // prepare variables for artifact
+            BlackboardArtifact.Type artifactType;
+            BlackboardAttribute.Type inferredTopic;
+            try{
+                // if artifact type does not exist
+                if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_INFERRED_TOPICS") == null){
+                    artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_INFERRED_TOPICS", "Facebook Inferred Topics from User");
+                    inferredTopic = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_INFERRED_TOPIC", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Inferred Topic");
+                }
+                else{
+                    artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_INFERRED_TOPICS");
+                    inferredTopic = currentCase.getSleuthkitCase().getAttributeType("LS_FB_INFERRED_TOPIC");
+                }
+            }
+            catch (TskCoreException | TskDataException e){
+                e.printStackTrace();
+                return;
+            }
+            for (String topic:topics.inferred_topics_v2){
+                // add variables to attributes
+                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                attributelist.add(new BlackboardAttribute(inferredTopic, FacebookIngestModuleFactory.getModuleName(), topic));
+
+                try{
+                    blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                }
+                catch (TskCoreException | BlackboardException e){
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+    }
+        
     /**
     * Process json files with Facebook posts and add data as Data Artifact
     * Facebook data for posts sent by user for the following:
