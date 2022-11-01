@@ -13,7 +13,8 @@ import java.util.List;
 public class ActiveSessionsV2 {
         public List<activeSessions> active_sessions_v2;
     public class activeSessions{
-        public long createdTimeStamp;
+        public long created_timestamp;
+        public long updated_timestamp;
         public String ip_address;
         public String user_agent;
         public String datr_cookie;
