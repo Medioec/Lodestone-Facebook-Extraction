@@ -651,7 +651,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
             BlackboardAttribute.Type artifactTimeStamp;
             BlackboardAttribute.Type artifactDataName;
             BlackboardAttribute.Type artifactURI;
-            BlackboardAttribute.Type artifactValue;
             
             try{
                 // if artifact type does not exist
@@ -662,7 +661,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     artifactTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Time Stamp");
                     artifactDataName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_DATA_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Data Name");
                     artifactURI = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_DATA_URI", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "URI");
-                    artifactValue = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBRECENTLY_VISITED_VALUE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "VALUE");
                     
                 }
                 else{
@@ -672,7 +670,6 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     artifactTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_TIME_STAMP");
                     artifactDataName = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_DATA_NAME");
                     artifactURI = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_DATA_URI");
-                    artifactValue = currentCase.getSleuthkitCase().getAttributeType("LS_FBRECENTLY_VISITED_VALUE");
                 }
             }
             catch (TskCoreException | TskDataException e){
@@ -747,13 +744,11 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     if (recentLog.entries != null){
                         for (RecentlyVisitedV2.recentLogins.Entry entry:recentLog.entries){
                             timeStamp = new TimestampToDate(entry.timestamp).getDate();
-                            dataName = entry.data.dataName;
+                            dataName = entry.data.name;
                             uri = entry.data.uri;
-                            value = entry.data.value;
                             attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
                             attributelist.add(new BlackboardAttribute(artifactDataName, FacebookIngestModuleFactory.getModuleName(), dataName));
                             attributelist.add(new BlackboardAttribute(artifactURI, FacebookIngestModuleFactory.getModuleName(), uri));
-                            attributelist.add(new BlackboardAttribute(artifactValue, FacebookIngestModuleFactory.getModuleName(), value));
                             try{
                                 blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                             }

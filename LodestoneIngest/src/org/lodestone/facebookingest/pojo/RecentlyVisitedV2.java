@@ -20,7 +20,7 @@ public class RecentlyVisitedV2 {
             public long timestamp;
             public Data data;
             public class Data{
-                public String dataName;
+                public String name;
                 public String uri;
                 public String value;
             }
