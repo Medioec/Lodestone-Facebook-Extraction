@@ -628,8 +628,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
     }
     
     /**
-    * Process visited_things_v2.json file and add data as Data Artifact
-    * Facebook visited_things_v2 data.
+    * Process recently_visited.json file and add data as Data Artifact
+    * Facebook recently_visited data.
     * Uses POJO RecentlyVisitedV2.java
     *
     * @param  af  JSON file
@@ -838,6 +838,7 @@ public class FacebookFileIngestModule implements FileIngestModule{
             // prepare variables for artifact
             BlackboardArtifact.Type artifactType;
             BlackboardAttribute.Type artifactCreatedTimeStamp;
+            BlackboardAttribute.Type artifactUpdatedTimeStamp;
             BlackboardAttribute.Type artifactip_address;
             BlackboardAttribute.Type artifactuser_agent;
             BlackboardAttribute.Type artifactdatr_cookie;
@@ -850,7 +851,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 // if artifact type does not exist
                 if (currentCase.getSleuthkitCase().getArtifactType("LS_FBACTIVESESSIONS") == null){
                     artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FBACTIVESESSIONS", "Facebook Active Session");
-                    artifactCreatedTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Time Stamp");
+                    artifactCreatedTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_CREATEDTIMESTAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Created Timestamp");
+                    artifactUpdatedTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_UPDATEDTIMESTAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Updated Timestamp");
                     artifactip_address = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
                     artifactuser_agent = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_AGENT", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Agent");
                     artifactdatr_cookie = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBACTIVESESSIONS_COOKIE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Datr Cookie");
@@ -862,7 +864,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 }
                 else{
                     artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FBACTIVESESSIONS");
-                    artifactCreatedTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_TIME_STAMP");
+                    artifactCreatedTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_CREATEDTIMESTAMP");
+                    artifactUpdatedTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_UPDATEDTIMESTAMP");
                     artifactip_address = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_IP");
                     artifactuser_agent = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_AGENT");
                     artifactdatr_cookie = currentCase.getSleuthkitCase().getAttributeType("LS_FBACTIVESESSIONS_COOKIE");
@@ -878,7 +881,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
             }
             for (ActiveSessionsV2.activeSessions actSession:activeSessions.active_sessions_v2){
                 
-                String timeStamp = new TimestampToDate(actSession.createdTimeStamp).getDate();
+                String createdTimestamp = new TimestampToDate(actSession.created_timestamp).getDate();
+                String updatedTimestamp = new TimestampToDate(actSession.updated_timestamp).getDate();
                 String ip_address = actSession.ip_address;
                 String user_agent = actSession.user_agent;
                 String datr_cookie = actSession.datr_cookie;
@@ -889,7 +893,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 
                 // add variables to attributes
                 Collection<BlackboardAttribute> attributelist = new ArrayList();
-                attributelist.add(new BlackboardAttribute(artifactCreatedTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
+                attributelist.add(new BlackboardAttribute(artifactCreatedTimeStamp, FacebookIngestModuleFactory.getModuleName(), createdTimestamp));
+                attributelist.add(new BlackboardAttribute(artifactUpdatedTimeStamp, FacebookIngestModuleFactory.getModuleName(), updatedTimestamp));
                 attributelist.add(new BlackboardAttribute(artifactip_address, FacebookIngestModuleFactory.getModuleName(), ip_address));
                 attributelist.add(new BlackboardAttribute(artifactuser_agent, FacebookIngestModuleFactory.getModuleName(), user_agent));
                 attributelist.add(new BlackboardAttribute(artifactdatr_cookie, FacebookIngestModuleFactory.getModuleName(), datr_cookie));
