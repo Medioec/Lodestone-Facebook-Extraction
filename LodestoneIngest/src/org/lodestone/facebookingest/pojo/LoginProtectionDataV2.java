@@ -16,8 +16,8 @@ public class LoginProtectionDataV2 {
         public String name;
         public Session session;
         public class Session{
-            public long createdDate;
-            public long updatedTimeStamp;
+            public long created_timestamp;
+            public long updated_timestamp;
             public String ip;
         }
     }
