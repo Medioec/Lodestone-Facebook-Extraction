@@ -494,35 +494,71 @@ public class FacebookFileIngestModule implements FileIngestModule{
             String name = "";
             String description = "";
             for (RecentlyViewedV2.RecentViews recentView:recentlyViewedV2.recently_viewed){
-                childName = "";
-                childDescription = "";
-                timeStamp = "";
-                dataName = "";
-                uri = "";    
-                altDate = "";
-                
-                name = recentView.name;
-                description = recentView.description;
-                 // add variables to attributes
-                Collection<BlackboardAttribute> attributelist = new ArrayList();
-                if (recentView.children != null){
-                    for (RecentlyViewedV2.RecentViews.Child child:recentView.children){
-                        childName = child.name;
-                        childDescription = child.description;
-                        if (child.entries != null){
-                            for (RecentlyViewedV2.RecentViews.Child.Entry entries:child.entries){
+                if(!recentView.name.equals("Marketplace Interactions")){
+                    childName = "";
+                    childDescription = "";
+                    timeStamp = "";
+                    dataName = "";
+                    uri = "";    
+                    altDate = "";
+
+                    name = recentView.name;
+                    description = recentView.description;
+                     // add variables to attributes
+                    if (recentView.children != null){
+                        for (RecentlyViewedV2.RecentViews.Child child:recentView.children){
+                            childName = child.name;
+                            childDescription = child.description;
+                            if (child.entries != null){
+                                for (RecentlyViewedV2.RecentViews.Child.Entry entries:child.entries){
+                                    timeStamp = new TimestampToDate(entries.timestamp).getDate();
+                                    dataName = entries.data.name;
+                                    uri = entries.data.uri;
+                                    altDate = entries.data.value;
+                                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                                    attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
+                                    attributelist.add(new BlackboardAttribute(artifactDescription, FacebookIngestModuleFactory.getModuleName(), description));
+                                    attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
+                                    attributelist.add(new BlackboardAttribute(artifactDataName, FacebookIngestModuleFactory.getModuleName(), dataName));
+                                    attributelist.add(new BlackboardAttribute(artifactURI, FacebookIngestModuleFactory.getModuleName(), uri));
+                                    attributelist.add(new BlackboardAttribute(artifactAltDate, FacebookIngestModuleFactory.getModuleName(), altDate));
+                                    attributelist.add(new BlackboardAttribute(artifactSubName, FacebookIngestModuleFactory.getModuleName(), childName));
+                                    attributelist.add(new BlackboardAttribute(artifactSubDescription, FacebookIngestModuleFactory.getModuleName(), childDescription));
+                                    try{
+                                        blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                                    }
+                                    catch (TskCoreException | BlackboardException e){
+                                        e.printStackTrace();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (recentView.entries != null){
+                            for (RecentlyViewedV2.RecentViews.Entry entries:recentView.entries){
+                                timeStamp = "";
+                                dataName = "";
+                                uri = "";    
+                                altDate = "";
                                 timeStamp = new TimestampToDate(entries.timestamp).getDate();
-                                dataName = entries.data.name;
-                                uri = entries.data.uri;
-                                altDate = entries.data.value;
+                                if (entries.data != null) {
+                                    dataName = entries.data.name;
+                                    uri = entries.data.uri;
+                                    altDate = entries.data.value;
+                                }
+                                Collection<BlackboardAttribute> attributelist = new ArrayList();
+                                attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
+                                attributelist.add(new BlackboardAttribute(artifactDescription, FacebookIngestModuleFactory.getModuleName(), description));
                                 attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
                                 attributelist.add(new BlackboardAttribute(artifactDataName, FacebookIngestModuleFactory.getModuleName(), dataName));
                                 attributelist.add(new BlackboardAttribute(artifactURI, FacebookIngestModuleFactory.getModuleName(), uri));
                                 attributelist.add(new BlackboardAttribute(artifactAltDate, FacebookIngestModuleFactory.getModuleName(), altDate));
-                                attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
-                                attributelist.add(new BlackboardAttribute(artifactDescription, FacebookIngestModuleFactory.getModuleName(), description));
                                 attributelist.add(new BlackboardAttribute(artifactSubName, FacebookIngestModuleFactory.getModuleName(), childName));
                                 attributelist.add(new BlackboardAttribute(artifactSubDescription, FacebookIngestModuleFactory.getModuleName(), childDescription));
+
                                 try{
                                     blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                                 }
@@ -534,29 +570,49 @@ public class FacebookFileIngestModule implements FileIngestModule{
                         }
                     }
                 }
-                else
-                {
-                    if (recentView.entries != null){
-                        for (RecentlyViewedV2.RecentViews.Entry entries:recentView.entries){
-                            timeStamp = "";
-                            dataName = "";
-                            uri = "";    
-                            altDate = "";
-                            timeStamp = new TimestampToDate(entries.timestamp).getDate();
-                            if (entries.data != null) {
-                                dataName = entries.data.name;
-                                uri = entries.data.uri;
-                                altDate = entries.data.value;
-                            }
-                            attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
-                            attributelist.add(new BlackboardAttribute(artifactDataName, FacebookIngestModuleFactory.getModuleName(), dataName));
-                            attributelist.add(new BlackboardAttribute(artifactURI, FacebookIngestModuleFactory.getModuleName(), uri));
-                            attributelist.add(new BlackboardAttribute(artifactAltDate, FacebookIngestModuleFactory.getModuleName(), altDate));
+                else{
+                    try{
+                        // Create separate artifact type for marketplace interactions
+                        if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_MARKETINTERACTIONS") == null){
+                            artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_MARKETINTERACTION", "Facebook Marketplace Interactions");
+                            artifactName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                            artifactDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description");
+                            artifactSubName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_NAME2", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name 2");
+                            artifactSubDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_DESCRIPTION2", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description 2");
+                            artifactAltDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Alt Date");
+
+                        }
+                        else{
+                            artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_MARKETINTERACTION");
+                            artifactName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_NAME");
+                            artifactDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_DESCRIPTION");
+                            artifactSubName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_NAME2");
+                            artifactSubDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_DESCRIPTION2");
+                            artifactAltDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_DATE");
+                        }
+                    }
+                    catch (TskCoreException | TskDataException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                    name = recentView.name;
+                    description = recentView.description;
+                    for(RecentlyViewedV2.RecentViews.Child child:recentView.children){
+                        childName = "";
+                        childDescription = "";
+                        
+                        childName = child.name;
+                        childDescription = child.description;
+                        for(RecentlyViewedV2.RecentViews.Child.Entry entry:child.entries){
+                            altDate = entry.data.value;
+                            
+                            Collection<BlackboardAttribute> attributelist = new ArrayList();
                             attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
                             attributelist.add(new BlackboardAttribute(artifactDescription, FacebookIngestModuleFactory.getModuleName(), description));
                             attributelist.add(new BlackboardAttribute(artifactSubName, FacebookIngestModuleFactory.getModuleName(), childName));
                             attributelist.add(new BlackboardAttribute(artifactSubDescription, FacebookIngestModuleFactory.getModuleName(), childDescription));
- 
+                            attributelist.add(new BlackboardAttribute(artifactAltDate, FacebookIngestModuleFactory.getModuleName(), altDate));
+
                             try{
                                 blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                             }
