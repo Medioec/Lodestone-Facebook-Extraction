@@ -28,14 +28,23 @@ public class Message1 {
         public String content;
         public String type;
         public List<Image> photos;
+        public List<Video> videos;
+        public List<Gif> gifs;
         public Sticker sticker;
         public List<File> files;
-        public String share;
+        public Share share;
         public String is_unsent;
         public String is_taken_down;
         public class Image {
             public String uri;
             public long creation_timestamp;
+        }
+        public class Video {
+            public String uri;
+            public long creation_timestamp;
+        }
+        public class Gif {
+            public String uri;
         }
         public class Sticker {
             public String uri;
@@ -43,6 +52,9 @@ public class Message1 {
         public class File {
             public String uri;
             public long creation_timestamp;
+        }
+        public class Share {
+            public String link;
         }
     }
     public class Image {
