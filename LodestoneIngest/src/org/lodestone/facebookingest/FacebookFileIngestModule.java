@@ -1091,14 +1091,14 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_LOGIN_PROTECTION_V2") == null){
                     artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_LOGIN_PROTECTION_V2", "Facebook Login Protection");
                     artifactName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
-                    artifactCreatedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_CREATE_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Create Date");
+                    artifactCreatedDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_CREATE_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Create Time Stamp");
                     artifactUpdatedTimeStamp = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_UPDATED_TIME_STAMP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Updated Time Stamp");
                     artifactIP = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FBLOGINPROTECT_IP", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "IP Address");
                 }
                 else{
                     artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_LOGIN_PROTECTION_V2");
                     artifactName = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_NAME");
-                    artifactCreatedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_CREATE_DATE");
+                    artifactCreatedDate = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_CREATE_TIME_STAMP");
                     artifactUpdatedTimeStamp = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_UPDATED_TIME_STAMP");
                     artifactIP = currentCase.getSleuthkitCase().getAttributeType("LS_FBLOGINPROTECT_UPDATED_IP");
                 }   
@@ -1112,8 +1112,8 @@ public class FacebookFileIngestModule implements FileIngestModule{
             
             for (LoginProtectionDataV2.loginProtection loginProtect:loginProtectionDataV2.login_protection_data_v2){
                 String name = loginProtect.name;
-                String createdDate = new TimestampToDate(loginProtect.session.createdDate).getDate();
-                String updatedTimeStamp = new TimestampToDate(loginProtect.session.updatedTimeStamp).getDate();
+                String createdDate = new TimestampToDate(loginProtect.session.created_timestamp).getDate();
+                String updatedTimeStamp = new TimestampToDate(loginProtect.session.updated_timestamp).getDate();
                 String ip = loginProtect.session.ip;
                                 
                 // add variables to attributes
