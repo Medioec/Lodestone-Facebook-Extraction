@@ -580,21 +580,21 @@ public class FacebookFileIngestModule implements FileIngestModule{
                     try{
                         // Create separate artifact type for marketplace interactions
                         if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_MARKETINTERACTIONS") == null){
-                            artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_MARKETINTERACTION", "Facebook Marketplace Interactions");
-                            artifactName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
-                            artifactDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description");
-                            artifactSubName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_NAME2", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name 2");
-                            artifactSubDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_DESCRIPTION2", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description 2");
-                            artifactAltDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTION_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Alt Date");
+                            artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_MARKETINTERACTIONS", "Facebook Marketplace Interactions");
+                            artifactName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                            artifactDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description");
+                            artifactSubName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_NAME2", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name 2");
+                            artifactSubDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_DESCRIPTION2", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description 2");
+                            artifactAltDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
 
                         }
                         else{
-                            artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_MARKETINTERACTION");
-                            artifactName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_NAME");
-                            artifactDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_DESCRIPTION");
-                            artifactSubName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_NAME2");
-                            artifactSubDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_DESCRIPTION2");
-                            artifactAltDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTION_DATE");
+                            artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_MARKETINTERACTIONS");
+                            artifactName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_NAME");
+                            artifactDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_DESCRIPTION");
+                            artifactSubName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_NAME2");
+                            artifactSubDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_DESCRIPTION2");
+                            artifactAltDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_DATE");
                         }
                     }
                     catch (TskCoreException | TskDataException e){
@@ -680,34 +680,87 @@ public class FacebookFileIngestModule implements FileIngestModule{
                 return;
             }
             for (RecentlyVisitedV2.recentLogins recentLog:recentlyVisitedV2.visited_things_v2){
-                String timeStamp = "";
-                String dataName = "";
-                String uri = "";
-                String value = "";
-                
-                String name = recentLog.name;
-                String description = recentLog.description;
+                if(recentLog.name.equals("Marketplace Visits")){
+                    // prepare variables for artifact
+                    BlackboardAttribute.Type artifactSubName;
+                    BlackboardAttribute.Type artifactSubDescription;
+                    BlackboardAttribute.Type artifactDate;
+                    try{
+                        // Create separate artifact type for marketplace interactions
+                        if (currentCase.getSleuthkitCase().getArtifactType("LS_FB_MARKETINTERACTIONS") == null){
+                            artifactType = currentCase.getSleuthkitCase().addBlackboardArtifactType("LS_FB_MARKETINTERACTIONS", "Facebook Marketplace Interactions");
+                            artifactName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_NAME", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name");
+                            artifactDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_DESCRIPTION", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description");
+                            artifactSubName = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_NAME2", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Name 2");
+                            artifactSubDescription = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_DESCRIPTION2", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Description 2");
+                            artifactDate = currentCase.getSleuthkitCase().addArtifactAttributeType("LS_FB_MARKETINTERACTIONS_DATE", TSK_BLACKBOARD_ATTRIBUTE_VALUE_TYPE.STRING, "Date");
 
-                 // add variables to attributes
-                Collection<BlackboardAttribute> attributelist = new ArrayList();
-                attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
-                attributelist.add(new BlackboardAttribute(artifactDescription, FacebookIngestModuleFactory.getModuleName(), description));
-                if (recentLog.entries != null){
-                    for (RecentlyVisitedV2.recentLogins.Entry entry:recentLog.entries){
-                        timeStamp = new TimestampToDate(entry.timestamp).getDate();
-                        dataName = entry.data.dataName;
-                        uri = entry.data.uri;
-                        value = entry.data.value;
-                        attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
-                        attributelist.add(new BlackboardAttribute(artifactDataName, FacebookIngestModuleFactory.getModuleName(), dataName));
-                        attributelist.add(new BlackboardAttribute(artifactURI, FacebookIngestModuleFactory.getModuleName(), uri));
-                        attributelist.add(new BlackboardAttribute(artifactValue, FacebookIngestModuleFactory.getModuleName(), value));
+                        }
+                        else{
+                            artifactType = currentCase.getSleuthkitCase().getArtifactType("LS_FB_MARKETINTERACTIONS");
+                            artifactName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_NAME");
+                            artifactDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_DESCRIPTION");
+                            artifactSubName = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_NAME2");
+                            artifactSubDescription = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_DESCRIPTION2");
+                            artifactDate = currentCase.getSleuthkitCase().getAttributeType("LS_FB_MARKETINTERACTIONS_DATE");
+                        }
+                    }
+                    catch (TskCoreException | TskDataException e){
+                        e.printStackTrace();
+                        return;
+                    }
+                    String name = recentLog.name;
+                    String description = recentLog.description;
+                    for(RecentlyVisitedV2.recentLogins.Entry entry:recentLog.entries){
+                        String empty = "";
+                        String date = entry.data.value;
+                            
+                        Collection<BlackboardAttribute> attributelist = new ArrayList();
+                        attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
+                        attributelist.add(new BlackboardAttribute(artifactDescription, FacebookIngestModuleFactory.getModuleName(), description));
+                        attributelist.add(new BlackboardAttribute(artifactSubName, FacebookIngestModuleFactory.getModuleName(), empty));
+                        attributelist.add(new BlackboardAttribute(artifactSubDescription, FacebookIngestModuleFactory.getModuleName(), empty));
+                        attributelist.add(new BlackboardAttribute(artifactDate, FacebookIngestModuleFactory.getModuleName(), date));
+
                         try{
                             blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
                         }
                         catch (TskCoreException | BlackboardException e){
                             e.printStackTrace();
                             return;
+                        }
+                    }
+                }
+                else{
+                    String timeStamp = "";
+                    String dataName = "";
+                    String uri = "";
+                    String value = "";
+
+                    String name = recentLog.name;
+                    String description = recentLog.description;
+
+                     // add variables to attributes
+                    Collection<BlackboardAttribute> attributelist = new ArrayList();
+                    attributelist.add(new BlackboardAttribute(artifactName, FacebookIngestModuleFactory.getModuleName(), name));
+                    attributelist.add(new BlackboardAttribute(artifactDescription, FacebookIngestModuleFactory.getModuleName(), description));
+                    if (recentLog.entries != null){
+                        for (RecentlyVisitedV2.recentLogins.Entry entry:recentLog.entries){
+                            timeStamp = new TimestampToDate(entry.timestamp).getDate();
+                            dataName = entry.data.dataName;
+                            uri = entry.data.uri;
+                            value = entry.data.value;
+                            attributelist.add(new BlackboardAttribute(artifactTimeStamp, FacebookIngestModuleFactory.getModuleName(), timeStamp));
+                            attributelist.add(new BlackboardAttribute(artifactDataName, FacebookIngestModuleFactory.getModuleName(), dataName));
+                            attributelist.add(new BlackboardAttribute(artifactURI, FacebookIngestModuleFactory.getModuleName(), uri));
+                            attributelist.add(new BlackboardAttribute(artifactValue, FacebookIngestModuleFactory.getModuleName(), value));
+                            try{
+                                blackboard.postArtifact(af.newDataArtifact(artifactType, attributelist), FacebookIngestModuleFactory.getModuleName());
+                            }
+                            catch (TskCoreException | BlackboardException e){
+                                e.printStackTrace();
+                                return;
+                            }
                         }
                     }
                 }
