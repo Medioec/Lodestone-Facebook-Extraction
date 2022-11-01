@@ -29,6 +29,7 @@ public class Message1 {
         public String type;
         public List<Image> photos;
         public Sticker sticker;
+        public List<File> files;
         public String share;
         public String is_unsent;
         public String is_taken_down;
@@ -38,6 +39,10 @@ public class Message1 {
         }
         public class Sticker {
             public String uri;
+        }
+        public class File {
+            public String uri;
+            public long creation_timestamp;
         }
     }
     public class Image {
