@@ -36,7 +36,7 @@ public class FacebookIngestModuleFactory extends IngestModuleFactoryAdapter{
 
     @Override
     public String getModuleDescription() {
-        String desc = "Produces artifacts from downlaoded Facebook information";
+        String desc = "Produces artifacts from Facebook Data JSON Export";
         return desc;
     }
 
