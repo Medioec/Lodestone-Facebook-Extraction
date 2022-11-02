@@ -117,6 +117,9 @@ public class addOnlineDataTask implements Runnable {
         ChromeOptions options = new ChromeOptions();
         //Add chrome switch to disable notification - "**--disable-notifications**"
         options.addArguments("--disable-notifications");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--headless");
+        
         
         try {
             Files.createDirectories(Paths.get(modDir));
@@ -192,6 +195,19 @@ public class addOnlineDataTask implements Runnable {
             //calls Datadownload method and set return as number of files
                 numF.setNumFiles(DataDownload(driver));
         }
+        //if download request too many; security prompt for password pops up
+//        try{
+//                //Wait until pending disappears
+//                WebElement pf = driver.findElement(By.xpath("//div[@class='x1i10hfl xggy1nq x1s07b3s x1kdt53j x1a2a7pz xjbqb8w x76ihet xwmqs3e x112ta8 xxxdfa6 x9f619 xzsf02u x1uxerd5 x1fcty0u x132q4wb x1a8lsjc x1pi30zi x1swvt13 x9desvi xh8yej3 x15h3p50 x10emqs4'][1]"));
+//                pf.click();
+//                WebElement confirmation = driver.findElement(By.xpath("//div[@class='x1lliihq x6ikm8r x10wlt62 x1n2onr6 xlyipyv xuxw1ft'][1]"));
+//                confirmation.click();
+//                }
+//        catch(Exception e){
+//                   System.out.println("No system prompts"); 
+//                }  
+//                //calls Datadownload method and set return as number of files
+//                numF.setNumFiles(DataDownload(driver)); 
  
         
         // number of zip files expected = before download count + facebook number of files to download
@@ -201,7 +217,7 @@ public class addOnlineDataTask implements Runnable {
         await().during(1000, MILLISECONDS).atMost(300, MINUTES).untilAsserted(() -> Assert.assertEquals(numberOfFilesToWait, CurrentNumOfZipFiles()));
         }
         catch (Exception e){
-             System.out.println("Download took too long, timeout error\n"+e);
+             System.out.println("Download took too long/Request still pending, please try to download again some time later as the request may still be pending\n"+e);
         }
         progressMonitor.setProgressText("Downloads complete");
         try{
@@ -310,6 +326,7 @@ public class addOnlineDataTask implements Runnable {
                     String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
                     String fileExpiry = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][5]")).getText();
                     //display file request details that it is attempting to download from
+                    //error around here
                     progressMonitor.setProgressText("Downloading file(s) "+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\nDownload: "+fileExpiry);
                         for (int i = 1; i < numFile+1; i++) 
                         {
@@ -325,12 +342,21 @@ public class addOnlineDataTask implements Runnable {
                                         + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
                                         + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
                             }
+//                             // number of zip files expected = before download count + facebook number of files to download
+//                            int numberOfFilesToWait = i-1;
+//                            //check if files are downloaded by comparing before and after number of zips
+//                            try{
+//                            await().during(1000, MILLISECONDS).atMost(300, MINUTES).untilAsserted(() -> Assert.assertEquals(numberOfFilesToWait, CurrentNumOfZipFiles()));
+//                            }
+//                            catch (Exception e){
+//                                 System.out.println("Download took too long/Request still pending, please try to download again some time later as the request may still be pending\n"+e);
+//                            }
                             Thread.sleep(600);
                         }
                 
                 }
             catch(InterruptedException e){
-               System.out.println(e);
+              e.printStackTrace();
             }  
          return noOfFiles;
     }
