@@ -11,7 +11,7 @@ import org.sleuthkit.datamodel.Host;
 @ServiceProvider(service = DataSourceProcessor.class)
 public class OnlineDataProcessor implements DataSourceProcessor {
 
-    private final String modulename = "Extraction data from online cloud sources";
+    private final String modulename = "Data extraction from Facebook via Selenium";
     private final OnlineDataProcessorPanel processorPanel;
     private final String projectDir; // For IDE release
 
