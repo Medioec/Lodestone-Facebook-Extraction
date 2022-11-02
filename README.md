@@ -1,5 +1,5 @@
 # Lodestone
-![Lodestone](https://user-images.githubusercontent.com/91124693/199464580-89170544-66a6-4aa4-b1cd-76bbd1e48ba8.png)
+![Lodestone](https://user-images.githubusercontent.com/91124693/199466991-e15412e7-4da0-4b38-85d3-159c78024f90.png)
 
 An autopsy plugin created for ICT2202 module
 
