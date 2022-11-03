@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.lodestone.facebooksource;
 
 import java.io.File;
@@ -52,6 +47,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import java.util.zip.ZipFile;
 import org.openide.util.Exceptions;
@@ -119,7 +115,7 @@ public class addOnlineDataTask implements Runnable {
         options.addArguments("--disable-notifications");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--headless");
-        
+   
         
         try {
             Files.createDirectories(Paths.get(modDir));
@@ -148,7 +144,6 @@ public class addOnlineDataTask implements Runnable {
         WebElement fb = driver.findElement(By.name("email"));
         fb.sendKeys(username);
         WebElement ps = driver.findElement(By.name("pass"));
-        //input ur own password and username
         ps.sendKeys(password);
         WebElement login = driver.findElement(By.name("login"));
         login.click();
@@ -166,10 +161,12 @@ public class addOnlineDataTask implements Runnable {
             }
         //Number of files read from FB description
         NumberOfFiles numF = new NumberOfFiles();
-        
         NumberOfFiles numCurrentZ = new NumberOfFiles();
         //set current number of zip files in dl directory using setNumFiles
         numCurrentZ.setNumFiles(CurrentNumOfZipFiles());
+        //stores the localfilepaths for the download in an array
+        localFilePaths = new ArrayList<>();
+        
         
         //if latest export, wait for pending status to finish and download the latest file instead of available ones(if any)
         if(LatestExport)
@@ -177,7 +174,6 @@ public class addOnlineDataTask implements Runnable {
             try{
                 //Wait until pending disappears
                 String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl'][1]")).getText();
-                
                 progressMonitor.setProgressText("Files pending for download, please wait");
                 if("Pending".equals(status))
                     {
@@ -195,30 +191,23 @@ public class addOnlineDataTask implements Runnable {
             //calls Datadownload method and set return as number of files
                 numF.setNumFiles(DataDownload(driver));
         }
-        //if download request too many; security prompt for password pops up
-//        try{
-//                //Wait until pending disappears
-//                WebElement pf = driver.findElement(By.xpath("//div[@class='x1i10hfl xggy1nq x1s07b3s x1kdt53j x1a2a7pz xjbqb8w x76ihet xwmqs3e x112ta8 xxxdfa6 x9f619 xzsf02u x1uxerd5 x1fcty0u x132q4wb x1a8lsjc x1pi30zi x1swvt13 x9desvi xh8yej3 x15h3p50 x10emqs4'][1]"));
-//                pf.click();
-//                WebElement confirmation = driver.findElement(By.xpath("//div[@class='x1lliihq x6ikm8r x10wlt62 x1n2onr6 xlyipyv xuxw1ft'][1]"));
-//                confirmation.click();
-//                }
-//        catch(Exception e){
-//                   System.out.println("No system prompts"); 
-//                }  
-//                //calls Datadownload method and set return as number of files
-//                numF.setNumFiles(DataDownload(driver)); 
- 
-        
+
+        // more efficient code for normal mode instead of headless mode used by chrome driver
         // number of zip files expected = before download count + facebook number of files to download
-        int numberOfFilesToWait = numCurrentZ.getNumFiles()+numF.getNumFiles();
+        //int numberOfFilesToWait = numCurrentZ.getNumFiles()+numF.getNumFiles();
         //check if files are downloaded by comparing before and after number of zips
-        try{
-        await().during(1000, MILLISECONDS).atMost(300, MINUTES).untilAsserted(() -> Assert.assertEquals(numberOfFilesToWait, CurrentNumOfZipFiles()));
-        }
-        catch (Exception e){
-             System.out.println("Download took too long/Request still pending, please try to download again some time later as the request may still be pending\n"+e);
-        }
+        //        try{
+        //        await().during(1000, MILLISECONDS).atMost(300, MINUTES).untilAsserted(() -> Assert.assertEquals(numberOfFilesToWait, CurrentNumOfZipFiles()));
+        //        }
+        //        catch (Exception e){
+        //             System.out.println("Download took too long/Request still pending, please try to download again some time later as the request may still be pending\n"+e);
+        //        }
+
+        //ensure paths in the array are unique only
+        HashSet<String> uniqueLocalFilePaths = new HashSet(localFilePaths);
+        List<String> uLocalFilePaths = new ArrayList<String>(uniqueLocalFilePaths);
+         System.out.println(uLocalFilePaths + " added as Data Source");
+        
         progressMonitor.setProgressText("Downloads complete");
         try{
             Thread.sleep(500);
@@ -227,44 +216,19 @@ public class addOnlineDataTask implements Runnable {
                System.out.println(e);
             }
         
- 
         errorList = new ArrayList<>();
         newDataSources = new ArrayList<>();
-        localFilePaths = new ArrayList<>();
-        
-        // Adding downloaded files as a Data Source
-        File downloadFolder = new File(modDir);
-        File[] listOfFiles = downloadFolder.listFiles();
-        
-        for (File file : listOfFiles) {
-            //unzipping files from downloadfolder dir after all downloads are completed.
-            UnZipFile uzfile = new UnZipFile();  
-            if(isZipFile(file.getAbsolutePath()))
-            {
-                progressMonitor.setProgressText("Unzipping downloaded files");
-                try {uzfile.UnZipFile(file.getAbsolutePath());} 
-                catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-      
-                  //newDir without ext name
-                String newFileDir = file.getAbsolutePath().replaceAll("\\.\\w+","");
-                //add unzipped files to localfilepaths list
-                localFilePaths.add(newFileDir);
-                System.out.println(newFileDir);
-            }
-        }
+   
         LocalFilesDataSource newDataSource;
         try {
             progressMonitor.setProgressText("Adding files to data source");
-            newDataSource = fileManager.addLocalFilesDataSource(UUID.randomUUID().toString(), newDataSourceName, "", host, localFilePaths, new ProgressUpdater());
+            newDataSource = fileManager.addLocalFilesDataSource(UUID.randomUUID().toString(), newDataSourceName, "", host, uLocalFilePaths, new ProgressUpdater());
             newDataSources.add(newDataSource);
         } catch (TskCoreException | TskDataException ex) {
             errorList.add(Bundle.addOnlineDataTask_error_add_files_dataSources());
             logger.log(Level.SEVERE, Bundle.addOnlineDataTask_error_add_files_dataSources());
             hasCriticalError = true;                    
         }
-        
         doCallBack();
     }
     //method to check current number of zipfiles in modDir
@@ -286,12 +250,10 @@ public class addOnlineDataTask implements Runnable {
     // getter and setter for numfiles
     public class NumberOfFiles {
        private int numfiles;
-
        // Getter
        public int getNumFiles() {
          return numfiles;
        }
-
        // Setter
        public void setNumFiles(int i) {
          this.numfiles = i;
@@ -326,7 +288,6 @@ public class addOnlineDataTask implements Runnable {
                     String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
                     String fileExpiry = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][5]")).getText();
                     //display file request details that it is attempting to download from
-                    //error around here
                     progressMonitor.setProgressText("Downloading file(s) "+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\nDownload: "+fileExpiry);
                         for (int i = 1; i < numFile+1; i++) 
                         {
@@ -335,6 +296,7 @@ public class addOnlineDataTask implements Runnable {
                             driver.findElement(By.cssSelector("[aria-label=Download]")).click();
                             //click on sub elements, if number of files exceed 1 means subelements are present in dropdownlist.
                             if(numFile > 1){
+                                progressMonitor.setProgressText("Downloading file "+"("+ i +")\t" +fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\nDownload: "+fileExpiry);
                                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
                                         + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
                                         + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")));
@@ -342,18 +304,40 @@ public class addOnlineDataTask implements Runnable {
                                         + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
                                         + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")).click();
                             }
-//                             // number of zip files expected = before download count + facebook number of files to download
-//                            int numberOfFilesToWait = i-1;
-//                            //check if files are downloaded by comparing before and after number of zips
-//                            try{
-//                            await().during(1000, MILLISECONDS).atMost(300, MINUTES).untilAsserted(() -> Assert.assertEquals(numberOfFilesToWait, CurrentNumOfZipFiles()));
-//                            }
-//                            catch (Exception e){
-//                                 System.out.println("Download took too long/Request still pending, please try to download again some time later as the request may still be pending\n"+e);
-//                            }
-                            Thread.sleep(600);
+                            Thread.sleep(500);
+                            
+                            //wait until 1 zip download is complete before resuming
+                            try{
+                            await().during(1000, MILLISECONDS).atMost(300, MINUTES).untilAsserted(() -> Assert.assertEquals(1, CurrentNumOfZipFiles()));
+                            }
+                            catch (Exception e){
+                                 System.out.println("Download took too long/Request still pending, please try to download again some time later as the request may still be pending\n"+e);
+                            }
+                             // Adding downloaded files as a Data Source
+                            File downloadFolder = new File(modDir);
+                            File[] listOfFiles = downloadFolder.listFiles();
+                                 for (File file : listOfFiles) 
+                                 {
+                                        //unzipping files from downloadfolder dir after all downloads are completed.
+                                        UnZipFile uzfile = new UnZipFile();
+                                        //check if its a zip file, if yes, unzip this file when done then del
+                                        if(isZipFile(file.getAbsolutePath()))
+                                        {
+                                            progressMonitor.setProgressText("Unzipping downloaded files");
+                                            try {uzfile.UnZipFile(file.getAbsolutePath());} 
+                                            catch (IOException ex) {
+                                                Exceptions.printStackTrace(ex);
+                                            }
+                                            //newDir without ext name for the unzipped file
+                                            String newFileDir = file.getAbsolutePath().replaceAll("\\.\\w+","");
+                                            //add unzipped files to localfilepaths list
+                                            localFilePaths.add(newFileDir);
+                                            //delete zip after unzipping
+                                            file.delete();                                           
+                                        }
+                                    }
+                            Thread.sleep(500);
                         }
-                
                 }
             catch(InterruptedException e){
               e.printStackTrace();
@@ -415,6 +399,4 @@ public class addOnlineDataTask implements Runnable {
             }
         }
     }
-    
-   
 }
