@@ -147,7 +147,14 @@ public class addOnlineDataTask implements Runnable {
         ps.sendKeys(password);
         WebElement login = driver.findElement(By.name("login"));
         login.click();
-        
+        WebDriverWait waitlogin = new WebDriverWait(driver, Duration.ofSeconds(15));
+        try{
+        waitlogin.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class='x1ye3gou xn6708d x1qughib x78zum5 x6s0dn4']")));
+        }
+        catch(Exception e){
+            errorList.add("Login Failed due to incorrect username or password");
+            doCallBack();
+            }
         //calls data request method
         DataRequest(driver,formatType,DataExport);
         //download files, if true wait if there is a pending request, if no pending request = download latest available file.
@@ -172,17 +179,20 @@ public class addOnlineDataTask implements Runnable {
         if(LatestExport)
         {
             try{
-                //Wait until pending disappears
+                //wait until any download button is available
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[aria-label=Download]")));
                 String status = driver.findElement(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl'][1]")).getText();
                 progressMonitor.setProgressText("Files pending for download, please wait");
                 if("Pending".equals(status))
                     {
+                        //Wait until pending disappears
                     wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[@class='x6s0dn4 x78zum5 x13a6bvl'][1]")));
                     Thread.sleep(600);
                     }
                 }
                 catch(Exception e){
-                   System.out.println("No Pending files available for download"); 
+                    errorList.add("No Pending files available for download");
+                    doCallBack();
                 }  
                 //calls Datadownload method and set return as number of files
                 numF.setNumFiles(DataDownload(driver));   
@@ -340,7 +350,8 @@ public class addOnlineDataTask implements Runnable {
                         }
                 }
             catch(InterruptedException e){
-              e.printStackTrace();
+              errorList.add("No  files available for download");
+              doCallBack();
             }  
          return noOfFiles;
     }
