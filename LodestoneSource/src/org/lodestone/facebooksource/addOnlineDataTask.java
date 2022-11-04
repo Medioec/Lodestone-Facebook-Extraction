@@ -298,7 +298,7 @@ public class addOnlineDataTask implements Runnable {
                     String fileQuality = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][3]")).getText();
                     String fileExpiry = driver.findElement(By.xpath("//span[@class='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1nxh6w3 x1sibtaa xo1l8bm xi81zsa'][5]")).getText();
                     //display file request details that it is attempting to download from
-                    progressMonitor.setProgressText("Downloading file(s) "+fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\nDownload: "+fileExpiry);
+                    progressMonitor.setProgressText("Downloading file(s) "+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\nDownload: "+fileExpiry);
                         for (int i = 1; i < numFile+1; i++) 
                         {
                             // click on the Download button as soon as the "Download" button is visible; else wait
@@ -306,7 +306,7 @@ public class addOnlineDataTask implements Runnable {
                             driver.findElement(By.cssSelector("[aria-label=Download]")).click();
                             //click on sub elements, if number of files exceed 1 means subelements are present in dropdownlist.
                             if(numFile > 1){
-                                progressMonitor.setProgressText("Downloading file "+"("+ i +")\t" +fileDate+"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\nDownload: "+fileExpiry);
+                                progressMonitor.setProgressText("Downloading file "+"("+ i +")\t" +"\n"+fileFormat+"\n"+fileQuality+"\n"+numFiles+"\nDownload: "+fileExpiry);
                                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@class='x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou xe8uvvx x1hl2dhg xggy1nq x1o1ewxj "
                                         + "x3x9cwd x1e5q0jg x13rtm0m x87ps6o x1lku1pv x1a2a7pz xjyslct x9f619 x1ypdohk x78zum5 x1q0g3np x2lah0s x1w4qvff "
                                         + "x13mpval xdj266r xat24cr xz9dl7a x1sxyh0 xsag5q8 xurb0ha x1n2onr6 x16tdsg8 x1ja2u2z x6s0dn4']["+i+"]")));
